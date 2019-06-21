@@ -20,11 +20,13 @@ my $gen_paws_pm    = 0;
 my $gen_classes    = 0;
 my $gen_docu_links = 0;
 my $gen_class_mapping = 0;
+my $list_files = 0;
 
 GetOptions ("paws_pm"    => \$gen_paws_pm,
             "classes"    => \$gen_classes,
             "docu_links" => \$gen_docu_links,
             "class_mapping" => \$gen_class_mapping,
+            "list_files" => \$list_files,
            )
 or die "Error in command line arguments\n";
 
@@ -42,6 +44,11 @@ if (not @files) {
     my $class_version = pop @class_defs;
     push @files, $class_version;
   }
+}
+
+if ($list_files) {
+  print $_, "\n" for @files;
+  exit 0;
 }
 
 if ($gen_paws_pm) {

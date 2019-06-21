@@ -32,7 +32,13 @@ gen-classes:
 	carton exec ./builder-bin/gen_classes.pl --class_mapping
 	mkdir -p auto-lib/Paws/DeleteMe
 	rm -r auto-lib/Paws/*
-	carton exec ./builder-bin/gen_classes.pl --paws_pm --classes
+	if [ x$(FAST_GEN) = x ]; then \
+	  carton exec ./builder-bin/gen_classes.pl --paws_pm --classes ; \
+	else \
+	  carton exec ./builder-bin/gen_classes.pl --paws_pm && \
+	  carton exec ./builder-bin/gen_classes.pl --list_files | \
+	    xargs -n1 -P$(FAST_GEN) -- carton exec ./builder-bin/gen_classes.pl --classes ; \
+	fi
 
 docu-links:
 	carton exec ./builder-bin/gen_classes.pl --class_mapping
