@@ -1,0 +1,4 @@
+  use MooseX::ClassAttribute;
+  class_has xml_keys =>(is => 'ro', default => '[% iclass.key.locationName || 'key' %]');
+  class_has xml_values =>(is => 'ro', default => '[% iclass.value.locationName || 'value' %]');
+

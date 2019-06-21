@@ -3,10 +3,7 @@ package [% inner_class %];
   use Moose;
   with 'Paws::API::StrToNativeMapParser';
 
-  use MooseX::ClassAttribute;
-  class_has xml_keys =>(is => 'ro', default => '[% iclass.key.locationName || 'key' %]');
-  class_has xml_values =>(is => 'ro', default => '[% iclass.value.locationName || 'value' %]');
-
+[% INCLUDE caller_map_attr.tt -%]
   has Map => (is => 'ro', isa => '[% map_class %]');
 1;
 
