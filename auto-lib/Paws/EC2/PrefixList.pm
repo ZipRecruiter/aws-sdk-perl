@@ -33,7 +33,7 @@ Use accessors for each attribute. If Att1 is expected to be an Paws::EC2::Prefix
 
 =head1 DESCRIPTION
 
-This class has no description
+Describes prefixes for AWS services.
 
 =head1 ATTRIBUTES
 

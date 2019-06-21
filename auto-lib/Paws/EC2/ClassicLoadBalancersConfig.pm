@@ -31,7 +31,9 @@ Use accessors for each attribute. If Att1 is expected to be an Paws::EC2::Classi
 
 =head1 DESCRIPTION
 
-This class has no description
+Describes the Classic Load Balancers to attach to a Spot Fleet. Spot
+Fleet registers the running Spot Instances with these Classic Load
+Balancers.
 
 =head1 ATTRIBUTES
 

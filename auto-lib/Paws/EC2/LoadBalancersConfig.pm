@@ -32,7 +32,8 @@ Use accessors for each attribute. If Att1 is expected to be an Paws::EC2::LoadBa
 
 =head1 DESCRIPTION
 
-This class has no description
+Describes the Classic Load Balancers and target groups to attach to a
+Spot Fleet request.
 
 =head1 ATTRIBUTES
 

@@ -35,7 +35,11 @@ Use accessors for each attribute. If Att1 is expected to be an Paws::EC2::Provis
 
 =head1 DESCRIPTION
 
-This class has no description
+Reserved. If you need to sustain traffic greater than the documented
+limits
+(https://docs.aws.amazon.com/AmazonVPC/latest/UserGuide/vpc-nat-gateway.html),
+contact us through the Support Center
+(https://console.aws.amazon.com/support/home?).
 
 =head1 ATTRIBUTES
 

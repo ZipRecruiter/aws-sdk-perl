@@ -31,7 +31,7 @@ Use accessors for each attribute. If Att1 is expected to be an Paws::EC2::Accoun
 
 =head1 DESCRIPTION
 
-This class has no description
+Describes a value of an account attribute.
 
 =head1 ATTRIBUTES
 

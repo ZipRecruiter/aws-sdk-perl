@@ -31,7 +31,7 @@ Use accessors for each attribute. If Att1 is expected to be an Paws::EC2::Launch
 
 =head1 DESCRIPTION
 
-This class has no description
+Indicates whether an instance is configured for hibernation.
 
 =head1 ATTRIBUTES
 

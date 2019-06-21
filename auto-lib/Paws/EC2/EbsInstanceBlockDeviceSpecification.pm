@@ -32,7 +32,8 @@ Use accessors for each attribute. If Att1 is expected to be an Paws::EC2::EbsIns
 
 =head1 DESCRIPTION
 
-This class has no description
+Describes information used to set up an EBS volume specified in a block
+device mapping.
 
 =head1 ATTRIBUTES
 

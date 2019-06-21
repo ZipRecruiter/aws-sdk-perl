@@ -33,7 +33,7 @@ Use accessors for each attribute. If Att1 is expected to be an Paws::EC2::VpcCid
 
 =head1 DESCRIPTION
 
-This class has no description
+Describes an IPv4 CIDR block associated with a VPC.
 
 =head1 ATTRIBUTES
 

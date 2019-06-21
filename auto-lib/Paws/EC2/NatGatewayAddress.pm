@@ -34,7 +34,8 @@ Use accessors for each attribute. If Att1 is expected to be an Paws::EC2::NatGat
 
 =head1 DESCRIPTION
 
-This class has no description
+Describes the IP addresses and network interface associated with a NAT
+gateway.
 
 =head1 ATTRIBUTES
 

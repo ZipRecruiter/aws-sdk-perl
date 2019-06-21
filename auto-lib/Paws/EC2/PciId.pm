@@ -34,7 +34,8 @@ Use accessors for each attribute. If Att1 is expected to be an Paws::EC2::PciId 
 
 =head1 DESCRIPTION
 
-This class has no description
+Describes the data that identifies an Amazon FPGA image (AFI) on the
+PCI bus.
 
 =head1 ATTRIBUTES
 

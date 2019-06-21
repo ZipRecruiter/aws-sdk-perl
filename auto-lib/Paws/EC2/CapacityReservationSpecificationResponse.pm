@@ -32,7 +32,13 @@ Use accessors for each attribute. If Att1 is expected to be an Paws::EC2::Capaci
 
 =head1 DESCRIPTION
 
-This class has no description
+Describes the instance's Capacity Reservation targeting preferences.
+The action returns the C<capacityReservationPreference> response
+element if the instance is configured to run in On-Demand capacity, or
+if it is configured in run in any C<open> Capacity Reservation that has
+matching attributes (instance type, platform, Availability Zone). The
+action returns the C<capacityReservationTarget> response element if the
+instance explicily targets a specific Capacity Reservation.
 
 =head1 ATTRIBUTES
 

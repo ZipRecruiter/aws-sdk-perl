@@ -32,7 +32,16 @@ Use accessors for each attribute. If Att1 is expected to be an Paws::EC2::Capaci
 
 =head1 DESCRIPTION
 
-This class has no description
+Describes an instance's Capacity Reservation targeting option. You can
+specify only one parameter at a time. If you specify
+C<CapacityReservationPreference> and C<CapacityReservationTarget>, the
+request fails.
+
+Use the C<CapacityReservationPreference> parameter to configure the
+instance to run as an On-Demand Instance or to run in any C<open>
+Capacity Reservation that has matching attributes (instance type,
+platform, Availability Zone). Use the C<CapacityReservationTarget>
+parameter to explicitly target a specific Capacity Reservation.
 
 =head1 ATTRIBUTES
 

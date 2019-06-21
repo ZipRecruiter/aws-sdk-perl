@@ -42,7 +42,10 @@ Use accessors for each attribute. If Att1 is expected to be an Paws::EC2::Volume
 
 =head1 DESCRIPTION
 
-This class has no description
+Describes the modification status of an EBS volume.
+
+If the volume has never been modified, some element values will be
+null.
 
 =head1 ATTRIBUTES
 

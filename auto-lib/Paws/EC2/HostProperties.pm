@@ -34,7 +34,7 @@ Use accessors for each attribute. If Att1 is expected to be an Paws::EC2::HostPr
 
 =head1 DESCRIPTION
 
-This class has no description
+Describes properties of a Dedicated Host.
 
 =head1 ATTRIBUTES
 

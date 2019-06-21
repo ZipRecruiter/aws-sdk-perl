@@ -32,7 +32,8 @@ Use accessors for each attribute. If Att1 is expected to be an Paws::EC2::Associ
 
 =head1 DESCRIPTION
 
-This class has no description
+Describes a target network that is associated with a Client VPN
+endpoint. A target network is a subnet in a VPC.
 
 =head1 ATTRIBUTES
 

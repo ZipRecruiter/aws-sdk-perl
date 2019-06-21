@@ -37,7 +37,7 @@ Use accessors for each attribute. If Att1 is expected to be an Paws::EC2::VpnGat
 
 =head1 DESCRIPTION
 
-This class has no description
+Describes a virtual private gateway.
 
 =head1 ATTRIBUTES
 

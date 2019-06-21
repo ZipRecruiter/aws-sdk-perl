@@ -32,7 +32,7 @@ Use accessors for each attribute. If Att1 is expected to be an Paws::EC2::VpnTun
 
 =head1 DESCRIPTION
 
-This class has no description
+The tunnel options for a VPN connection.
 
 =head1 ATTRIBUTES
 

@@ -34,7 +34,8 @@ Use accessors for each attribute. If Att1 is expected to be an Paws::EC2::Elasti
 
 =head1 DESCRIPTION
 
-This class has no description
+Describes the association between an instance and an elastic inference
+accelerator.
 
 =head1 ATTRIBUTES
 

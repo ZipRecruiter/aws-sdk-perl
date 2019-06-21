@@ -61,4 +61,3 @@ The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
-

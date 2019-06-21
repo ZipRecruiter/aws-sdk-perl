@@ -15,14 +15,14 @@ Each attribute should be used as a named argument in the calls that expect this 
 
 As an example, if Att1 is expected to be a [% inner_class %] object:
 
-  $service_obj->Method(Att1 => { [% shape.members.keys.sort.0 %] => $value, ..., [% shape.members.keys.sort.-1 %] => $value  });
+  $service_obj->Method(Att1 => { [% iclass.members.keys.sort.0 %] => $value, ..., [% iclass.members.keys.sort.-1 %] => $value  });
 
 =head3 Results returned from an API call
 
 Use accessors for each attribute. If Att1 is expected to be an [% inner_class %] object:
 
   $result = $service_obj->Method(...);
-  $result->Att1->[% shape.members.keys.sort.0 %]
+  $result->Att1->[% iclass.members.keys.sort.0 %]
 
 =head1 DESCRIPTION
 
@@ -30,11 +30,11 @@ Use accessors for each attribute. If Att1 is expected to be an [% inner_class %]
 
 =head1 ATTRIBUTES
 
-[% FOREACH param_name IN shape.members.keys.sort -%]
-  [%- member = c.shape(shape.members.$param_name.shape) %]
-=head2 [%- IF (c.required_in_shape(shape,param_name)) %]B<REQUIRED> [% END %][% param_name %] => [% c.perl_type_to_pod(member.perl_type) %]
+[% FOREACH param_name IN iclass.members.keys.sort -%]
+  [%- member = c.shape(iclass.members.$param_name.shape) %]
+=head2 [%- IF (c.required_in_shape(iclass,param_name)) %]B<REQUIRED> [% END %][% param_name %] => [% c.perl_type_to_pod(member.perl_type) %]
 
-  [% c.doc_for_param_name_in_shape(shape, param_name) %]
+  [% c.doc_for_param_name_in_shape(iclass, param_name) %]
 
 [% END %]
 

@@ -39,7 +39,7 @@ Use accessors for each attribute. If Att1 is expected to be an Paws::EC2::Servic
 
 =head1 DESCRIPTION
 
-This class has no description
+Describes a service configuration for a VPC endpoint service.
 
 =head1 ATTRIBUTES
 

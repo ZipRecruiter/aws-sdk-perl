@@ -1169,7 +1169,7 @@ package Paws::API::Builder {
         die "Unrecognized Map type in query API " . Dumper($iclass) . ' keys_shape ' . Dumper($keys_shape) . ' values_shape' . Dumper($values_shape);
       }
     } elsif ($iclass->{type} eq 'structure') {
-      $self->process_template('object.tt', { c => $self, shape => $iclass, inner_class => $inner_class });
+      $self->process_template('object.tt', { c => $self, iclass => $iclass, inner_class => $inner_class });
     }
   }
 }

@@ -36,7 +36,8 @@ Use accessors for each attribute. If Att1 is expected to be an Paws::EC2::StaleS
 
 =head1 DESCRIPTION
 
-This class has no description
+Describes a stale security group (a security group that contains stale
+rules).
 
 =head1 ATTRIBUTES
 

@@ -34,7 +34,7 @@ Use accessors for each attribute. If Att1 is expected to be an Paws::EC2::Create
 
 =head1 DESCRIPTION
 
-This class has no description
+Describes the instances that could not be launched by the fleet.
 
 =head1 ATTRIBUTES
 

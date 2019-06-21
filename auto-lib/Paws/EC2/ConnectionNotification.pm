@@ -37,7 +37,8 @@ Use accessors for each attribute. If Att1 is expected to be an Paws::EC2::Connec
 
 =head1 DESCRIPTION
 
-This class has no description
+Describes a connection notification for a VPC endpoint or VPC endpoint
+service.
 
 =head1 ATTRIBUTES
 

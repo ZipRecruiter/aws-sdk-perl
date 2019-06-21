@@ -44,7 +44,11 @@ Use accessors for each attribute. If Att1 is expected to be an Paws::EC2::Schedu
 
 =head1 DESCRIPTION
 
-This class has no description
+Describes the launch specification for a Scheduled Instance.
+
+If you are launching the Scheduled Instance in EC2-VPC, you must
+specify the ID of the subnet. You can specify the subnet using either
+C<SubnetId> or C<NetworkInterface>.
 
 =head1 ATTRIBUTES
 

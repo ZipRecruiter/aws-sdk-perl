@@ -31,7 +31,7 @@ Use accessors for each attribute. If Att1 is expected to be an Paws::EC2::Credit
 
 =head1 DESCRIPTION
 
-This class has no description
+Describes the credit option for CPU usage of a T2 or T3 instance.
 
 =head1 ATTRIBUTES
 

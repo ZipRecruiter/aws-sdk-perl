@@ -31,7 +31,8 @@ Use accessors for each attribute. If Att1 is expected to be an Paws::EC2::Target
 
 =head1 DESCRIPTION
 
-This class has no description
+Describes the target groups to attach to a Spot Fleet. Spot Fleet
+registers the running Spot Instances with these target groups.
 
 =head1 ATTRIBUTES
 

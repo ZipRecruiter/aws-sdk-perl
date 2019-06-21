@@ -32,7 +32,8 @@ Use accessors for each attribute. If Att1 is expected to be an Paws::EC2::FpgaIm
 
 =head1 DESCRIPTION
 
-This class has no description
+Describes the state of the bitstream generation process for an Amazon
+FPGA image (AFI).
 
 =head1 ATTRIBUTES
 

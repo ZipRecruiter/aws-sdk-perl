@@ -33,7 +33,10 @@ Use accessors for each attribute. If Att1 is expected to be an Paws::EC2::Client
 
 =head1 DESCRIPTION
 
-This class has no description
+Describes the authentication methods used by a Client VPN endpoint.
+Client VPN supports Active Directory and mutual authentication. For
+more information, see Authentication in the I<AWS Client VPN Admin
+Guide>.
 
 =head1 ATTRIBUTES
 

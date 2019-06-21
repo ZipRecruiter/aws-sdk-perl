@@ -34,7 +34,8 @@ Use accessors for each attribute. If Att1 is expected to be an Paws::EC2::ByoipC
 
 =head1 DESCRIPTION
 
-This class has no description
+Information about an address range that is provisioned for use with
+your AWS resources through bring your own IP addresses (BYOIP).
 
 =head1 ATTRIBUTES
 

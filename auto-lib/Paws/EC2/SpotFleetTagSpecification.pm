@@ -32,7 +32,7 @@ Use accessors for each attribute. If Att1 is expected to be an Paws::EC2::SpotFl
 
 =head1 DESCRIPTION
 
-This class has no description
+The tags for a Spot Fleet resource.
 
 =head1 ATTRIBUTES
 

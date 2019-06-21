@@ -32,7 +32,7 @@ Use accessors for each attribute. If Att1 is expected to be an Paws::EC2::Create
 
 =head1 DESCRIPTION
 
-This class has no description
+Describes modifications to the permissions for a volume.
 
 =head1 ATTRIBUTES
 

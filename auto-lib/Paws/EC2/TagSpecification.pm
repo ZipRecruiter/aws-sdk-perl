@@ -32,7 +32,7 @@ Use accessors for each attribute. If Att1 is expected to be an Paws::EC2::TagSpe
 
 =head1 DESCRIPTION
 
-This class has no description
+The tags to apply to a resource when the resource is being created.
 
 =head1 ATTRIBUTES
 

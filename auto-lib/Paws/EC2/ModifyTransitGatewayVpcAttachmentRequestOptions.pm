@@ -32,7 +32,7 @@ Use accessors for each attribute. If Att1 is expected to be an Paws::EC2::Modify
 
 =head1 DESCRIPTION
 
-This class has no description
+Describes the options for a VPC attachment.
 
 =head1 ATTRIBUTES
 

@@ -32,7 +32,8 @@ Use accessors for each attribute. If Att1 is expected to be an Paws::EC2::CidrAu
 
 =head1 DESCRIPTION
 
-This class has no description
+Provides authorization for Amazon to bring a specific IP address range
+to a specific AWS account using bring your own IP addresses (BYOIP).
 
 =head1 ATTRIBUTES
 

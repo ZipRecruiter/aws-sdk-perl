@@ -32,7 +32,7 @@ Use accessors for each attribute. If Att1 is expected to be an Paws::EC2::Instan
 
 =head1 DESCRIPTION
 
-This class has no description
+Describes an instance to export.
 
 =head1 ATTRIBUTES
 

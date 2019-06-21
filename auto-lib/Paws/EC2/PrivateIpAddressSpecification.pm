@@ -32,7 +32,7 @@ Use accessors for each attribute. If Att1 is expected to be an Paws::EC2::Privat
 
 =head1 DESCRIPTION
 
-This class has no description
+Describes a secondary private IPv4 address for a network interface.
 
 =head1 ATTRIBUTES
 

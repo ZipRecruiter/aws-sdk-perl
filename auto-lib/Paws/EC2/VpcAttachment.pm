@@ -32,7 +32,7 @@ Use accessors for each attribute. If Att1 is expected to be an Paws::EC2::VpcAtt
 
 =head1 DESCRIPTION
 
-This class has no description
+Describes an attachment between a virtual private gateway and a VPC.
 
 =head1 ATTRIBUTES
 

@@ -35,7 +35,8 @@ Use accessors for each attribute. If Att1 is expected to be an Paws::EC2::SpotPr
 
 =head1 DESCRIPTION
 
-This class has no description
+Describes the maximum price per hour that you are willing to pay for a
+Spot Instance.
 
 =head1 ATTRIBUTES
 

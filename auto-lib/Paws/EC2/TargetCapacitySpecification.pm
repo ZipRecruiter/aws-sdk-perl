@@ -34,7 +34,11 @@ Use accessors for each attribute. If Att1 is expected to be an Paws::EC2::Target
 
 =head1 DESCRIPTION
 
-This class has no description
+The number of units to request. You can choose to set the target
+capacity in terms of instances or a performance characteristic that is
+important to your application workload, such as vCPUs, memory, or I/O.
+If the request type is C<maintain>, you can specify a target capacity
+of 0 and add capacity later.
 
 =head1 ATTRIBUTES
 

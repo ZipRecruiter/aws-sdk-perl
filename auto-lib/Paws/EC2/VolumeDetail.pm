@@ -31,7 +31,7 @@ Use accessors for each attribute. If Att1 is expected to be an Paws::EC2::Volume
 
 =head1 DESCRIPTION
 
-This class has no description
+Describes an EBS volume.
 
 =head1 ATTRIBUTES
 

@@ -34,7 +34,7 @@ Use accessors for each attribute. If Att1 is expected to be an Paws::EC2::Classi
 
 =head1 DESCRIPTION
 
-This class has no description
+Describes a linked EC2-Classic instance.
 
 =head1 ATTRIBUTES
 

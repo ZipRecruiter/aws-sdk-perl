@@ -40,7 +40,7 @@ Use accessors for each attribute. If Att1 is expected to be an Paws::EC2::Transi
 
 =head1 DESCRIPTION
 
-This class has no description
+Describes an attachment between a resource and a transit gateway.
 
 =head1 ATTRIBUTES
 

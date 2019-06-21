@@ -55,7 +55,7 @@ Use accessors for each attribute. If Att1 is expected to be an Paws::EC2::Reques
 
 =head1 DESCRIPTION
 
-This class has no description
+The information to include in the launch template.
 
 =head1 ATTRIBUTES
 

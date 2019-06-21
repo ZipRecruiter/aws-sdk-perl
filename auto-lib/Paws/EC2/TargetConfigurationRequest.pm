@@ -32,7 +32,7 @@ Use accessors for each attribute. If Att1 is expected to be an Paws::EC2::Target
 
 =head1 DESCRIPTION
 
-This class has no description
+Details about the target configuration.
 
 =head1 ATTRIBUTES
 

@@ -31,7 +31,7 @@ Use accessors for each attribute. If Att1 is expected to be an Paws::EC2::Elasti
 
 =head1 DESCRIPTION
 
-This class has no description
+A specification for an Elastic Graphics accelerator.
 
 =head1 ATTRIBUTES
 

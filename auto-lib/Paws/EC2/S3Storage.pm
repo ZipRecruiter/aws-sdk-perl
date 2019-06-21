@@ -35,7 +35,8 @@ Use accessors for each attribute. If Att1 is expected to be an Paws::EC2::S3Stor
 
 =head1 DESCRIPTION
 
-This class has no description
+Describes the storage parameters for S3 and S3 buckets for an instance
+store-backed AMI.
 
 =head1 ATTRIBUTES
 

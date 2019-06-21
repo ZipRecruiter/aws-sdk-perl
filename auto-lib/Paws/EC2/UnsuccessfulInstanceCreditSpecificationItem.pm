@@ -32,7 +32,8 @@ Use accessors for each attribute. If Att1 is expected to be an Paws::EC2::Unsucc
 
 =head1 DESCRIPTION
 
-This class has no description
+Describes the T2 or T3 instance whose credit option for CPU usage was
+not modified.
 
 =head1 ATTRIBUTES
 

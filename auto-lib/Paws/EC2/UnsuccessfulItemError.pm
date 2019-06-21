@@ -32,7 +32,9 @@ Use accessors for each attribute. If Att1 is expected to be an Paws::EC2::Unsucc
 
 =head1 DESCRIPTION
 
-This class has no description
+Information about the error that occurred. For more information about
+errors, see Error Codes
+(https://docs.aws.amazon.com/AWSEC2/latest/APIReference/errors-overview.html).
 
 =head1 ATTRIBUTES
 

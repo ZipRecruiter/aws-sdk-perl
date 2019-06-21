@@ -31,7 +31,11 @@ Use accessors for each attribute. If Att1 is expected to be an Paws::EC2::Launch
 
 =head1 DESCRIPTION
 
-This class has no description
+Indicates whether the instance is configured for hibernation. This
+parameter is valid only if the instance meets the hibernation
+prerequisites
+(https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/Hibernate.html#hibernating-prerequisites).
+Hibernation is currently supported only for Amazon Linux.
 
 =head1 ATTRIBUTES
 

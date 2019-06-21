@@ -32,7 +32,7 @@ Use accessors for each attribute. If Att1 is expected to be an Paws::EC2::Target
 
 =head1 DESCRIPTION
 
-This class has no description
+Information about the Convertible Reserved Instance offering.
 
 =head1 ATTRIBUTES
 

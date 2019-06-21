@@ -32,7 +32,7 @@ Use accessors for each attribute. If Att1 is expected to be an Paws::EC2::Purcha
 
 =head1 DESCRIPTION
 
-This class has no description
+Describes a request to purchase Scheduled Instances.
 
 =head1 ATTRIBUTES
 

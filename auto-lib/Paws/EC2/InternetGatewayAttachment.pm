@@ -32,7 +32,8 @@ Use accessors for each attribute. If Att1 is expected to be an Paws::EC2::Intern
 
 =head1 DESCRIPTION
 
-This class has no description
+Describes the attachment of a VPC to an internet gateway or an
+egress-only internet gateway.
 
 =head1 ATTRIBUTES
 

@@ -32,7 +32,56 @@ Use accessors for each attribute. If Att1 is expected to be an Paws::EC2::Filter
 
 =head1 DESCRIPTION
 
-This class has no description
+A filter name and value pair that is used to return a more specific
+list of results from a describe operation. Filters can be used to match
+a set of resources by specific criteria, such as tags, attributes, or
+IDs. The filters supported by a describe operation are documented with
+the describe operation. For example:
+
+=over
+
+=item *
+
+DescribeAvailabilityZones
+
+=item *
+
+DescribeImages
+
+=item *
+
+DescribeInstances
+
+=item *
+
+DescribeKeyPairs
+
+=item *
+
+DescribeSecurityGroups
+
+=item *
+
+DescribeSnapshots
+
+=item *
+
+DescribeSubnets
+
+=item *
+
+DescribeTags
+
+=item *
+
+DescribeVolumes
+
+=item *
+
+DescribeVpcs
+
+=back
+
 
 =head1 ATTRIBUTES
 

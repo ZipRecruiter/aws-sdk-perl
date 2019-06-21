@@ -32,7 +32,8 @@ Use accessors for each attribute. If Att1 is expected to be an Paws::EC2::SlotDa
 
 =head1 DESCRIPTION
 
-This class has no description
+Describes the time period for a Scheduled Instance to start its first
+schedule. The time period must span less than one day.
 
 =head1 ATTRIBUTES
 

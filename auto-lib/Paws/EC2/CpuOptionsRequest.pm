@@ -32,7 +32,8 @@ Use accessors for each attribute. If Att1 is expected to be an Paws::EC2::CpuOpt
 
 =head1 DESCRIPTION
 
-This class has no description
+The CPU options for the instance. Both the core count and threads per
+core must be specified in the request.
 
 =head1 ATTRIBUTES
 

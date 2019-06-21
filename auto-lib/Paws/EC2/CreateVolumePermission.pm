@@ -32,7 +32,8 @@ Use accessors for each attribute. If Att1 is expected to be an Paws::EC2::Create
 
 =head1 DESCRIPTION
 
-This class has no description
+Describes the user or group to be added or removed from the permissions
+for a volume.
 
 =head1 ATTRIBUTES
 

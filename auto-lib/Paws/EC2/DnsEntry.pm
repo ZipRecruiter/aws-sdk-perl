@@ -32,7 +32,7 @@ Use accessors for each attribute. If Att1 is expected to be an Paws::EC2::DnsEnt
 
 =head1 DESCRIPTION
 
-This class has no description
+Describes a DNS entry.
 
 =head1 ATTRIBUTES
 

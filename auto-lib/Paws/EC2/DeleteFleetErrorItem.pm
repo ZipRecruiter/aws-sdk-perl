@@ -32,7 +32,7 @@ Use accessors for each attribute. If Att1 is expected to be an Paws::EC2::Delete
 
 =head1 DESCRIPTION
 
-This class has no description
+Describes an EC2 Fleet that was not successfully deleted.
 
 =head1 ATTRIBUTES
 
