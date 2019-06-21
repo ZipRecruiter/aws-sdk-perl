@@ -153,7 +153,7 @@ You shouldn't make instances of this class. Each attribute should be used as a n
                     },
                     ...
                   ],
-                  OutputChannel => 1,       # max: 7; OPTIONAL
+                  OutputChannel => 1,       # max: 7
 
                 },
                 ...
@@ -188,11 +188,11 @@ You shouldn't make instances of this class. Each attribute should be used as a n
                     CaptionChannel => 1,    # min: 1, max: 4
                     LanguageCode =>
                       'My__stringMin3Max3',    # min: 3, max: 3; OPTIONAL
-                    LanguageDescription => 'My__stringMin1',  # min: 1; OPTIONAL
+                    LanguageDescription => 'My__stringMin1',    # min: 1
 
                   },
                   ...
-                ],                                            # OPTIONAL
+                ],                                              # OPTIONAL
                 CaptionLanguageSetting =>
                   'INSERT',    # values: INSERT, NONE, OMIT; OPTIONAL
                 ClientCache => 'DISABLED', # values: DISABLED, ENABLED; OPTIONAL
@@ -458,7 +458,7 @@ You shouldn't make instances of this class. Each attribute should be used as a n
                         AudioRenditionSets => 'My__string',
                       },    # OPTIONAL
                     },
-                    NameModifier    => 'My__stringMin1',    # min: 1; OPTIONAL
+                    NameModifier    => 'My__stringMin1',    # min: 1
                     SegmentModifier => 'My__string',
                   },    # OPTIONAL
                   MsSmoothOutputSettings => { NameModifier => 'My__string', }
@@ -603,7 +603,7 @@ You shouldn't make instances of this class. Each attribute should be used as a n
                 GopBReference =>
                   'DISABLED',    # values: DISABLED, ENABLED; OPTIONAL
                 GopClosedCadence => 1,    # OPTIONAL
-                GopNumBFrames    => 1,    # max: 7; OPTIONAL
+                GopNumBFrames    => 1,    # max: 7
                 GopSize          => 1,    # OPTIONAL
                 GopSizeUnits => 'FRAMES', # values: FRAMES, SECONDS; OPTIONAL
                 Level => 'H264_LEVEL_1'
@@ -814,7 +814,7 @@ You shouldn't make instances of this class. Each attribute should be used as a n
           InputSettings       => {
             AudioSelectors => [
               {
-                Name             => 'My__stringMin1',    # min: 1; OPTIONAL
+                Name             => 'My__stringMin1',    # min: 1
                 SelectorSettings => {
                   AudioLanguageSelection => {
                     LanguageCode => 'My__string',
@@ -831,7 +831,7 @@ You shouldn't make instances of this class. Each attribute should be used as a n
             ],        # OPTIONAL
             CaptionSelectors => [
               {
-                Name             => 'My__stringMin1',    # min: 1; OPTIONAL
+                Name             => 'My__stringMin1',    # min: 1
                 LanguageCode     => 'My__string',
                 SelectorSettings => {
                   AribSourceSettings => {

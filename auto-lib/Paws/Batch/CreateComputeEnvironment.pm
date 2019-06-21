@@ -32,10 +32,10 @@ You shouldn't make instances of this class. Each attribute should be used as a n
 =head1 SYNOPSIS
 
     my $batch = Paws->service('Batch');
-    # To create a managed EC2 compute environment
-    # This example creates a managed compute environment with specific C4
-    # instance types that are launched on demand. The compute environment is
-    # called C4OnDemand.
+  # To create a managed EC2 compute environment
+  # This example creates a managed compute environment with specific C4 instance
+  # types that are launched on demand. The compute environment is called
+  # C4OnDemand.
     my $CreateComputeEnvironmentResponse = $batch->CreateComputeEnvironment(
       'ComputeEnvironmentName' => 'C4OnDemand',
       'ComputeResources'       => {
@@ -65,12 +65,11 @@ You shouldn't make instances of this class. Each attribute should be used as a n
     my $computeEnvironmentName =
       $CreateComputeEnvironmentResponse->computeEnvironmentName;
 
-    # Returns a L<Paws::Batch::CreateComputeEnvironmentResponse> object.
-    # To create a managed EC2 Spot compute environment
-    # This example creates a managed compute environment with the M4 instance
-    # type that is launched when the Spot bid price is at or below 20% of the
-    # On-Demand price for the instance type. The compute environment is called
-    # M4Spot.
+  # Returns a L<Paws::Batch::CreateComputeEnvironmentResponse> object.
+  # To create a managed EC2 Spot compute environment
+  # This example creates a managed compute environment with the M4 instance type
+  # that is launched when the Spot bid price is at or below 20% of the On-Demand
+  # price for the instance type. The compute environment is called M4Spot.
     my $CreateComputeEnvironmentResponse = $batch->CreateComputeEnvironment(
       'ComputeEnvironmentName' => 'M4Spot',
       'ComputeResources'       => {

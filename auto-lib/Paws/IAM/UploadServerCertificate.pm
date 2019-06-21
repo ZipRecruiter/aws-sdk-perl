@@ -31,9 +31,9 @@ You shouldn't make instances of this class. Each attribute should be used as a n
 =head1 SYNOPSIS
 
     my $iam = Paws->service('IAM');
-    # To upload a server certificate to your AWS account
-    # The following upload-server-certificate command uploads a server
-    # certificate to your AWS account:
+  # To upload a server certificate to your AWS account
+  # The following upload-server-certificate command uploads a server certificate
+  # to your AWS account:
     my $UploadServerCertificateResponse = $iam->UploadServerCertificate(
       'CertificateBody' =>
 '-----BEGIN CERTIFICATE-----<a very long certificate text string>-----END CERTIFICATE-----',

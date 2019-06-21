@@ -70,7 +70,7 @@ You shouldn't make instances of this class. Each attribute should be used as a n
                 , # values: ENG, SPA, FRA, DEU, GER, ZHO, ARA, HIN, JPN, RUS, POR, ITA, URD, VIE, KOR, PAN, ABK, AAR, AFR, AKA, SQI, AMH, ARG, HYE, ASM, AVA, AVE, AYM, AZE, BAM, BAK, EUS, BEL, BEN, BIH, BIS, BOS, BRE, BUL, MYA, CAT, KHM, CHA, CHE, NYA, CHU, CHV, COR, COS, CRE, HRV, CES, DAN, DIV, NLD, DZO, ENM, EPO, EST, EWE, FAO, FIJ, FIN, FRM, FUL, GLA, GLG, LUG, KAT, ELL, GRN, GUJ, HAT, HAU, HEB, HER, HMO, HUN, ISL, IDO, IBO, IND, INA, ILE, IKU, IPK, GLE, JAV, KAL, KAN, KAU, KAS, KAZ, KIK, KIN, KIR, KOM, KON, KUA, KUR, LAO, LAT, LAV, LIM, LIN, LIT, LUB, LTZ, MKD, MLG, MSA, MAL, MLT, GLV, MRI, MAR, MAH, MON, NAU, NAV, NDE, NBL, NDO, NEP, SME, NOR, NOB, NNO, OCI, OJI, ORI, ORM, OSS, PLI, FAS, POL, PUS, QUE, QAA, RON, ROH, RUN, SMO, SAG, SAN, SRD, SRB, SNA, III, SND, SIN, SLK, SLV, SOM, SOT, SUN, SWA, SSW, SWE, TGL, TAH, TGK, TAM, TAT, TEL, THA, BOD, TIR, TON, TSO, TSN, TUR, TUK, TWI, UIG, UKR, UZB, VEN, VOL, WLN, CYM, FRY, WOL, XHO, YID, YOR, ZHA, ZUL, ORJ, QPC, TNG; OPTIONAL
                 Offset => 1,    # min: -2147483648, max: 2147483647; OPTIONAL
                 Pids   => [
-                  1, ...        # min: 1, max: 2147483647; OPTIONAL
+                  1, ...        # min: 1, max: 2147483647
                 ],              # OPTIONAL
                 ProgramSelection => 1,    # max: 8; OPTIONAL
                 RemixSettings    => {
@@ -90,7 +90,7 @@ You shouldn't make instances of this class. Each attribute should be used as a n
                 SelectorType =>
                   'PID',    # values: PID, TRACK, LANGUAGE_CODE; OPTIONAL
                 Tracks => [
-                  1, ...    # min: 1, max: 2147483647; OPTIONAL
+                  1, ...    # min: 1, max: 2147483647
                 ],          # OPTIONAL
               },
             },    # OPTIONAL
@@ -106,7 +106,7 @@ You shouldn't make instances of this class. Each attribute should be used as a n
                       1,    # min: 1, max: 4; OPTIONAL
                   },    # OPTIONAL
                   DvbSubSourceSettings => {
-                    Pid => 1,    # min: 1, max: 2147483647; OPTIONAL
+                    Pid => 1,    # min: 1, max: 2147483647
                   },    # OPTIONAL
                   EmbeddedSourceSettings => {
                     Convert608To708 =>
@@ -130,7 +130,7 @@ You shouldn't make instances of this class. Each attribute should be used as a n
                     ,    # min: 3, max: 3; OPTIONAL
                   },    # OPTIONAL
                   TrackSourceSettings => {
-                    TrackNumber => 1,    # min: 1, max: 2147483647; OPTIONAL
+                    TrackNumber => 1,    # min: 1, max: 2147483647
                   },    # OPTIONAL
                 },    # OPTIONAL
               },
@@ -167,7 +167,7 @@ You shouldn't make instances of this class. Each attribute should be used as a n
               },
               ...
             ],                                                        # OPTIONAL
-            ProgramNumber => 1,    # min: 1, max: 2147483647; OPTIONAL
+            ProgramNumber => 1,    # min: 1, max: 2147483647
             PsiControl => 'IGNORE_PSI',  # values: IGNORE_PSI, USE_PSI; OPTIONAL
             TimecodeSource => 'EMBEDDED'
             ,    # values: EMBEDDED, ZEROBASED, SPECIFIEDSTART; OPTIONAL
@@ -189,7 +189,7 @@ You shouldn't make instances of this class. Each attribute should be used as a n
                 WhitePointX               => 1,    # max: 50000; OPTIONAL
                 WhitePointY               => 1,    # max: 50000; OPTIONAL
               },    # OPTIONAL
-              Pid           => 1,  # min: 1, max: 2147483647; OPTIONAL
+              Pid           => 1,  # min: 1, max: 2147483647
               ProgramNumber => 1,  # min: -2147483648, max: 2147483647; OPTIONAL
             },    # OPTIONAL
           },
@@ -243,7 +243,7 @@ You shouldn't make instances of this class. Each attribute should be used as a n
                   },    # OPTIONAL
                   Type => 'STATIC_KEY',    # values: STATIC_KEY; OPTIONAL
                 },    # OPTIONAL
-                FragmentLength => 1,    # min: 1, max: 2147483647; OPTIONAL
+                FragmentLength      => 1,         # min: 1, max: 2147483647
                 ManifestCompression => 'GZIP',    # values: GZIP, NONE; OPTIONAL
                 ManifestDurationFormat =>
                   'FLOATING_POINT',  # values: FLOATING_POINT, INTEGER; OPTIONAL
@@ -251,7 +251,7 @@ You shouldn't make instances of this class. Each attribute should be used as a n
                 MinFinalSegmentLength => 1,    # OPTIONAL
                 SegmentControl => 'SINGLE_FILE'
                 ,    # values: SINGLE_FILE, SEGMENTED_FILES; OPTIONAL
-                SegmentLength => 1,    # min: 1, max: 2147483647; OPTIONAL
+                SegmentLength => 1,    # min: 1, max: 2147483647
                 StreamInfResolution =>
                   'INCLUDE',           # values: INCLUDE, EXCLUDE; OPTIONAL
                 WriteDashManifest =>
@@ -274,13 +274,13 @@ You shouldn't make instances of this class. Each attribute should be used as a n
                     Url => 'My__stringPatternHttps',        # OPTIONAL
                   },    # OPTIONAL
                 },    # OPTIONAL
-                FragmentLength => 1,    # min: 1, max: 2147483647; OPTIONAL
+                FragmentLength => 1,    # min: 1, max: 2147483647
                 HbbtvCompliance =>
                   'HBBTV_1_5',          # values: HBBTV_1_5, NONE; OPTIONAL
                 MinBufferTime  => 1,              # max: 2147483647; OPTIONAL
                 SegmentControl => 'SINGLE_FILE'
                 ,    # values: SINGLE_FILE, SEGMENTED_FILES; OPTIONAL
-                SegmentLength => 1,    # min: 1, max: 2147483647; OPTIONAL
+                SegmentLength => 1,    # min: 1, max: 2147483647
                 WriteSegmentTimelineInRepresentation =>
                   'ENABLED',           # values: ENABLED, DISABLED; OPTIONAL
               },    # OPTIONAL
@@ -351,17 +351,16 @@ You shouldn't make instances of this class. Each attribute should be used as a n
                 ProgramDateTimePeriod => 1,              # max: 3600; OPTIONAL
                 SegmentControl        => 'SINGLE_FILE'
                 ,    # values: SINGLE_FILE, SEGMENTED_FILES; OPTIONAL
-                SegmentLength => 1,    # min: 1, max: 2147483647; OPTIONAL
-                SegmentsPerSubdirectory =>
-                  1,                   # min: 1, max: 2147483647; OPTIONAL
+                SegmentLength           => 1,    # min: 1, max: 2147483647
+                SegmentsPerSubdirectory => 1,    # min: 1, max: 2147483647
                 StreamInfResolution =>
-                  'INCLUDE',           # values: INCLUDE, EXCLUDE; OPTIONAL
+                  'INCLUDE',    # values: INCLUDE, EXCLUDE; OPTIONAL
                 TimedMetadataId3Frame =>
-                  'NONE',              # values: NONE, PRIV, TDRL; OPTIONAL
+                  'NONE',       # values: NONE, PRIV, TDRL; OPTIONAL
                 TimedMetadataId3Period =>
-                  1,    # min: -2147483648, max: 2147483647; OPTIONAL
+                  1,            # min: -2147483648, max: 2147483647; OPTIONAL
                 TimestampDeltaMilliseconds =>
-                  1,    # min: -2147483648, max: 2147483647; OPTIONAL
+                  1,            # min: -2147483648, max: 2147483647; OPTIONAL
               },    # OPTIONAL
               MsSmoothGroupSettings => {
                 AudioDeduplication => 'COMBINE_DUPLICATE_STREAMS'
@@ -379,8 +378,8 @@ You shouldn't make instances of this class. Each attribute should be used as a n
                     Url => 'My__stringPatternHttps',        # OPTIONAL
                   },    # OPTIONAL
                 },    # OPTIONAL
-                FragmentLength   => 1,       # min: 1, max: 2147483647; OPTIONAL
-                ManifestEncoding => 'UTF8',  # values: UTF8, UTF16; OPTIONAL
+                FragmentLength   => 1,         # min: 1, max: 2147483647
+                ManifestEncoding => 'UTF8',    # values: UTF8, UTF16; OPTIONAL
               },    # OPTIONAL
               Type => 'HLS_GROUP_SETTINGS'
               , # values: HLS_GROUP_SETTINGS, DASH_ISO_GROUP_SETTINGS, FILE_GROUP_SETTINGS, MS_SMOOTH_GROUP_SETTINGS, CMAF_GROUP_SETTINGS; OPTIONAL
@@ -614,9 +613,9 @@ You shouldn't make instances of this class. Each attribute should be used as a n
                     AudioBufferModel  => 'DVB',    # values: DVB, ATSC; OPTIONAL
                     AudioFramesPerPes => 1,        # max: 2147483647; OPTIONAL
                     AudioPids         => [
-                      1, ...    # min: 32, max: 8182; OPTIONAL
-                    ],          # OPTIONAL
-                    Bitrate => 1,    # max: 2147483647; OPTIONAL
+                      1, ...                       # min: 32, max: 8182
+                    ],                             # OPTIONAL
+                    Bitrate => 1,                  # max: 2147483647; OPTIONAL
                     BufferModel =>
                       'MULTIPLEX',    # values: MULTIPLEX, NONE; OPTIONAL
                     DvbNitSettings => {
@@ -635,12 +634,12 @@ You shouldn't make instances of this class. Each attribute should be used as a n
                         'My__stringMin1Max256',    # min: 1, max: 256; OPTIONAL
                     },    # OPTIONAL
                     DvbSubPids => [
-                      1, ...    # min: 32, max: 8182; OPTIONAL
+                      1, ...    # min: 32, max: 8182
                     ],          # OPTIONAL
                     DvbTdtSettings => {
                       TdtInterval => 1,    # min: 1000, max: 30000; OPTIONAL
                     },    # OPTIONAL
-                    DvbTeletextPid => 1,    # min: 32, max: 8182; OPTIONAL
+                    DvbTeletextPid => 1,    # min: 32, max: 8182
                     EbpAudioInterval => 'VIDEO_AND_FIXED_INTERVALS'
                     , # values: VIDEO_AND_FIXED_INTERVALS, VIDEO_INTERVAL; OPTIONAL
                     EbpPlacement => 'VIDEO_AND_AUDIO_PIDS'
@@ -657,13 +656,13 @@ You shouldn't make instances of this class. Each attribute should be used as a n
                     PatInterval       => 1,     # max: 1000; OPTIONAL
                     PcrControl => 'PCR_EVERY_PES_PACKET'
                     , # values: PCR_EVERY_PES_PACKET, CONFIGURED_PCR_PERIOD; OPTIONAL
-                    PcrPid             => 1,      # min: 32, max: 8182; OPTIONAL
-                    PmtInterval        => 1,      # max: 1000; OPTIONAL
-                    PmtPid             => 1,      # min: 32, max: 8182; OPTIONAL
-                    PrivateMetadataPid => 1,      # min: 32, max: 8182; OPTIONAL
-                    ProgramNumber      => 1,      # max: 65535; OPTIONAL
-                    RateMode           => 'VBR',  # values: VBR, CBR; OPTIONAL
-                    Scte35Pid          => 1,      # min: 32, max: 8182; OPTIONAL
+                    PcrPid             => 1,        # min: 32, max: 8182
+                    PmtInterval        => 1,        # max: 1000; OPTIONAL
+                    PmtPid             => 1,        # min: 32, max: 8182
+                    PrivateMetadataPid => 1,        # min: 32, max: 8182
+                    ProgramNumber      => 1,        # max: 65535; OPTIONAL
+                    RateMode           => 'VBR',    # values: VBR, CBR; OPTIONAL
+                    Scte35Pid          => 1,        # min: 32, max: 8182
                     Scte35Source =>
                       'PASSTHROUGH',    # values: PASSTHROUGH, NONE; OPTIONAL
                     SegmentationMarkers => 'NONE'
@@ -671,32 +670,32 @@ You shouldn't make instances of this class. Each attribute should be used as a n
                     SegmentationStyle => 'MAINTAIN_CADENCE'
                     ,    # values: MAINTAIN_CADENCE, RESET_CADENCE; OPTIONAL
                     SegmentationTime  => 1,    # OPTIONAL
-                    TimedMetadataPid  => 1,    # min: 32, max: 8182; OPTIONAL
+                    TimedMetadataPid  => 1,    # min: 32, max: 8182
                     TransportStreamId => 1,    # max: 65535; OPTIONAL
-                    VideoPid          => 1,    # min: 32, max: 8182; OPTIONAL
+                    VideoPid          => 1,    # min: 32, max: 8182
                   },    # OPTIONAL
                   M3u8Settings => {
                     AudioFramesPerPes => 1,    # max: 2147483647; OPTIONAL
                     AudioPids         => [
-                      1, ...                   # min: 32, max: 8182; OPTIONAL
+                      1, ...                   # min: 32, max: 8182
                     ],                         # OPTIONAL
                     NielsenId3  => 'INSERT',   # values: INSERT, NONE; OPTIONAL
                     PatInterval => 1,          # max: 1000; OPTIONAL
                     PcrControl => 'PCR_EVERY_PES_PACKET'
                     , # values: PCR_EVERY_PES_PACKET, CONFIGURED_PCR_PERIOD; OPTIONAL
-                    PcrPid             => 1,    # min: 32, max: 8182; OPTIONAL
+                    PcrPid             => 1,    # min: 32, max: 8182
                     PmtInterval        => 1,    # max: 1000; OPTIONAL
-                    PmtPid             => 1,    # min: 32, max: 8182; OPTIONAL
-                    PrivateMetadataPid => 1,    # min: 32, max: 8182; OPTIONAL
+                    PmtPid             => 1,    # min: 32, max: 8182
+                    PrivateMetadataPid => 1,    # min: 32, max: 8182
                     ProgramNumber      => 1,    # max: 65535; OPTIONAL
-                    Scte35Pid          => 1,    # min: 32, max: 8182; OPTIONAL
+                    Scte35Pid          => 1,    # min: 32, max: 8182
                     Scte35Source =>
                       'PASSTHROUGH',    # values: PASSTHROUGH, NONE; OPTIONAL
                     TimedMetadata =>
                       'PASSTHROUGH',    # values: PASSTHROUGH, NONE; OPTIONAL
-                    TimedMetadataPid  => 1,    # min: 32, max: 8182; OPTIONAL
+                    TimedMetadataPid  => 1,    # min: 32, max: 8182
                     TransportStreamId => 1,    # max: 65535; OPTIONAL
-                    VideoPid          => 1,    # min: 32, max: 8182; OPTIONAL
+                    VideoPid          => 1,    # min: 32, max: 8182
                   },    # OPTIONAL
                   MovSettings => {
                     ClapAtom => 'INCLUDE',  # values: INCLUDE, EXCLUDE; OPTIONAL
@@ -737,10 +736,8 @@ You shouldn't make instances of this class. Each attribute should be used as a n
                     Codec => 'FRAME_CAPTURE'
                     , # values: FRAME_CAPTURE, H_264, H_265, MPEG2, PRORES; OPTIONAL
                     FrameCaptureSettings => {
-                      FramerateDenominator =>
-                        1,    # min: 1, max: 2147483647; OPTIONAL
-                      FramerateNumerator =>
-                        1,    # min: 1, max: 2147483647; OPTIONAL
+                      FramerateDenominator => 1,    # min: 1, max: 2147483647
+                      FramerateNumerator   => 1,    # min: 1, max: 2147483647
                       MaxCaptures => 1,    # min: 1, max: 10000000; OPTIONAL
                       Quality     => 1,    # min: 1, max: 100; OPTIONAL
                     },    # OPTIONAL
@@ -764,10 +761,8 @@ You shouldn't make instances of this class. Each attribute should be used as a n
                       ,    # values: INITIALIZE_FROM_SOURCE, SPECIFIED; OPTIONAL
                       FramerateConversionAlgorithm => 'DUPLICATE_DROP'
                       ,    # values: DUPLICATE_DROP, INTERPOLATE; OPTIONAL
-                      FramerateDenominator =>
-                        1,    # min: 1, max: 2147483647; OPTIONAL
-                      FramerateNumerator =>
-                        1,    # min: 1, max: 2147483647; OPTIONAL
+                      FramerateDenominator => 1,    # min: 1, max: 2147483647
+                      FramerateNumerator   => 1,    # min: 1, max: 2147483647
                       GopBReference =>
                         'DISABLED',    # values: DISABLED, ENABLED; OPTIONAL
                       GopClosedCadence => 1,    # max: 2147483647; OPTIONAL
@@ -785,8 +780,8 @@ You shouldn't make instances of this class. Each attribute should be used as a n
                       NumberReferenceFrames => 1,    # min: 1, max: 6; OPTIONAL
                       ParControl => 'INITIALIZE_FROM_SOURCE'
                       ,    # values: INITIALIZE_FROM_SOURCE, SPECIFIED; OPTIONAL
-                      ParDenominator => 1,   # min: 1, max: 2147483647; OPTIONAL
-                      ParNumerator   => 1,   # min: 1, max: 2147483647; OPTIONAL
+                      ParDenominator => 1,    # min: 1, max: 2147483647
+                      ParNumerator   => 1,    # min: 1, max: 2147483647
                       QualityTuningLevel => 'SINGLE_PASS'
                       , # values: SINGLE_PASS, SINGLE_PASS_HQ, MULTI_PASS_HQ; OPTIONAL
                       QvbrSettings => {
@@ -831,10 +826,8 @@ You shouldn't make instances of this class. Each attribute should be used as a n
                       ,    # values: INITIALIZE_FROM_SOURCE, SPECIFIED; OPTIONAL
                       FramerateConversionAlgorithm => 'DUPLICATE_DROP'
                       ,    # values: DUPLICATE_DROP, INTERPOLATE; OPTIONAL
-                      FramerateDenominator =>
-                        1,    # min: 1, max: 2147483647; OPTIONAL
-                      FramerateNumerator =>
-                        1,    # min: 1, max: 2147483647; OPTIONAL
+                      FramerateDenominator => 1,    # min: 1, max: 2147483647
+                      FramerateNumerator   => 1,    # min: 1, max: 2147483647
                       GopBReference =>
                         'DISABLED',    # values: DISABLED, ENABLED; OPTIONAL
                       GopClosedCadence => 1,    # max: 2147483647; OPTIONAL
@@ -852,8 +845,8 @@ You shouldn't make instances of this class. Each attribute should be used as a n
                       NumberReferenceFrames => 1,    # min: 1, max: 6; OPTIONAL
                       ParControl => 'INITIALIZE_FROM_SOURCE'
                       ,    # values: INITIALIZE_FROM_SOURCE, SPECIFIED; OPTIONAL
-                      ParDenominator => 1,   # min: 1, max: 2147483647; OPTIONAL
-                      ParNumerator   => 1,   # min: 1, max: 2147483647; OPTIONAL
+                      ParDenominator => 1,    # min: 1, max: 2147483647
+                      ParNumerator   => 1,    # min: 1, max: 2147483647
                       QualityTuningLevel => 'SINGLE_PASS'
                       , # values: SINGLE_PASS, SINGLE_PASS_HQ, MULTI_PASS_HQ; OPTIONAL
                       QvbrSettings => {
@@ -915,8 +908,8 @@ You shouldn't make instances of this class. Each attribute should be used as a n
                         1,                 # max: 7; OPTIONAL
                       ParControl => 'INITIALIZE_FROM_SOURCE'
                       ,    # values: INITIALIZE_FROM_SOURCE, SPECIFIED; OPTIONAL
-                      ParDenominator => 1,   # min: 1, max: 2147483647; OPTIONAL
-                      ParNumerator   => 1,   # min: 1, max: 2147483647; OPTIONAL
+                      ParDenominator => 1,    # min: 1, max: 2147483647
+                      ParNumerator   => 1,    # min: 1, max: 2147483647
                       QualityTuningLevel => 'SINGLE_PASS'
                       ,    # values: SINGLE_PASS, MULTI_PASS; OPTIONAL
                       RateControlMode => 'VBR',    # values: VBR, CBR; OPTIONAL
@@ -939,16 +932,14 @@ You shouldn't make instances of this class. Each attribute should be used as a n
                       ,    # values: INITIALIZE_FROM_SOURCE, SPECIFIED; OPTIONAL
                       FramerateConversionAlgorithm => 'DUPLICATE_DROP'
                       ,    # values: DUPLICATE_DROP, INTERPOLATE; OPTIONAL
-                      FramerateDenominator =>
-                        1,    # min: 1, max: 2147483647; OPTIONAL
-                      FramerateNumerator =>
-                        1,    # min: 1, max: 2147483647; OPTIONAL
+                      FramerateDenominator => 1,    # min: 1, max: 2147483647
+                      FramerateNumerator   => 1,    # min: 1, max: 2147483647
                       InterlaceMode => 'PROGRESSIVE'
                       , # values: PROGRESSIVE, TOP_FIELD, BOTTOM_FIELD, FOLLOW_TOP_FIELD, FOLLOW_BOTTOM_FIELD; OPTIONAL
                       ParControl => 'INITIALIZE_FROM_SOURCE'
                       ,    # values: INITIALIZE_FROM_SOURCE, SPECIFIED; OPTIONAL
-                      ParDenominator => 1,   # min: 1, max: 2147483647; OPTIONAL
-                      ParNumerator   => 1,   # min: 1, max: 2147483647; OPTIONAL
+                      ParDenominator => 1,    # min: 1, max: 2147483647
+                      ParNumerator   => 1,    # min: 1, max: 2147483647
                       SlowPal =>
                         'DISABLED',    # values: DISABLED, ENABLED; OPTIONAL
                       Telecine => 'NONE',    # values: NONE, HARD; OPTIONAL

@@ -32,10 +32,10 @@ You shouldn't make instances of this class. Each attribute should be used as a n
 =head1 SYNOPSIS
 
     my $autoscaling = Paws->service('ApplicationAutoScaling');
-    # To register an ECS service as a scalable target
-    # This example registers a scalable target from an Amazon ECS service called
-    # web-app that is running on the default cluster, with a minimum desired
-    # count of 1 task and a maximum desired count of 10 tasks.
+  # To register an ECS service as a scalable target
+  # This example registers a scalable target from an Amazon ECS service called
+  # web-app that is running on the default cluster, with a minimum desired count
+  # of 1 task and a maximum desired count of 10 tasks.
     my $RegisterScalableTargetResponse = $autoscaling->RegisterScalableTarget(
       'MaxCapacity' => 10,
       'MinCapacity' => 1,
@@ -46,9 +46,9 @@ You shouldn't make instances of this class. Each attribute should be used as a n
       'ServiceNamespace'  => 'ecs'
     );
 
-   # To register an EC2 Spot fleet as a scalable target
-   # This example registers a scalable target from an Amazon EC2 Spot fleet with
-   # a minimum target capacity of 1 and a maximum of 10.
+ # To register an EC2 Spot fleet as a scalable target
+ # This example registers a scalable target from an Amazon EC2 Spot fleet with a
+ # minimum target capacity of 1 and a maximum of 10.
     my $RegisterScalableTargetResponse = $autoscaling->RegisterScalableTarget(
       'MaxCapacity' => 10,
       'MinCapacity' => 1,

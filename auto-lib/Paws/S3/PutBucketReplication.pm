@@ -65,7 +65,7 @@ You shouldn't make instances of this class. Each attribute should be used as a n
                     Value => 'MyValue',
 
                   },
-                  ...                          # OPTIONAL
+                  ...
                 ],                             # OPTIONAL
               },    # OPTIONAL
               Prefix => 'MyPrefix',    # OPTIONAL
@@ -73,7 +73,7 @@ You shouldn't make instances of this class. Each attribute should be used as a n
                 Key   => 'MyObjectKey',    # min: 1
                 Value => 'MyValue',
 
-              },    # OPTIONAL
+              },
             },    # OPTIONAL
             ID                      => 'MyID',        # OPTIONAL
             Prefix                  => 'MyPrefix',    # OPTIONAL

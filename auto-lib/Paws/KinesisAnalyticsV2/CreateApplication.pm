@@ -50,7 +50,7 @@ You shouldn't make instances of this class. Each attribute should be used as a n
           },    # OPTIONAL
         },
         ApplicationSnapshotConfiguration => {
-          SnapshotsEnabled => 1,    # OPTIONAL
+          SnapshotsEnabled => 1,
 
         },    # OPTIONAL
         EnvironmentProperties => {
@@ -71,7 +71,7 @@ You shouldn't make instances of this class. Each attribute should be used as a n
           CheckpointConfiguration => {
             ConfigurationType          => 'DEFAULT',   # values: DEFAULT, CUSTOM
             CheckpointInterval         => 1,           # OPTIONAL
-            CheckpointingEnabled       => 1,           # OPTIONAL
+            CheckpointingEnabled       => 1,
             MinPauseBetweenCheckpoints => 1,           # OPTIONAL
           },    # OPTIONAL
           MonitoringConfiguration => {
@@ -82,7 +82,7 @@ You shouldn't make instances of this class. Each attribute should be used as a n
           },    # OPTIONAL
           ParallelismConfiguration => {
             ConfigurationType  => 'DEFAULT',    # values: DEFAULT, CUSTOM
-            AutoScalingEnabled => 1,            # OPTIONAL
+            AutoScalingEnabled => 1,
             Parallelism        => 1,            # min: 1; OPTIONAL
             ParallelismPerKPU  => 1,            # min: 1; OPTIONAL
           },    # OPTIONAL

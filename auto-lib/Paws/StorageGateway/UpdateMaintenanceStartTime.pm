@@ -30,10 +30,9 @@ You shouldn't make instances of this class. Each attribute should be used as a n
 =head1 SYNOPSIS
 
     my $storagegateway = Paws->service('StorageGateway');
-    # To update a gateway's maintenance start time
-    # Updates a gateway's weekly maintenance start time information, including
-    # day and time of the week. The maintenance time is in your gateway's time
-    # zone.
+  # To update a gateway's maintenance start time
+  # Updates a gateway's weekly maintenance start time information, including day
+  # and time of the week. The maintenance time is in your gateway's time zone.
     my $UpdateMaintenanceStartTimeOutput =
       $storagegateway->UpdateMaintenanceStartTime(
       'DayOfWeek' => 2,
