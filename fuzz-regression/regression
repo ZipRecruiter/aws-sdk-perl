@@ -1,0 +1,365 @@
+#!/usr/bin/env perl
+
+# This is a simple tool that randomly generates request objects and
+# then dumps the serialization to files in baseline/ with --generate.
+#
+# Without --generate, it will load the constructors we used in the
+# baseline and then instantiate the request objects and dump both the
+# constructor and serialization to files in results/.  Afterwards you
+# can diff the directories to understand how changes affect encoding.
+
+use Getopt::Long;
+use strict;
+use warnings;
+use Paws;
+use FindBin qw($Bin);
+use Scalar::Util qw(blessed);
+use Path::Tiny;
+use Try::Tiny;
+BEGIN { Paws->default_config->immutable(1) }
+use constant FUZZ_FACTOR => 0.8;
+srand(time);
+
+GetOptions(
+  'verbose|v' => \my $verbose,
+  'count=i' => \my $count,
+  'help|h' => \my $help,
+  'generate' => \my $generate,
+);
+if ($help) {
+  die <<"EOS";
+--count=# - number of benchmarks per request
+--verbose - verbose
+--help - this help
+--generate - regenerate new files
+EOS
+}
+
+$count //= 10;
+
+package Test::CustomCredentials {
+  use Moose;
+  use Paws::Credential;
+  with 'Paws::Credential';
+
+  sub access_key { 'CustomAK' };
+  sub secret_key { 'CustomSK' };
+  sub session_token {};
+
+  __PACKAGE__->meta->make_immutable;
+};
+
+package RecordCaller {
+  use Moose;
+  use Try::Tiny;
+
+  with 'Paws::Net::RetryCallerRole', 'Paws::Net::CallerRole';
+
+  use Paws::Net::APIResponse;
+  use JSON::XS;
+  use URI::Fast qw(uri);
+
+  has 'output_file' => ( is => 'rw', isa => 'Maybe[Str]' );
+  has 'constructor' => ( is => 'rw' );
+
+  sub send_request {
+    my ($self, $service, $call_object) = @_;
+
+    my $requestObj = $service->prepare_request_for_call($call_object);
+    my $headers = $requestObj->headers->clone;
+    $headers->remove_header('x-amz-date');
+    $headers->remove_header('authorization');
+    $headers->remove_header('date');
+    $headers->remove_header('x-amz-content-sha256');
+    my $content = $requestObj->content // '';
+    my $url = uri($requestObj->url);
+
+    if ($self->output_file) {
+      open my $fh, ">", $self->output_file;
+      my $output = {
+        cons => $self->constructor,
+        method => $requestObj->method,
+        url => {
+          host       => scalar $url->host,
+          port       => scalar $url->port,
+          scheme     => scalar $url->scheme,
+          path       => scalar $url->path,
+          query_hash => scalar $url->query_hash,
+        },
+        headers => $headers->as_string,
+      };
+
+      my $type = $headers->header("content-type");
+      $type //= '';
+
+      if ($type eq "application/x-www-form-urlencoded") {
+        $output->{parameters} = $requestObj->{parameters};
+      } else {
+        my $json = JSON::XS->new->canonical->utf8(1);
+        $output->{content} = try {
+          $json->encode($json->decode($content));
+        } catch {
+          $content;
+        };
+      }
+
+      require Data::Dumper;
+      print $fh Data::Dumper->new([$output], ['$output'])->Terse(1)->Sortkeys(1)->Deparse(1)->Indent(2)->Dump;
+
+      $self->output_file(undef);
+    } else {
+      require DDP; &DDP::p({ '$requestObj' => $requestObj }, class => {expand => 'all'});
+    }
+
+    return Paws::Net::APIResponse->new(
+      status => 599,
+      content => "an error occurred",
+      headers => {},
+    );
+  }
+
+  sub caller_to_response {
+    my ($self, $service, $call_object, $response) = @_;
+    if ($response->status == 599) {
+      return Paws::Exception->new(message => $response->content, code => 'ConnectionError', request_id => '');
+    } else {
+      return $service->response_to_object->process($call_object, $response);
+    }
+  }
+
+  __PACKAGE__->meta->make_immutable;
+};
+
+my $mock_caller = RecordCaller->new;
+
+my $paws = Paws->new(
+  config => {
+    caller => $mock_caller,
+    credentials => 'Test::CustomCredentials',
+    region => 'us-west-2',
+  },
+);
+
+my @services = @ARGV > 0 ? @ARGV : "DynamoDB";
+if (@services == 1 && $services[0] eq "all") {
+  @services = sort $paws->available_services;
+}
+
+for my $service_name (@services) {
+  my $service = $paws->service($service_name, max_attempts => 1);
+
+  my @requests;
+  {
+    open my $fh, "<", get_mod_file("Paws::${service_name}");
+    my $last_sub = "undef";
+    while (<$fh>) {
+      $last_sub = $1 if /\bsub ([a-z0-9A-Z_]+)/;
+      push @requests, $last_sub if /\$self->caller->do_call/;
+    }
+  }
+
+  if ($generate) {
+    my $output_dir = path($Bin)->child("baseline");
+    for my $request_name (@requests) {
+      my $dir = path($output_dir)->child($service_name, $request_name);
+      `mkdir -p $dir`;
+      for my $iter (1..$count) {
+        my $mod = "Paws::${service_name}::${request_name}";
+        printf "Generating %s [%d/%d]\n", $mod, $iter, $count;
+        my $file = $dir->child("result${iter}.txt");
+        my $cons = generate_class_constructor($mod, FUZZ_FACTOR);
+        run_test(
+          service => $service,
+          request_name => $request_name,
+          cons => $cons,
+          file => $file,
+        );
+      }
+    }
+  } else {
+    my $gen_dir = path($Bin)->child("baseline");
+    my $output_dir = path($Bin)->child("results");
+    for my $request_name (@requests) {
+      my $input_dir = path($gen_dir)->child($service_name, $request_name);
+      next unless -d $input_dir;
+      my $dir = path($output_dir)->child($service_name, $request_name);
+      `mkdir -p $dir`;
+      for my $iter (1..$count) {
+        my $mod = "Paws::${service_name}::${request_name}";
+        printf "Generating %s [%d/?]\n", $mod, $iter;
+        my $input_file = $input_dir->child("result${iter}.txt");
+        last unless -e $input_file;
+        my $output = eval $input_file->slurp;
+        die "Couldn't load $input_file: $@" unless $output && $output->{cons};
+        my $file = $dir->child("result${iter}.txt");
+        my $cons = $output->{cons};
+        run_test(
+          service => $service,
+          request_name => $request_name,
+          cons => $cons,
+          file => $file,
+        );
+      }
+    }
+  }
+}
+
+sub get_mod_file {
+  my $mod = shift;
+  eval "require $mod; 1" or die "failed to load $mod";
+  $mod =~ s/::/\//g;
+  $mod .= ".pm";
+
+  my $file = $INC{$mod};
+  die "$mod not found in \%INC" unless $file;
+  return $file;
+}
+
+sub generate_class_constructor {
+  my ($mod, $fuzz_factor) = @_;
+
+  my $mod_type = get_mod_type($mod);
+  # require DDP; &DDP::p({ '$mod' => $mod, '$mod_type' => $mod_type });
+  my @attrs = get_attributes($mod);
+  my %res;
+
+  if ($mod_type eq "Paws::API::MapStr" || $mod_type =~ /^Paws::API::StrTo/) {
+    die "expected just one constructor for map" unless @attrs == 1;
+    %res = %{generate_type($attrs[0]{isa}, fuzz => $fuzz_factor)};
+  } else {
+    for my $attr (@attrs) {
+      my $gen = $attr->{required};
+      $gen = rand(1) <= $fuzz_factor unless $gen;
+      $res{$attr->{name}} = generate_type($attr->{isa}, required => $attr->{required}, fuzz => $fuzz_factor) if $gen;
+    }
+  }
+
+  return \%res;
+}
+
+sub generate_type {
+  my ($type, %opts) = @_;
+  my $fuzz_factor = $opts{fuzz};
+  my $new_fuzz_factor = defined($fuzz_factor) ? $fuzz_factor * 0.5 : undef;
+
+  if ($type eq "Str") {
+    my $randstr = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 ";
+    my $min_len = 16;
+    my $res = "";
+    my $i = 0;
+    while (1) {
+      my $gen = $i < $min_len ? 1 : rand(1) <= $fuzz_factor;
+      last unless $gen;
+      $res .= substr $randstr, int(rand(length($randstr))), 1;
+      $i++;
+    }
+    return $res;
+  } elsif ($type eq "Int") {
+    return int(rand(2**31));
+  } elsif ($type eq "Num") {
+    return rand(2**31);
+  } elsif ($type eq "Bool") {
+    return int(rand(2));
+  } elsif ($type =~ /^InstanceOf\['([^']+)'\]$/ || ($type =~ /::/ && $type =~ /^([A-Za-z0-9_:]+)$/)) {
+    my $mod = $1;
+    return generate_class_constructor($mod, $new_fuzz_factor);
+  } elsif ($type =~ /^HashRef\[(.*)\]$/) {
+    my %res;
+    my $inner_type = $1;
+    while (1) {
+      my $gen = $opts{required} && keys %res == 0 ? 1 : rand(1) <= $fuzz_factor;
+      last unless $gen;
+      $res{generate_type("Str", fuzz => $fuzz_factor)} = generate_type($inner_type, fuzz => $fuzz_factor);
+    }
+    return \%res;
+  } elsif ($type =~ /^Maybe\[(.*)\]$/) {
+    my $gen = 1; # rand(1) <= 0.5;
+    my $inner_type = $1;
+    return $gen ? generate_type($inner_type, fuzz => $fuzz_factor) : undef;
+  } elsif ($type eq "Str|Undef") {
+    my $gen = 1; # rand(1) <= 0.5;
+    return $gen ? generate_type("Str", fuzz => $fuzz_factor) : undef;
+  } elsif ($type =~ /^ArrayRef\[(.*)\]$/) {
+    my @res;
+    my $inner_type = $1;
+
+    while (1) {
+      my $gen = $opts{required} && @res == 0 ? 1 : rand(1) <= $fuzz_factor;
+      last unless $gen;
+      push @res, generate_type($inner_type, fuzz => $fuzz_factor);
+    }
+
+    return \@res;
+  }
+  die "unrecognized type $type";
+}
+
+sub get_attributes {
+  my $mod = shift;
+
+  my @attrs;
+
+  {
+    open my $fh, "<", get_mod_file($mod);
+    while (<$fh>) {
+      chomp;
+      if (/(?:\s|^)has\s+(\S+)\s*=>\s*\(/) {
+        my $attr = { name => $1 };
+        die "has line wraps? $_" unless /\);$/;
+        die "can't find isa? $_" unless / isa => ([^),]+)/;
+        $attr->{isa} = $1;
+        $attr->{isa} =~ s/^'(.*)'$/$1/;
+        $attr->{required} = 1 if /required => 1/;
+        push @attrs, $attr;
+      }
+    }
+  }
+
+  return @attrs;
+}
+
+
+sub get_mod_type {
+  my $mod = shift;
+
+  {
+    open my $fh, "<", get_mod_file($mod);
+    while (<$fh>) {
+      chomp;
+      if (/with ['"]([^'"]+)['"]/) {
+        return $1;
+      }
+    }
+  }
+
+  return "";
+}
+
+sub run_test {
+  my (%opts) = @_;
+  my $cons = $opts{cons};
+  my $file = $opts{file};
+  my $service = $opts{service};
+  my $request_name = $opts{request_name};
+
+  $mock_caller->constructor($cons);
+  $mock_caller->output_file("$file");
+  try {
+    local $SIG{__DIE__} = sub { require Carp; die @_ if ref($_[0]); if ($_[-1] =~ /\n$/s) { my $arg = pop @_; $arg =~ s/(.*)( at .*? line .*?\n$)/$1/s; push @_, $arg; } die &Carp::longmess; };
+    $service->$request_name(%$cons);
+  }
+  catch {
+    my $err = $_;
+
+    return if blessed($err) && $err->isa("Paws::Exception") && $err->code eq "ConnectionError";
+
+    require Data::Dumper;
+    open my $fh, ">", "$file";
+    my $output = {
+      exception => "$err",
+      cons => $cons,
+    };
+    print $fh Data::Dumper->new([$output], ['$output'])->Terse(1)->Sortkeys(1)->Deparse(1)->Indent(2)->Dump;
+    warn "Failed to generate request in $file";
+  };
+}
