@@ -1,8 +1,139 @@
 package Paws::DynamoDB::SSESpecification;
   use Moose;
-  has Enabled => (is => 'ro', isa => 'Bool');
-  has KMSMasterKeyId => (is => 'ro', isa => 'Str');
-  has SSEType => (is => 'ro', isa => 'Str');
+  use Types::Standard -types;
+  use namespace::clean -except => 'meta';
+  with 'Paws::API::Object';
+
+  has Enabled => (is => 'ro', isa => Bool);
+  has KMSMasterKeyId => (is => 'ro', isa => Str);
+  has SSEType => (is => 'ro', isa => Str);
+
+  sub new_with_coercions {
+    my ($class, $args) = @_;
+
+    my %res = %$args;
+    if (exists $args->{Enabled}) {
+      $res{Enabled} = (map {
+            0 + !!$_
+      } ($args->{Enabled}))[0];
+    }
+    if (exists $args->{KMSMasterKeyId}) {
+      $res{KMSMasterKeyId} = (map {
+            "$_"
+      } ($args->{KMSMasterKeyId}))[0];
+    }
+    if (exists $args->{SSEType}) {
+      $res{SSEType} = (map {
+            "$_"
+      } ($args->{SSEType}))[0];
+    }
+
+    return $class->new(\%res);
+  }
+
+  sub new_from_xml {
+    my ($class, $xml) = @_;
+
+    my $res = {};
+    for ($xml->childNodes) {
+      if (!defined(my $nodeName = $_->nodeName)) {
+      } elsif ($nodeName eq "Enabled") {
+        my $key = "Enabled";
+            $res->{$key} =
+              do { my $d = $_->nodeValue // ''; $d eq "true" || $d eq "1" };
+      } elsif ($nodeName eq "KMSMasterKeyId") {
+        my $key = "KMSMasterKeyId";
+            $res->{$key} = "" . ( $_->nodeValue // '' );
+      } elsif ($nodeName eq "SSEType") {
+        my $key = "SSEType";
+            $res->{$key} = "" . ( $_->nodeValue // '' );
+
+      } else {
+        # warn "Unrecognized element $nodeName";
+      }
+    }
+
+    return $class->new_with_coercions($res);
+  }
+
+  sub to_hash_data {
+    my ($self) = @_;
+
+    my %res;
+    if (exists $self->{Enabled}) {
+      $res{Enabled} = (map {
+            0 + !!$_
+      } ($self->Enabled))[0];
+    }
+    if (exists $self->{KMSMasterKeyId}) {
+      $res{KMSMasterKeyId} = (map {
+            "$_"
+      } ($self->KMSMasterKeyId))[0];
+    }
+    if (exists $self->{SSEType}) {
+      $res{SSEType} = (map {
+            "$_"
+      } ($self->SSEType))[0];
+    }
+
+    return \%res;
+  }
+
+  sub to_json_data {
+    my ($self) = @_;
+
+    my %res;
+    if (exists $self->{Enabled}) {
+      $res{Enabled} = (map {
+            $_ ? \1 : \0
+      } ($self->Enabled))[0];
+    }
+    if (exists $self->{KMSMasterKeyId}) {
+      $res{KMSMasterKeyId} = (map {
+            "$_"
+      } ($self->KMSMasterKeyId))[0];
+    }
+    if (exists $self->{SSEType}) {
+      $res{SSEType} = (map {
+            "$_"
+      } ($self->SSEType))[0];
+    }
+
+    return \%res;
+  }
+
+  sub to_parameter_data {
+    my ($self, $res, $prefix) = @_;
+    $res //= {};
+    $prefix = defined $prefix ? "$prefix." : "";
+
+
+    if (exists $self->{Enabled}) {
+      my $key = "${prefix}Enabled";
+      do {
+            $res->{$key} = $_ ? "true" : "false";
+      } for $self->Enabled;
+    }
+
+    if (exists $self->{KMSMasterKeyId}) {
+      my $key = "${prefix}KMSMasterKeyId";
+      do {
+            $res->{$key} = "$_";
+      } for $self->KMSMasterKeyId;
+    }
+
+    if (exists $self->{SSEType}) {
+      my $key = "${prefix}SSEType";
+      do {
+            $res->{$key} = "$_";
+      } for $self->SSEType;
+    }
+
+    return $res;
+  }
+
+
+  __PACKAGE__->meta->make_immutable;
 1;
 
 ### main pod documentation begin ###

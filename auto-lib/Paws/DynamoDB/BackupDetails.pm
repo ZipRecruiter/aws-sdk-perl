@@ -1,12 +1,242 @@
 package Paws::DynamoDB::BackupDetails;
   use Moose;
-  has BackupArn => (is => 'ro', isa => 'Str', required => 1);
-  has BackupCreationDateTime => (is => 'ro', isa => 'Str', required => 1);
-  has BackupExpiryDateTime => (is => 'ro', isa => 'Str');
-  has BackupName => (is => 'ro', isa => 'Str', required => 1);
-  has BackupSizeBytes => (is => 'ro', isa => 'Int');
-  has BackupStatus => (is => 'ro', isa => 'Str', required => 1);
-  has BackupType => (is => 'ro', isa => 'Str', required => 1);
+  use Types::Standard -types;
+  use namespace::clean -except => 'meta';
+  with 'Paws::API::Object';
+
+  has BackupArn => (is => 'ro', isa => Str, required => 1);
+  has BackupCreationDateTime => (is => 'ro', isa => Str, required => 1);
+  has BackupExpiryDateTime => (is => 'ro', isa => Str);
+  has BackupName => (is => 'ro', isa => Str, required => 1);
+  has BackupSizeBytes => (is => 'ro', isa => Int);
+  has BackupStatus => (is => 'ro', isa => Str, required => 1);
+  has BackupType => (is => 'ro', isa => Str, required => 1);
+
+  sub new_with_coercions {
+    my ($class, $args) = @_;
+
+    my %res = %$args;
+    if (exists $args->{BackupArn}) {
+      $res{BackupArn} = (map {
+            "$_"
+      } ($args->{BackupArn}))[0];
+    }
+    if (exists $args->{BackupCreationDateTime}) {
+      $res{BackupCreationDateTime} = (map {
+            "$_"
+      } ($args->{BackupCreationDateTime}))[0];
+    }
+    if (exists $args->{BackupExpiryDateTime}) {
+      $res{BackupExpiryDateTime} = (map {
+            "$_"
+      } ($args->{BackupExpiryDateTime}))[0];
+    }
+    if (exists $args->{BackupName}) {
+      $res{BackupName} = (map {
+            "$_"
+      } ($args->{BackupName}))[0];
+    }
+    if (exists $args->{BackupSizeBytes}) {
+      $res{BackupSizeBytes} = (map {
+            int($_)
+      } ($args->{BackupSizeBytes}))[0];
+    }
+    if (exists $args->{BackupStatus}) {
+      $res{BackupStatus} = (map {
+            "$_"
+      } ($args->{BackupStatus}))[0];
+    }
+    if (exists $args->{BackupType}) {
+      $res{BackupType} = (map {
+            "$_"
+      } ($args->{BackupType}))[0];
+    }
+
+    return $class->new(\%res);
+  }
+
+  sub new_from_xml {
+    my ($class, $xml) = @_;
+
+    my $res = {};
+    for ($xml->childNodes) {
+      if (!defined(my $nodeName = $_->nodeName)) {
+      } elsif ($nodeName eq "BackupArn") {
+        my $key = "BackupArn";
+            $res->{$key} = "" . ( $_->nodeValue // '' );
+      } elsif ($nodeName eq "BackupCreationDateTime") {
+        my $key = "BackupCreationDateTime";
+            $res->{$key} = "" . ( $_->nodeValue // '' );
+      } elsif ($nodeName eq "BackupExpiryDateTime") {
+        my $key = "BackupExpiryDateTime";
+            $res->{$key} = "" . ( $_->nodeValue // '' );
+      } elsif ($nodeName eq "BackupName") {
+        my $key = "BackupName";
+            $res->{$key} = "" . ( $_->nodeValue // '' );
+      } elsif ($nodeName eq "BackupSizeBytes") {
+        my $key = "BackupSizeBytes";
+            $res->{$key} = int( $_->nodeValue // 0 );
+      } elsif ($nodeName eq "BackupStatus") {
+        my $key = "BackupStatus";
+            $res->{$key} = "" . ( $_->nodeValue // '' );
+      } elsif ($nodeName eq "BackupType") {
+        my $key = "BackupType";
+            $res->{$key} = "" . ( $_->nodeValue // '' );
+
+      } else {
+        # warn "Unrecognized element $nodeName";
+      }
+    }
+
+    return $class->new_with_coercions($res);
+  }
+
+  sub to_hash_data {
+    my ($self) = @_;
+
+    my %res;
+    if (exists $self->{BackupArn}) {
+      $res{BackupArn} = (map {
+            "$_"
+      } ($self->BackupArn))[0];
+    }
+    if (exists $self->{BackupCreationDateTime}) {
+      $res{BackupCreationDateTime} = (map {
+            "$_"
+      } ($self->BackupCreationDateTime))[0];
+    }
+    if (exists $self->{BackupExpiryDateTime}) {
+      $res{BackupExpiryDateTime} = (map {
+            "$_"
+      } ($self->BackupExpiryDateTime))[0];
+    }
+    if (exists $self->{BackupName}) {
+      $res{BackupName} = (map {
+            "$_"
+      } ($self->BackupName))[0];
+    }
+    if (exists $self->{BackupSizeBytes}) {
+      $res{BackupSizeBytes} = (map {
+            int($_)
+      } ($self->BackupSizeBytes))[0];
+    }
+    if (exists $self->{BackupStatus}) {
+      $res{BackupStatus} = (map {
+            "$_"
+      } ($self->BackupStatus))[0];
+    }
+    if (exists $self->{BackupType}) {
+      $res{BackupType} = (map {
+            "$_"
+      } ($self->BackupType))[0];
+    }
+
+    return \%res;
+  }
+
+  sub to_json_data {
+    my ($self) = @_;
+
+    my %res;
+    if (exists $self->{BackupArn}) {
+      $res{BackupArn} = (map {
+            "$_"
+      } ($self->BackupArn))[0];
+    }
+    if (exists $self->{BackupCreationDateTime}) {
+      $res{BackupCreationDateTime} = (map {
+            "$_"
+      } ($self->BackupCreationDateTime))[0];
+    }
+    if (exists $self->{BackupExpiryDateTime}) {
+      $res{BackupExpiryDateTime} = (map {
+            "$_"
+      } ($self->BackupExpiryDateTime))[0];
+    }
+    if (exists $self->{BackupName}) {
+      $res{BackupName} = (map {
+            "$_"
+      } ($self->BackupName))[0];
+    }
+    if (exists $self->{BackupSizeBytes}) {
+      $res{BackupSizeBytes} = (map {
+            int($_)
+      } ($self->BackupSizeBytes))[0];
+    }
+    if (exists $self->{BackupStatus}) {
+      $res{BackupStatus} = (map {
+            "$_"
+      } ($self->BackupStatus))[0];
+    }
+    if (exists $self->{BackupType}) {
+      $res{BackupType} = (map {
+            "$_"
+      } ($self->BackupType))[0];
+    }
+
+    return \%res;
+  }
+
+  sub to_parameter_data {
+    my ($self, $res, $prefix) = @_;
+    $res //= {};
+    $prefix = defined $prefix ? "$prefix." : "";
+
+
+    if (exists $self->{BackupArn}) {
+      my $key = "${prefix}BackupArn";
+      do {
+            $res->{$key} = "$_";
+      } for $self->BackupArn;
+    }
+
+    if (exists $self->{BackupCreationDateTime}) {
+      my $key = "${prefix}BackupCreationDateTime";
+      do {
+            $res->{$key} = "$_";
+      } for $self->BackupCreationDateTime;
+    }
+
+    if (exists $self->{BackupExpiryDateTime}) {
+      my $key = "${prefix}BackupExpiryDateTime";
+      do {
+            $res->{$key} = "$_";
+      } for $self->BackupExpiryDateTime;
+    }
+
+    if (exists $self->{BackupName}) {
+      my $key = "${prefix}BackupName";
+      do {
+            $res->{$key} = "$_";
+      } for $self->BackupName;
+    }
+
+    if (exists $self->{BackupSizeBytes}) {
+      my $key = "${prefix}BackupSizeBytes";
+      do {
+            $res->{$key} = int($_);
+      } for $self->BackupSizeBytes;
+    }
+
+    if (exists $self->{BackupStatus}) {
+      my $key = "${prefix}BackupStatus";
+      do {
+            $res->{$key} = "$_";
+      } for $self->BackupStatus;
+    }
+
+    if (exists $self->{BackupType}) {
+      my $key = "${prefix}BackupType";
+      do {
+            $res->{$key} = "$_";
+      } for $self->BackupType;
+    }
+
+    return $res;
+  }
+
+
+  __PACKAGE__->meta->make_immutable;
 1;
 
 ### main pod documentation begin ###

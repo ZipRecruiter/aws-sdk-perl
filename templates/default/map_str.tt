@@ -1,0 +1,84 @@
+[%-
+  obj_class = final_shape.perl_type;
+-%]
+package [% inner_class %];
+  use Moose;
+  use Types::Standard -types;
+  use namespace::clean -except => 'meta';
+  with 'Paws::API::MapStr';
+
+  has Map => (is => 'ro', isa => HashRef[[% values_shape.type_information.perl_type %]]);
+
+  sub new_with_coercions {
+    my ($class, $args) = @_;
+    return $class->new({
+      Map => {
+        map {
+          ( $_ => (map {
+[% FILTER indent('        ') %]
+[%- c.perltidy_source(values_shape.type_information.create_perl) %]
+[%- END %]
+          } ($args->{$_}))[0] );
+        } keys %$args,
+      }
+    });
+  }
+
+  sub to_json_data {
+    my ($self) = @_;
+    return {
+      map {
+        ( $_ => (map {
+[% FILTER indent('      ') %]
+[%- c.perltidy_source(values_shape.type_information.to_json) %]
+[%- END %]
+        } ($self->Map->{$_}))[0] );
+      } keys %{$self->Map}
+    };
+  }
+
+  sub to_hash_data {
+    my ($self) = @_;
+    return {
+      map {
+        ( $_ => (map {
+[% FILTER indent('      ') %]
+[%- c.perltidy_source(values_shape.type_information.to_hash) %]
+[%- END %]
+        } ($self->Map->{$_}))[0] );
+      } keys %{$self->Map}
+    };
+  }
+
+  sub to_parameter_data {
+    my ($self, $res, $prefix) = @_;
+    $res //= {};
+    $prefix = defined $prefix ? "$prefix." : "";
+
+    my $map = $self->Map;
+
+    my $i = 1;
+    for my $map_key (keys %$map) {
+[% IF values_shape.type_information.deepest_shape.type_information.type == "map" OR
+      values_shape.type_information.deepest_shape.type_information.type == "structure" -%]
+      $res->{"${prefix}${i}.Name"} = $map_key;
+      my $key = "${prefix}${i}.Value";
+[% ELSE -%]
+      $res->{"${prefix}entry.${i}.key"} = $map_key;
+      my $key = "${prefix}entry.${i}.value";
+[% END -%]
+      do {
+[% FILTER indent('      ') %]
+[%- c.perltidy_source(values_shape.type_information.to_parameter) %]
+[%- END %]
+      } for $map->{$map_key};
+      $i++;
+    }
+
+    return $res;
+  }
+
+  __PACKAGE__->meta->make_immutable;
+1;
+
+[% INCLUDE 'map_str_to_whatever.tt' %]

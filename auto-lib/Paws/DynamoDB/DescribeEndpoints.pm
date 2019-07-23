@@ -1,12 +1,67 @@
 
 package Paws::DynamoDB::DescribeEndpoints;
   use Moose;
-
+  use Types::Standard -types;
   use MooseX::ClassAttribute;
+  use namespace::clean -except => 'meta';
+  with 'Paws::API::CallArgs';
+
+
 
   class_has _api_call => (isa => 'Str', is => 'ro', default => 'DescribeEndpoints');
   class_has _returns => (isa => 'Str', is => 'ro', default => 'Paws::DynamoDB::DescribeEndpointsResponse');
   class_has _result_key => (isa => 'Str', is => 'ro');
+
+  sub new_with_coercions {
+    my ($class, $args) = @_;
+
+    my %res = %$args;
+
+    return $class->new(\%res);
+  }
+
+  sub new_from_xml {
+    my ($class, $xml) = @_;
+
+    my $res = {};
+    for ($xml->childNodes) {
+      if (!defined(my $nodeName = $_->nodeName)) {
+
+      } else {
+        # warn "Unrecognized element $nodeName";
+      }
+    }
+
+    return $class->new_with_coercions($res);
+  }
+
+  sub to_hash_data {
+    my ($self) = @_;
+
+    my %res;
+
+    return \%res;
+  }
+
+  sub to_json_data {
+    my ($self) = @_;
+
+    my %res;
+
+    return \%res;
+  }
+
+  sub to_parameter_data {
+    my ($self, $res, $prefix) = @_;
+    $res //= {};
+    $prefix = defined $prefix ? "$prefix." : "";
+
+
+    return $res;
+  }
+
+
+  __PACKAGE__->meta->make_immutable;
 1;
 
 ### main pod documentation begin ###

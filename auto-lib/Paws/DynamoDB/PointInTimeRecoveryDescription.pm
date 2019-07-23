@@ -1,8 +1,138 @@
 package Paws::DynamoDB::PointInTimeRecoveryDescription;
   use Moose;
-  has EarliestRestorableDateTime => (is => 'ro', isa => 'Str');
-  has LatestRestorableDateTime => (is => 'ro', isa => 'Str');
-  has PointInTimeRecoveryStatus => (is => 'ro', isa => 'Str');
+  use Types::Standard -types;
+  use namespace::clean -except => 'meta';
+  with 'Paws::API::Object';
+
+  has EarliestRestorableDateTime => (is => 'ro', isa => Str);
+  has LatestRestorableDateTime => (is => 'ro', isa => Str);
+  has PointInTimeRecoveryStatus => (is => 'ro', isa => Str);
+
+  sub new_with_coercions {
+    my ($class, $args) = @_;
+
+    my %res = %$args;
+    if (exists $args->{EarliestRestorableDateTime}) {
+      $res{EarliestRestorableDateTime} = (map {
+            "$_"
+      } ($args->{EarliestRestorableDateTime}))[0];
+    }
+    if (exists $args->{LatestRestorableDateTime}) {
+      $res{LatestRestorableDateTime} = (map {
+            "$_"
+      } ($args->{LatestRestorableDateTime}))[0];
+    }
+    if (exists $args->{PointInTimeRecoveryStatus}) {
+      $res{PointInTimeRecoveryStatus} = (map {
+            "$_"
+      } ($args->{PointInTimeRecoveryStatus}))[0];
+    }
+
+    return $class->new(\%res);
+  }
+
+  sub new_from_xml {
+    my ($class, $xml) = @_;
+
+    my $res = {};
+    for ($xml->childNodes) {
+      if (!defined(my $nodeName = $_->nodeName)) {
+      } elsif ($nodeName eq "EarliestRestorableDateTime") {
+        my $key = "EarliestRestorableDateTime";
+            $res->{$key} = "" . ( $_->nodeValue // '' );
+      } elsif ($nodeName eq "LatestRestorableDateTime") {
+        my $key = "LatestRestorableDateTime";
+            $res->{$key} = "" . ( $_->nodeValue // '' );
+      } elsif ($nodeName eq "PointInTimeRecoveryStatus") {
+        my $key = "PointInTimeRecoveryStatus";
+            $res->{$key} = "" . ( $_->nodeValue // '' );
+
+      } else {
+        # warn "Unrecognized element $nodeName";
+      }
+    }
+
+    return $class->new_with_coercions($res);
+  }
+
+  sub to_hash_data {
+    my ($self) = @_;
+
+    my %res;
+    if (exists $self->{EarliestRestorableDateTime}) {
+      $res{EarliestRestorableDateTime} = (map {
+            "$_"
+      } ($self->EarliestRestorableDateTime))[0];
+    }
+    if (exists $self->{LatestRestorableDateTime}) {
+      $res{LatestRestorableDateTime} = (map {
+            "$_"
+      } ($self->LatestRestorableDateTime))[0];
+    }
+    if (exists $self->{PointInTimeRecoveryStatus}) {
+      $res{PointInTimeRecoveryStatus} = (map {
+            "$_"
+      } ($self->PointInTimeRecoveryStatus))[0];
+    }
+
+    return \%res;
+  }
+
+  sub to_json_data {
+    my ($self) = @_;
+
+    my %res;
+    if (exists $self->{EarliestRestorableDateTime}) {
+      $res{EarliestRestorableDateTime} = (map {
+            "$_"
+      } ($self->EarliestRestorableDateTime))[0];
+    }
+    if (exists $self->{LatestRestorableDateTime}) {
+      $res{LatestRestorableDateTime} = (map {
+            "$_"
+      } ($self->LatestRestorableDateTime))[0];
+    }
+    if (exists $self->{PointInTimeRecoveryStatus}) {
+      $res{PointInTimeRecoveryStatus} = (map {
+            "$_"
+      } ($self->PointInTimeRecoveryStatus))[0];
+    }
+
+    return \%res;
+  }
+
+  sub to_parameter_data {
+    my ($self, $res, $prefix) = @_;
+    $res //= {};
+    $prefix = defined $prefix ? "$prefix." : "";
+
+
+    if (exists $self->{EarliestRestorableDateTime}) {
+      my $key = "${prefix}EarliestRestorableDateTime";
+      do {
+            $res->{$key} = "$_";
+      } for $self->EarliestRestorableDateTime;
+    }
+
+    if (exists $self->{LatestRestorableDateTime}) {
+      my $key = "${prefix}LatestRestorableDateTime";
+      do {
+            $res->{$key} = "$_";
+      } for $self->LatestRestorableDateTime;
+    }
+
+    if (exists $self->{PointInTimeRecoveryStatus}) {
+      my $key = "${prefix}PointInTimeRecoveryStatus";
+      do {
+            $res->{$key} = "$_";
+      } for $self->PointInTimeRecoveryStatus;
+    }
+
+    return $res;
+  }
+
+
+  __PACKAGE__->meta->make_immutable;
 1;
 
 ### main pod documentation begin ###

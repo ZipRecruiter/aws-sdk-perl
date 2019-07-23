@@ -1,8 +1,167 @@
 package Paws::DynamoDB::LocalSecondaryIndexInfo;
   use Moose;
-  has IndexName => (is => 'ro', isa => 'Str');
-  has KeySchema => (is => 'ro', isa => 'ArrayRef[Paws::DynamoDB::KeySchemaElement]');
-  has Projection => (is => 'ro', isa => 'Paws::DynamoDB::Projection');
+  use Types::Standard -types;
+  use namespace::clean -except => 'meta';
+  with 'Paws::API::Object';
+
+  has IndexName => (is => 'ro', isa => Str);
+  has KeySchema => (is => 'ro', isa => ArrayRef[InstanceOf['Paws::DynamoDB::KeySchemaElement']]);
+  has Projection => (is => 'ro', isa => InstanceOf['Paws::DynamoDB::Projection']);
+
+  sub new_with_coercions {
+    my ($class, $args) = @_;
+
+    my %res = %$args;
+    if (exists $args->{IndexName}) {
+      $res{IndexName} = (map {
+            "$_"
+      } ($args->{IndexName}))[0];
+    }
+    if (exists $args->{KeySchema}) {
+      $res{KeySchema} = (map {
+            [
+              map {
+                ref($_) eq 'Paws::DynamoDB::KeySchemaElement' ? $_ : do {
+                  require Paws::DynamoDB::KeySchemaElement;
+                  Paws::DynamoDB::KeySchemaElement->new_with_coercions($_);
+                }
+              } @$_
+            ]
+      } ($args->{KeySchema}))[0];
+    }
+    if (exists $args->{Projection}) {
+      $res{Projection} = (map {
+            ref($_) eq 'Paws::DynamoDB::Projection' ? $_ : do {
+              require Paws::DynamoDB::Projection;
+              Paws::DynamoDB::Projection->new_with_coercions($_);
+              }
+      } ($args->{Projection}))[0];
+    }
+
+    return $class->new(\%res);
+  }
+
+  sub new_from_xml {
+    my ($class, $xml) = @_;
+
+    my $res = {};
+    for ($xml->childNodes) {
+      if (!defined(my $nodeName = $_->nodeName)) {
+      } elsif ($nodeName eq "IndexName") {
+        my $key = "IndexName";
+            $res->{$key} = "" . ( $_->nodeValue // '' );
+      } elsif ($nodeName eq "KeySchema") {
+        my $key = "KeySchema";
+            do {
+              my $tmp = $res->{$key} // [];
+              $res->{$key} = do {
+                require Paws::DynamoDB::KeySchemaElement;
+                Paws::DynamoDB::KeySchemaElement->new_from_xml($_);
+              };
+              push @$tmp, $res->{$key};
+              $res->{$key} = $tmp;
+              }
+      } elsif ($nodeName eq "Projection") {
+        my $key = "Projection";
+            $res->{$key} = do {
+              require Paws::DynamoDB::Projection;
+              Paws::DynamoDB::Projection->new_from_xml($_);
+            };
+
+      } else {
+        # warn "Unrecognized element $nodeName";
+      }
+    }
+
+    return $class->new_with_coercions($res);
+  }
+
+  sub to_hash_data {
+    my ($self) = @_;
+
+    my %res;
+    if (exists $self->{IndexName}) {
+      $res{IndexName} = (map {
+            "$_"
+      } ($self->IndexName))[0];
+    }
+    if (exists $self->{KeySchema}) {
+      $res{KeySchema} = (map {
+            [ map { $_->to_hash_data } @$_ ]
+      } ($self->KeySchema))[0];
+    }
+    if (exists $self->{Projection}) {
+      $res{Projection} = (map {
+            $_->to_hash_data
+      } ($self->Projection))[0];
+    }
+
+    return \%res;
+  }
+
+  sub to_json_data {
+    my ($self) = @_;
+
+    my %res;
+    if (exists $self->{IndexName}) {
+      $res{IndexName} = (map {
+            "$_"
+      } ($self->IndexName))[0];
+    }
+    if (exists $self->{KeySchema}) {
+      $res{KeySchema} = (map {
+            [ map { $_->to_json_data } @$_ ]
+      } ($self->KeySchema))[0];
+    }
+    if (exists $self->{Projection}) {
+      $res{Projection} = (map {
+            $_->to_json_data
+      } ($self->Projection))[0];
+    }
+
+    return \%res;
+  }
+
+  sub to_parameter_data {
+    my ($self, $res, $prefix) = @_;
+    $res //= {};
+    $prefix = defined $prefix ? "$prefix." : "";
+
+
+    if (exists $self->{IndexName}) {
+      my $key = "${prefix}IndexName";
+      do {
+            $res->{$key} = "$_";
+      } for $self->IndexName;
+    }
+
+    if (exists $self->{KeySchema}) {
+      my $key = "${prefix}KeySchema";
+      do {
+            for my $index ( 0 .. ( @$_ - 1 ) ) {
+              my $orig_key = $key;
+              my $key      = sprintf( '%s.member.%d', $orig_key, $index + 1 );
+              my $val      = $_->[$index];
+              do {
+                $_->to_parameter_data( $res, $key );
+                }
+                for $val;
+            }
+      } for $self->KeySchema;
+    }
+
+    if (exists $self->{Projection}) {
+      my $key = "${prefix}Projection";
+      do {
+            $_->to_parameter_data( $res, $key );
+      } for $self->Projection;
+    }
+
+    return $res;
+  }
+
+
+  __PACKAGE__->meta->make_immutable;
 1;
 
 ### main pod documentation begin ###

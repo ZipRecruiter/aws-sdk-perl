@@ -1,12 +1,260 @@
 package Paws::DynamoDB::ConsumedCapacity;
   use Moose;
-  has CapacityUnits => (is => 'ro', isa => 'Num');
-  has GlobalSecondaryIndexes => (is => 'ro', isa => 'Paws::DynamoDB::SecondaryIndexesCapacityMap');
-  has LocalSecondaryIndexes => (is => 'ro', isa => 'Paws::DynamoDB::SecondaryIndexesCapacityMap');
-  has ReadCapacityUnits => (is => 'ro', isa => 'Num');
-  has Table => (is => 'ro', isa => 'Paws::DynamoDB::Capacity');
-  has TableName => (is => 'ro', isa => 'Str');
-  has WriteCapacityUnits => (is => 'ro', isa => 'Num');
+  use Types::Standard -types;
+  use namespace::clean -except => 'meta';
+  with 'Paws::API::Object';
+
+  has CapacityUnits => (is => 'ro', isa => Num);
+  has GlobalSecondaryIndexes => (is => 'ro', isa => InstanceOf['Paws::DynamoDB::SecondaryIndexesCapacityMap']);
+  has LocalSecondaryIndexes => (is => 'ro', isa => InstanceOf['Paws::DynamoDB::SecondaryIndexesCapacityMap']);
+  has ReadCapacityUnits => (is => 'ro', isa => Num);
+  has Table => (is => 'ro', isa => InstanceOf['Paws::DynamoDB::Capacity']);
+  has TableName => (is => 'ro', isa => Str);
+  has WriteCapacityUnits => (is => 'ro', isa => Num);
+
+  sub new_with_coercions {
+    my ($class, $args) = @_;
+
+    my %res = %$args;
+    if (exists $args->{CapacityUnits}) {
+      $res{CapacityUnits} = (map {
+            0 + $_
+      } ($args->{CapacityUnits}))[0];
+    }
+    if (exists $args->{GlobalSecondaryIndexes}) {
+      $res{GlobalSecondaryIndexes} = (map {
+            ref($_) eq 'Paws::DynamoDB::SecondaryIndexesCapacityMap' ? $_ : do {
+              require Paws::DynamoDB::SecondaryIndexesCapacityMap;
+              Paws::DynamoDB::SecondaryIndexesCapacityMap->new_with_coercions($_);
+              }
+      } ($args->{GlobalSecondaryIndexes}))[0];
+    }
+    if (exists $args->{LocalSecondaryIndexes}) {
+      $res{LocalSecondaryIndexes} = (map {
+            ref($_) eq 'Paws::DynamoDB::SecondaryIndexesCapacityMap' ? $_ : do {
+              require Paws::DynamoDB::SecondaryIndexesCapacityMap;
+              Paws::DynamoDB::SecondaryIndexesCapacityMap->new_with_coercions($_);
+              }
+      } ($args->{LocalSecondaryIndexes}))[0];
+    }
+    if (exists $args->{ReadCapacityUnits}) {
+      $res{ReadCapacityUnits} = (map {
+            0 + $_
+      } ($args->{ReadCapacityUnits}))[0];
+    }
+    if (exists $args->{Table}) {
+      $res{Table} = (map {
+            ref($_) eq 'Paws::DynamoDB::Capacity' ? $_ : do {
+              require Paws::DynamoDB::Capacity;
+              Paws::DynamoDB::Capacity->new_with_coercions($_);
+              }
+      } ($args->{Table}))[0];
+    }
+    if (exists $args->{TableName}) {
+      $res{TableName} = (map {
+            "$_"
+      } ($args->{TableName}))[0];
+    }
+    if (exists $args->{WriteCapacityUnits}) {
+      $res{WriteCapacityUnits} = (map {
+            0 + $_
+      } ($args->{WriteCapacityUnits}))[0];
+    }
+
+    return $class->new(\%res);
+  }
+
+  sub new_from_xml {
+    my ($class, $xml) = @_;
+
+    my $res = {};
+    for ($xml->childNodes) {
+      if (!defined(my $nodeName = $_->nodeName)) {
+      } elsif ($nodeName eq "CapacityUnits") {
+        my $key = "CapacityUnits";
+            $res->{$key} = 0 + ( $_->nodeValue // 0 );
+      } elsif ($nodeName eq "GlobalSecondaryIndexes") {
+        my $key = "GlobalSecondaryIndexes";
+            do {
+              require Paws::DynamoDB::SecondaryIndexesCapacityMap;
+              Paws::DynamoDB::SecondaryIndexesCapacityMap->read_xml( $_, $res, $key );
+            };
+      } elsif ($nodeName eq "LocalSecondaryIndexes") {
+        my $key = "LocalSecondaryIndexes";
+            do {
+              require Paws::DynamoDB::SecondaryIndexesCapacityMap;
+              Paws::DynamoDB::SecondaryIndexesCapacityMap->read_xml( $_, $res, $key );
+            };
+      } elsif ($nodeName eq "ReadCapacityUnits") {
+        my $key = "ReadCapacityUnits";
+            $res->{$key} = 0 + ( $_->nodeValue // 0 );
+      } elsif ($nodeName eq "Table") {
+        my $key = "Table";
+            $res->{$key} = do {
+              require Paws::DynamoDB::Capacity;
+              Paws::DynamoDB::Capacity->new_from_xml($_);
+            };
+      } elsif ($nodeName eq "TableName") {
+        my $key = "TableName";
+            $res->{$key} = "" . ( $_->nodeValue // '' );
+      } elsif ($nodeName eq "WriteCapacityUnits") {
+        my $key = "WriteCapacityUnits";
+            $res->{$key} = 0 + ( $_->nodeValue // 0 );
+
+      } else {
+        # warn "Unrecognized element $nodeName";
+      }
+    }
+
+    return $class->new_with_coercions($res);
+  }
+
+  sub to_hash_data {
+    my ($self) = @_;
+
+    my %res;
+    if (exists $self->{CapacityUnits}) {
+      $res{CapacityUnits} = (map {
+            0 + $_
+      } ($self->CapacityUnits))[0];
+    }
+    if (exists $self->{GlobalSecondaryIndexes}) {
+      $res{GlobalSecondaryIndexes} = (map {
+            $_->to_hash_data
+      } ($self->GlobalSecondaryIndexes))[0];
+    }
+    if (exists $self->{LocalSecondaryIndexes}) {
+      $res{LocalSecondaryIndexes} = (map {
+            $_->to_hash_data
+      } ($self->LocalSecondaryIndexes))[0];
+    }
+    if (exists $self->{ReadCapacityUnits}) {
+      $res{ReadCapacityUnits} = (map {
+            0 + $_
+      } ($self->ReadCapacityUnits))[0];
+    }
+    if (exists $self->{Table}) {
+      $res{Table} = (map {
+            $_->to_hash_data
+      } ($self->Table))[0];
+    }
+    if (exists $self->{TableName}) {
+      $res{TableName} = (map {
+            "$_"
+      } ($self->TableName))[0];
+    }
+    if (exists $self->{WriteCapacityUnits}) {
+      $res{WriteCapacityUnits} = (map {
+            0 + $_
+      } ($self->WriteCapacityUnits))[0];
+    }
+
+    return \%res;
+  }
+
+  sub to_json_data {
+    my ($self) = @_;
+
+    my %res;
+    if (exists $self->{CapacityUnits}) {
+      $res{CapacityUnits} = (map {
+            0 + $_
+      } ($self->CapacityUnits))[0];
+    }
+    if (exists $self->{GlobalSecondaryIndexes}) {
+      $res{GlobalSecondaryIndexes} = (map {
+            $_->to_json_data
+      } ($self->GlobalSecondaryIndexes))[0];
+    }
+    if (exists $self->{LocalSecondaryIndexes}) {
+      $res{LocalSecondaryIndexes} = (map {
+            $_->to_json_data
+      } ($self->LocalSecondaryIndexes))[0];
+    }
+    if (exists $self->{ReadCapacityUnits}) {
+      $res{ReadCapacityUnits} = (map {
+            0 + $_
+      } ($self->ReadCapacityUnits))[0];
+    }
+    if (exists $self->{Table}) {
+      $res{Table} = (map {
+            $_->to_json_data
+      } ($self->Table))[0];
+    }
+    if (exists $self->{TableName}) {
+      $res{TableName} = (map {
+            "$_"
+      } ($self->TableName))[0];
+    }
+    if (exists $self->{WriteCapacityUnits}) {
+      $res{WriteCapacityUnits} = (map {
+            0 + $_
+      } ($self->WriteCapacityUnits))[0];
+    }
+
+    return \%res;
+  }
+
+  sub to_parameter_data {
+    my ($self, $res, $prefix) = @_;
+    $res //= {};
+    $prefix = defined $prefix ? "$prefix." : "";
+
+
+    if (exists $self->{CapacityUnits}) {
+      my $key = "${prefix}CapacityUnits";
+      do {
+            $res->{$key} = 0 + $_;
+      } for $self->CapacityUnits;
+    }
+
+    if (exists $self->{GlobalSecondaryIndexes}) {
+      my $key = "${prefix}GlobalSecondaryIndexes";
+      do {
+            $_->to_parameter_data( $res, $key );
+      } for $self->GlobalSecondaryIndexes;
+    }
+
+    if (exists $self->{LocalSecondaryIndexes}) {
+      my $key = "${prefix}LocalSecondaryIndexes";
+      do {
+            $_->to_parameter_data( $res, $key );
+      } for $self->LocalSecondaryIndexes;
+    }
+
+    if (exists $self->{ReadCapacityUnits}) {
+      my $key = "${prefix}ReadCapacityUnits";
+      do {
+            $res->{$key} = 0 + $_;
+      } for $self->ReadCapacityUnits;
+    }
+
+    if (exists $self->{Table}) {
+      my $key = "${prefix}Table";
+      do {
+            $_->to_parameter_data( $res, $key );
+      } for $self->Table;
+    }
+
+    if (exists $self->{TableName}) {
+      my $key = "${prefix}TableName";
+      do {
+            $res->{$key} = "$_";
+      } for $self->TableName;
+    }
+
+    if (exists $self->{WriteCapacityUnits}) {
+      my $key = "${prefix}WriteCapacityUnits";
+      do {
+            $res->{$key} = 0 + $_;
+      } for $self->WriteCapacityUnits;
+    }
+
+    return $res;
+  }
+
+
+  __PACKAGE__->meta->make_immutable;
 1;
 
 ### main pod documentation begin ###

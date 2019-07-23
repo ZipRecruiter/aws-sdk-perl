@@ -1,7 +1,112 @@
 package Paws::DynamoDB::TimeToLiveDescription;
   use Moose;
-  has AttributeName => (is => 'ro', isa => 'Str');
-  has TimeToLiveStatus => (is => 'ro', isa => 'Str');
+  use Types::Standard -types;
+  use namespace::clean -except => 'meta';
+  with 'Paws::API::Object';
+
+  has AttributeName => (is => 'ro', isa => Str);
+  has TimeToLiveStatus => (is => 'ro', isa => Str);
+
+  sub new_with_coercions {
+    my ($class, $args) = @_;
+
+    my %res = %$args;
+    if (exists $args->{AttributeName}) {
+      $res{AttributeName} = (map {
+            "$_"
+      } ($args->{AttributeName}))[0];
+    }
+    if (exists $args->{TimeToLiveStatus}) {
+      $res{TimeToLiveStatus} = (map {
+            "$_"
+      } ($args->{TimeToLiveStatus}))[0];
+    }
+
+    return $class->new(\%res);
+  }
+
+  sub new_from_xml {
+    my ($class, $xml) = @_;
+
+    my $res = {};
+    for ($xml->childNodes) {
+      if (!defined(my $nodeName = $_->nodeName)) {
+      } elsif ($nodeName eq "AttributeName") {
+        my $key = "AttributeName";
+            $res->{$key} = "" . ( $_->nodeValue // '' );
+      } elsif ($nodeName eq "TimeToLiveStatus") {
+        my $key = "TimeToLiveStatus";
+            $res->{$key} = "" . ( $_->nodeValue // '' );
+
+      } else {
+        # warn "Unrecognized element $nodeName";
+      }
+    }
+
+    return $class->new_with_coercions($res);
+  }
+
+  sub to_hash_data {
+    my ($self) = @_;
+
+    my %res;
+    if (exists $self->{AttributeName}) {
+      $res{AttributeName} = (map {
+            "$_"
+      } ($self->AttributeName))[0];
+    }
+    if (exists $self->{TimeToLiveStatus}) {
+      $res{TimeToLiveStatus} = (map {
+            "$_"
+      } ($self->TimeToLiveStatus))[0];
+    }
+
+    return \%res;
+  }
+
+  sub to_json_data {
+    my ($self) = @_;
+
+    my %res;
+    if (exists $self->{AttributeName}) {
+      $res{AttributeName} = (map {
+            "$_"
+      } ($self->AttributeName))[0];
+    }
+    if (exists $self->{TimeToLiveStatus}) {
+      $res{TimeToLiveStatus} = (map {
+            "$_"
+      } ($self->TimeToLiveStatus))[0];
+    }
+
+    return \%res;
+  }
+
+  sub to_parameter_data {
+    my ($self, $res, $prefix) = @_;
+    $res //= {};
+    $prefix = defined $prefix ? "$prefix." : "";
+
+
+    if (exists $self->{AttributeName}) {
+      my $key = "${prefix}AttributeName";
+      do {
+            $res->{$key} = "$_";
+      } for $self->AttributeName;
+    }
+
+    if (exists $self->{TimeToLiveStatus}) {
+      my $key = "${prefix}TimeToLiveStatus";
+      do {
+            $res->{$key} = "$_";
+      } for $self->TimeToLiveStatus;
+    }
+
+    return $res;
+  }
+
+
+  __PACKAGE__->meta->make_immutable;
 1;
 
 ### main pod documentation begin ###

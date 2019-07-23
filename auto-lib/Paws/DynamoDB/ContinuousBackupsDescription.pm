@@ -1,7 +1,118 @@
 package Paws::DynamoDB::ContinuousBackupsDescription;
   use Moose;
-  has ContinuousBackupsStatus => (is => 'ro', isa => 'Str', required => 1);
-  has PointInTimeRecoveryDescription => (is => 'ro', isa => 'Paws::DynamoDB::PointInTimeRecoveryDescription');
+  use Types::Standard -types;
+  use namespace::clean -except => 'meta';
+  with 'Paws::API::Object';
+
+  has ContinuousBackupsStatus => (is => 'ro', isa => Str, required => 1);
+  has PointInTimeRecoveryDescription => (is => 'ro', isa => InstanceOf['Paws::DynamoDB::PointInTimeRecoveryDescription']);
+
+  sub new_with_coercions {
+    my ($class, $args) = @_;
+
+    my %res = %$args;
+    if (exists $args->{ContinuousBackupsStatus}) {
+      $res{ContinuousBackupsStatus} = (map {
+            "$_"
+      } ($args->{ContinuousBackupsStatus}))[0];
+    }
+    if (exists $args->{PointInTimeRecoveryDescription}) {
+      $res{PointInTimeRecoveryDescription} = (map {
+            ref($_) eq 'Paws::DynamoDB::PointInTimeRecoveryDescription' ? $_ : do {
+              require Paws::DynamoDB::PointInTimeRecoveryDescription;
+              Paws::DynamoDB::PointInTimeRecoveryDescription->new_with_coercions($_);
+              }
+      } ($args->{PointInTimeRecoveryDescription}))[0];
+    }
+
+    return $class->new(\%res);
+  }
+
+  sub new_from_xml {
+    my ($class, $xml) = @_;
+
+    my $res = {};
+    for ($xml->childNodes) {
+      if (!defined(my $nodeName = $_->nodeName)) {
+      } elsif ($nodeName eq "ContinuousBackupsStatus") {
+        my $key = "ContinuousBackupsStatus";
+            $res->{$key} = "" . ( $_->nodeValue // '' );
+      } elsif ($nodeName eq "PointInTimeRecoveryDescription") {
+        my $key = "PointInTimeRecoveryDescription";
+            $res->{$key} = do {
+              require Paws::DynamoDB::PointInTimeRecoveryDescription;
+              Paws::DynamoDB::PointInTimeRecoveryDescription->new_from_xml($_);
+            };
+
+      } else {
+        # warn "Unrecognized element $nodeName";
+      }
+    }
+
+    return $class->new_with_coercions($res);
+  }
+
+  sub to_hash_data {
+    my ($self) = @_;
+
+    my %res;
+    if (exists $self->{ContinuousBackupsStatus}) {
+      $res{ContinuousBackupsStatus} = (map {
+            "$_"
+      } ($self->ContinuousBackupsStatus))[0];
+    }
+    if (exists $self->{PointInTimeRecoveryDescription}) {
+      $res{PointInTimeRecoveryDescription} = (map {
+            $_->to_hash_data
+      } ($self->PointInTimeRecoveryDescription))[0];
+    }
+
+    return \%res;
+  }
+
+  sub to_json_data {
+    my ($self) = @_;
+
+    my %res;
+    if (exists $self->{ContinuousBackupsStatus}) {
+      $res{ContinuousBackupsStatus} = (map {
+            "$_"
+      } ($self->ContinuousBackupsStatus))[0];
+    }
+    if (exists $self->{PointInTimeRecoveryDescription}) {
+      $res{PointInTimeRecoveryDescription} = (map {
+            $_->to_json_data
+      } ($self->PointInTimeRecoveryDescription))[0];
+    }
+
+    return \%res;
+  }
+
+  sub to_parameter_data {
+    my ($self, $res, $prefix) = @_;
+    $res //= {};
+    $prefix = defined $prefix ? "$prefix." : "";
+
+
+    if (exists $self->{ContinuousBackupsStatus}) {
+      my $key = "${prefix}ContinuousBackupsStatus";
+      do {
+            $res->{$key} = "$_";
+      } for $self->ContinuousBackupsStatus;
+    }
+
+    if (exists $self->{PointInTimeRecoveryDescription}) {
+      my $key = "${prefix}PointInTimeRecoveryDescription";
+      do {
+            $_->to_parameter_data( $res, $key );
+      } for $self->PointInTimeRecoveryDescription;
+    }
+
+    return $res;
+  }
+
+
+  __PACKAGE__->meta->make_immutable;
 1;
 
 ### main pod documentation begin ###

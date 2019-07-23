@@ -1,14 +1,323 @@
 package Paws::DynamoDB::SourceTableDetails;
   use Moose;
-  has BillingMode => (is => 'ro', isa => 'Str');
-  has ItemCount => (is => 'ro', isa => 'Int');
-  has KeySchema => (is => 'ro', isa => 'ArrayRef[Paws::DynamoDB::KeySchemaElement]', required => 1);
-  has ProvisionedThroughput => (is => 'ro', isa => 'Paws::DynamoDB::ProvisionedThroughput', required => 1);
-  has TableArn => (is => 'ro', isa => 'Str');
-  has TableCreationDateTime => (is => 'ro', isa => 'Str', required => 1);
-  has TableId => (is => 'ro', isa => 'Str', required => 1);
-  has TableName => (is => 'ro', isa => 'Str', required => 1);
-  has TableSizeBytes => (is => 'ro', isa => 'Int');
+  use Types::Standard -types;
+  use namespace::clean -except => 'meta';
+  with 'Paws::API::Object';
+
+  has BillingMode => (is => 'ro', isa => Str);
+  has ItemCount => (is => 'ro', isa => Int);
+  has KeySchema => (is => 'ro', isa => ArrayRef[InstanceOf['Paws::DynamoDB::KeySchemaElement']], required => 1);
+  has ProvisionedThroughput => (is => 'ro', isa => InstanceOf['Paws::DynamoDB::ProvisionedThroughput'], required => 1);
+  has TableArn => (is => 'ro', isa => Str);
+  has TableCreationDateTime => (is => 'ro', isa => Str, required => 1);
+  has TableId => (is => 'ro', isa => Str, required => 1);
+  has TableName => (is => 'ro', isa => Str, required => 1);
+  has TableSizeBytes => (is => 'ro', isa => Int);
+
+  sub new_with_coercions {
+    my ($class, $args) = @_;
+
+    my %res = %$args;
+    if (exists $args->{BillingMode}) {
+      $res{BillingMode} = (map {
+            "$_"
+      } ($args->{BillingMode}))[0];
+    }
+    if (exists $args->{ItemCount}) {
+      $res{ItemCount} = (map {
+            int($_)
+      } ($args->{ItemCount}))[0];
+    }
+    if (exists $args->{KeySchema}) {
+      $res{KeySchema} = (map {
+            [
+              map {
+                ref($_) eq 'Paws::DynamoDB::KeySchemaElement' ? $_ : do {
+                  require Paws::DynamoDB::KeySchemaElement;
+                  Paws::DynamoDB::KeySchemaElement->new_with_coercions($_);
+                }
+              } @$_
+            ]
+      } ($args->{KeySchema}))[0];
+    }
+    if (exists $args->{ProvisionedThroughput}) {
+      $res{ProvisionedThroughput} = (map {
+            ref($_) eq 'Paws::DynamoDB::ProvisionedThroughput' ? $_ : do {
+              require Paws::DynamoDB::ProvisionedThroughput;
+              Paws::DynamoDB::ProvisionedThroughput->new_with_coercions($_);
+              }
+      } ($args->{ProvisionedThroughput}))[0];
+    }
+    if (exists $args->{TableArn}) {
+      $res{TableArn} = (map {
+            "$_"
+      } ($args->{TableArn}))[0];
+    }
+    if (exists $args->{TableCreationDateTime}) {
+      $res{TableCreationDateTime} = (map {
+            "$_"
+      } ($args->{TableCreationDateTime}))[0];
+    }
+    if (exists $args->{TableId}) {
+      $res{TableId} = (map {
+            "$_"
+      } ($args->{TableId}))[0];
+    }
+    if (exists $args->{TableName}) {
+      $res{TableName} = (map {
+            "$_"
+      } ($args->{TableName}))[0];
+    }
+    if (exists $args->{TableSizeBytes}) {
+      $res{TableSizeBytes} = (map {
+            int($_)
+      } ($args->{TableSizeBytes}))[0];
+    }
+
+    return $class->new(\%res);
+  }
+
+  sub new_from_xml {
+    my ($class, $xml) = @_;
+
+    my $res = {};
+    for ($xml->childNodes) {
+      if (!defined(my $nodeName = $_->nodeName)) {
+      } elsif ($nodeName eq "BillingMode") {
+        my $key = "BillingMode";
+            $res->{$key} = "" . ( $_->nodeValue // '' );
+      } elsif ($nodeName eq "ItemCount") {
+        my $key = "ItemCount";
+            $res->{$key} = int( $_->nodeValue // 0 );
+      } elsif ($nodeName eq "KeySchema") {
+        my $key = "KeySchema";
+            do {
+              my $tmp = $res->{$key} // [];
+              $res->{$key} = do {
+                require Paws::DynamoDB::KeySchemaElement;
+                Paws::DynamoDB::KeySchemaElement->new_from_xml($_);
+              };
+              push @$tmp, $res->{$key};
+              $res->{$key} = $tmp;
+              }
+      } elsif ($nodeName eq "ProvisionedThroughput") {
+        my $key = "ProvisionedThroughput";
+            $res->{$key} = do {
+              require Paws::DynamoDB::ProvisionedThroughput;
+              Paws::DynamoDB::ProvisionedThroughput->new_from_xml($_);
+            };
+      } elsif ($nodeName eq "TableArn") {
+        my $key = "TableArn";
+            $res->{$key} = "" . ( $_->nodeValue // '' );
+      } elsif ($nodeName eq "TableCreationDateTime") {
+        my $key = "TableCreationDateTime";
+            $res->{$key} = "" . ( $_->nodeValue // '' );
+      } elsif ($nodeName eq "TableId") {
+        my $key = "TableId";
+            $res->{$key} = "" . ( $_->nodeValue // '' );
+      } elsif ($nodeName eq "TableName") {
+        my $key = "TableName";
+            $res->{$key} = "" . ( $_->nodeValue // '' );
+      } elsif ($nodeName eq "TableSizeBytes") {
+        my $key = "TableSizeBytes";
+            $res->{$key} = int( $_->nodeValue // 0 );
+
+      } else {
+        # warn "Unrecognized element $nodeName";
+      }
+    }
+
+    return $class->new_with_coercions($res);
+  }
+
+  sub to_hash_data {
+    my ($self) = @_;
+
+    my %res;
+    if (exists $self->{BillingMode}) {
+      $res{BillingMode} = (map {
+            "$_"
+      } ($self->BillingMode))[0];
+    }
+    if (exists $self->{ItemCount}) {
+      $res{ItemCount} = (map {
+            int($_)
+      } ($self->ItemCount))[0];
+    }
+    if (exists $self->{KeySchema}) {
+      $res{KeySchema} = (map {
+            [ map { $_->to_hash_data } @$_ ]
+      } ($self->KeySchema))[0];
+    }
+    if (exists $self->{ProvisionedThroughput}) {
+      $res{ProvisionedThroughput} = (map {
+            $_->to_hash_data
+      } ($self->ProvisionedThroughput))[0];
+    }
+    if (exists $self->{TableArn}) {
+      $res{TableArn} = (map {
+            "$_"
+      } ($self->TableArn))[0];
+    }
+    if (exists $self->{TableCreationDateTime}) {
+      $res{TableCreationDateTime} = (map {
+            "$_"
+      } ($self->TableCreationDateTime))[0];
+    }
+    if (exists $self->{TableId}) {
+      $res{TableId} = (map {
+            "$_"
+      } ($self->TableId))[0];
+    }
+    if (exists $self->{TableName}) {
+      $res{TableName} = (map {
+            "$_"
+      } ($self->TableName))[0];
+    }
+    if (exists $self->{TableSizeBytes}) {
+      $res{TableSizeBytes} = (map {
+            int($_)
+      } ($self->TableSizeBytes))[0];
+    }
+
+    return \%res;
+  }
+
+  sub to_json_data {
+    my ($self) = @_;
+
+    my %res;
+    if (exists $self->{BillingMode}) {
+      $res{BillingMode} = (map {
+            "$_"
+      } ($self->BillingMode))[0];
+    }
+    if (exists $self->{ItemCount}) {
+      $res{ItemCount} = (map {
+            int($_)
+      } ($self->ItemCount))[0];
+    }
+    if (exists $self->{KeySchema}) {
+      $res{KeySchema} = (map {
+            [ map { $_->to_json_data } @$_ ]
+      } ($self->KeySchema))[0];
+    }
+    if (exists $self->{ProvisionedThroughput}) {
+      $res{ProvisionedThroughput} = (map {
+            $_->to_json_data
+      } ($self->ProvisionedThroughput))[0];
+    }
+    if (exists $self->{TableArn}) {
+      $res{TableArn} = (map {
+            "$_"
+      } ($self->TableArn))[0];
+    }
+    if (exists $self->{TableCreationDateTime}) {
+      $res{TableCreationDateTime} = (map {
+            "$_"
+      } ($self->TableCreationDateTime))[0];
+    }
+    if (exists $self->{TableId}) {
+      $res{TableId} = (map {
+            "$_"
+      } ($self->TableId))[0];
+    }
+    if (exists $self->{TableName}) {
+      $res{TableName} = (map {
+            "$_"
+      } ($self->TableName))[0];
+    }
+    if (exists $self->{TableSizeBytes}) {
+      $res{TableSizeBytes} = (map {
+            int($_)
+      } ($self->TableSizeBytes))[0];
+    }
+
+    return \%res;
+  }
+
+  sub to_parameter_data {
+    my ($self, $res, $prefix) = @_;
+    $res //= {};
+    $prefix = defined $prefix ? "$prefix." : "";
+
+
+    if (exists $self->{BillingMode}) {
+      my $key = "${prefix}BillingMode";
+      do {
+            $res->{$key} = "$_";
+      } for $self->BillingMode;
+    }
+
+    if (exists $self->{ItemCount}) {
+      my $key = "${prefix}ItemCount";
+      do {
+            $res->{$key} = int($_);
+      } for $self->ItemCount;
+    }
+
+    if (exists $self->{KeySchema}) {
+      my $key = "${prefix}KeySchema";
+      do {
+            for my $index ( 0 .. ( @$_ - 1 ) ) {
+              my $orig_key = $key;
+              my $key      = sprintf( '%s.member.%d', $orig_key, $index + 1 );
+              my $val      = $_->[$index];
+              do {
+                $_->to_parameter_data( $res, $key );
+                }
+                for $val;
+            }
+      } for $self->KeySchema;
+    }
+
+    if (exists $self->{ProvisionedThroughput}) {
+      my $key = "${prefix}ProvisionedThroughput";
+      do {
+            $_->to_parameter_data( $res, $key );
+      } for $self->ProvisionedThroughput;
+    }
+
+    if (exists $self->{TableArn}) {
+      my $key = "${prefix}TableArn";
+      do {
+            $res->{$key} = "$_";
+      } for $self->TableArn;
+    }
+
+    if (exists $self->{TableCreationDateTime}) {
+      my $key = "${prefix}TableCreationDateTime";
+      do {
+            $res->{$key} = "$_";
+      } for $self->TableCreationDateTime;
+    }
+
+    if (exists $self->{TableId}) {
+      my $key = "${prefix}TableId";
+      do {
+            $res->{$key} = "$_";
+      } for $self->TableId;
+    }
+
+    if (exists $self->{TableName}) {
+      my $key = "${prefix}TableName";
+      do {
+            $res->{$key} = "$_";
+      } for $self->TableName;
+    }
+
+    if (exists $self->{TableSizeBytes}) {
+      my $key = "${prefix}TableSizeBytes";
+      do {
+            $res->{$key} = int($_);
+      } for $self->TableSizeBytes;
+    }
+
+    return $res;
+  }
+
+
+  __PACKAGE__->meta->make_immutable;
 1;
 
 ### main pod documentation begin ###

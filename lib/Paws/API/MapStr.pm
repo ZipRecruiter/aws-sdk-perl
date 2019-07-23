@@ -1,5 +1,6 @@
-package Paws::API::StrToObjMapParser;
+package Paws::API::MapStr;
   use Moose::Role;
+  use namespace::clean -except => 'meta';
 
   sub ValueFor {
     my ($self, $key) = shift;

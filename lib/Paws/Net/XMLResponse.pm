@@ -1,16 +1,15 @@
 package Paws::Net::XMLResponse;
   use Moose;
-  use XML::Simple qw//;
+  use XML::LibXML;
   use Carp qw(croak);
   use Paws::Exception;
 
   has _xml_parser => (
     is => 'ro',
     default => sub {
-      return XML::Simple->new(
-        ForceArray    => qr/^(?:item|Errors)/i,
-        KeyAttr       => '',
-        SuppressEmpty => undef,
+
+      return XML::LibXML->new(
+        no_network => 1
       );
     }
   );
@@ -27,7 +26,13 @@ package Paws::Net::XMLResponse;
       );
     }
 
-    my $struct = eval { $self->_xml_parser->parse_string($response->content) };
+    my $xml_doc = eval {
+      $self->_xml_parser->load_xml(
+        string => $response->content
+      )
+    };
+    require DDP; &DDP::p({ '$response->content' => $response->content });
+    require DDP; &DDP::p({ '$xml_doc' => $xml_doc });
     if ($@){
       return Paws::Exception->throw(
         message => $@,
@@ -36,7 +41,11 @@ package Paws::Net::XMLResponse;
         http_status => $response->status,
       );
     }
-    return $struct;
+    require DDP; &DDP::p({ '$xlm_doc->node_name' => $xml_doc->nodeName });
+    require DDP; &DDP::p({ '$xlm_doc->node_name' => $xml_doc->nodeValue });
+    require DDP; &DDP::p({ '$xlm_doc->node_name' => [map { $_->nodeName } $xml_doc->childNodes] });
+    die "foo";
+    return $xml_doc;
   }
 
   sub process {

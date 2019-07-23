@@ -1,10 +1,16 @@
-[%- operation = c.operation(op_name) %]
-[%- iclass = c.input_for_operation(op_name) %]
+[%- operation = c.operation(op_name) -%]
+[%- iclass = c.input_for_operation(op_name) -%]
 package [% c.api %]::[% operation.name %];
   use Moose;
+  use Types::Standard -types;
+  use MooseX::ClassAttribute;
+  use JSON::MaybeXS;
+  use namespace::clean -except => 'meta';
+  with 'Paws::API::CallArgs';
+
 [% FOREACH param_name IN iclass.members.keys.sort -%]
   [%- member = c.shape(iclass.members.$param_name.shape) -%]
-  has [% param_name %] => (is => 'ro', isa => '[% member.perl_type %]'
+  has [% param_name %] => (is => 'ro', isa => [% member.perl_type %]
   [%- IF (iclass.members.$param_name.location == 'header') %], traits => ['ParamInHeader'], header_name => '[% iclass.members.$param_name.locationName %]'
   [%- ELSIF (iclass.members.$param_name.location == 'querystring') %], traits => ['ParamInQuery'], query_name => '[% iclass.members.$param_name.locationName %]'
   [%- ELSIF (iclass.members.$param_name.location == 'uri') %], traits => ['ParamInURI'], uri_name => '[% iclass.members.$param_name.locationName %]'
@@ -13,7 +19,6 @@ package [% c.api %]::[% operation.name %];
   [%- END %]
   [%- IF (c.required_in_shape(iclass,param_name)) %], required => 1[% END %]);
 [% END %]
-  use MooseX::ClassAttribute;
 
   [%- IF (iclass.payload) -%]  class_has _stream_param => (is => 'ro', default => '[% c.to_payload_shape_name(iclass.payload) %]');[% END %]
   class_has _api_call => (isa => 'Str', is => 'ro', default => '[% op_name %]');
@@ -23,6 +28,10 @@ package [% c.api %]::[% operation.name %];
     [%- IF (operation.output.keys.size) -%]
       [%- c.api %]::[% c.shapename_for_operation_output(op_name) -%]
     [%- ELSE -%]Paws::API::Response[% END -%]');
+
+[% INCLUDE object_raw_constructor.tt members = iclass.members, rest = 1 %]
+
+  __PACKAGE__->meta->make_immutable;
 1;
 
 [% INCLUDE 'callclass_documentation.tt' %]

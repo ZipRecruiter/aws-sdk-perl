@@ -1,8 +1,82 @@
 package Paws::DynamoDB::BatchGetResponseMap;
   use Moose;
-  with 'Paws::API::StrToObjMapParser';
+  use Types::Standard -types;
+  use namespace::clean -except => 'meta';
+  with 'Paws::API::MapStr';
 
-  has Map => (is => 'ro', isa => 'HashRef[ArrayRef[Paws::DynamoDB::AttributeMap]]');
+  has Map => (is => 'ro', isa => HashRef[ArrayRef[InstanceOf['Paws::DynamoDB::AttributeMap']]]);
+
+  sub new_with_coercions {
+    my ($class, $args) = @_;
+    return $class->new({
+      Map => {
+        map {
+          ( $_ => (map {
+            [
+              map {
+                ref($_) eq 'Paws::DynamoDB::AttributeMap' ? $_ : do {
+                  require Paws::DynamoDB::AttributeMap;
+                  Paws::DynamoDB::AttributeMap->new_with_coercions($_);
+                }
+              } @$_
+            ]
+          } ($args->{$_}))[0] );
+        } keys %$args,
+      }
+    });
+  }
+
+  sub to_json_data {
+    my ($self) = @_;
+    return {
+      map {
+        ( $_ => (map {
+          [ map { $_->to_json_data } @$_ ]
+        } ($self->Map->{$_}))[0] );
+      } keys %{$self->Map}
+    };
+  }
+
+  sub to_hash_data {
+    my ($self) = @_;
+    return {
+      map {
+        ( $_ => (map {
+          [ map { $_->to_hash_data } @$_ ]
+        } ($self->Map->{$_}))[0] );
+      } keys %{$self->Map}
+    };
+  }
+
+  sub to_parameter_data {
+    my ($self, $res, $prefix) = @_;
+    $res //= {};
+    $prefix = defined $prefix ? "$prefix." : "";
+
+    my $map = $self->Map;
+
+    my $i = 1;
+    for my $map_key (keys %$map) {
+      $res->{"${prefix}${i}.Name"} = $map_key;
+      my $key = "${prefix}${i}.Value";
+      do {
+          for my $index ( 0 .. ( @$_ - 1 ) ) {
+            my $orig_key = $key;
+            my $key      = sprintf( '%s.member.%d', $orig_key, $index + 1 );
+            my $val      = $_->[$index];
+            do {
+              $_->to_parameter_data( $res, $key );
+              }
+              for $val;
+          }
+      } for $map->{$map_key};
+      $i++;
+    }
+
+    return $res;
+  }
+
+  __PACKAGE__->meta->make_immutable;
 1;
 
 ### main pod documentation begin ###

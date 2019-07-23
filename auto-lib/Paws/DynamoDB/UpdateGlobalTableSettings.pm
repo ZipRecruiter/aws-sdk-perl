@@ -1,18 +1,280 @@
 
 package Paws::DynamoDB::UpdateGlobalTableSettings;
   use Moose;
-  has GlobalTableBillingMode => (is => 'ro', isa => 'Str');
-  has GlobalTableGlobalSecondaryIndexSettingsUpdate => (is => 'ro', isa => 'ArrayRef[Paws::DynamoDB::GlobalTableGlobalSecondaryIndexSettingsUpdate]');
-  has GlobalTableName => (is => 'ro', isa => 'Str', required => 1);
-  has GlobalTableProvisionedWriteCapacityAutoScalingSettingsUpdate => (is => 'ro', isa => 'Paws::DynamoDB::AutoScalingSettingsUpdate');
-  has GlobalTableProvisionedWriteCapacityUnits => (is => 'ro', isa => 'Int');
-  has ReplicaSettingsUpdate => (is => 'ro', isa => 'ArrayRef[Paws::DynamoDB::ReplicaSettingsUpdate]');
-
+  use Types::Standard -types;
   use MooseX::ClassAttribute;
+  use namespace::clean -except => 'meta';
+  with 'Paws::API::CallArgs';
+
+  has GlobalTableBillingMode => (is => 'ro', isa => Str);
+  has GlobalTableGlobalSecondaryIndexSettingsUpdate => (is => 'ro', isa => ArrayRef[InstanceOf['Paws::DynamoDB::GlobalTableGlobalSecondaryIndexSettingsUpdate']]);
+  has GlobalTableName => (is => 'ro', isa => Str, required => 1);
+  has GlobalTableProvisionedWriteCapacityAutoScalingSettingsUpdate => (is => 'ro', isa => InstanceOf['Paws::DynamoDB::AutoScalingSettingsUpdate']);
+  has GlobalTableProvisionedWriteCapacityUnits => (is => 'ro', isa => Int);
+  has ReplicaSettingsUpdate => (is => 'ro', isa => ArrayRef[InstanceOf['Paws::DynamoDB::ReplicaSettingsUpdate']]);
+
 
   class_has _api_call => (isa => 'Str', is => 'ro', default => 'UpdateGlobalTableSettings');
   class_has _returns => (isa => 'Str', is => 'ro', default => 'Paws::DynamoDB::UpdateGlobalTableSettingsOutput');
   class_has _result_key => (isa => 'Str', is => 'ro');
+
+  sub new_with_coercions {
+    my ($class, $args) = @_;
+
+    my %res = %$args;
+    if (exists $args->{GlobalTableBillingMode}) {
+      $res{GlobalTableBillingMode} = (map {
+            "$_"
+      } ($args->{GlobalTableBillingMode}))[0];
+    }
+    if (exists $args->{GlobalTableGlobalSecondaryIndexSettingsUpdate}) {
+      $res{GlobalTableGlobalSecondaryIndexSettingsUpdate} = (map {
+            [
+              map {
+                ref($_) eq
+                  'Paws::DynamoDB::GlobalTableGlobalSecondaryIndexSettingsUpdate'
+                  ? $_
+                  : do {
+                  require Paws::DynamoDB::GlobalTableGlobalSecondaryIndexSettingsUpdate;
+                  Paws::DynamoDB::GlobalTableGlobalSecondaryIndexSettingsUpdate
+                    ->new_with_coercions($_);
+                }
+              } @$_
+            ]
+      } ($args->{GlobalTableGlobalSecondaryIndexSettingsUpdate}))[0];
+    }
+    if (exists $args->{GlobalTableName}) {
+      $res{GlobalTableName} = (map {
+            "$_"
+      } ($args->{GlobalTableName}))[0];
+    }
+    if (exists $args->{GlobalTableProvisionedWriteCapacityAutoScalingSettingsUpdate}) {
+      $res{GlobalTableProvisionedWriteCapacityAutoScalingSettingsUpdate} = (map {
+            ref($_) eq 'Paws::DynamoDB::AutoScalingSettingsUpdate' ? $_ : do {
+              require Paws::DynamoDB::AutoScalingSettingsUpdate;
+              Paws::DynamoDB::AutoScalingSettingsUpdate->new_with_coercions($_);
+              }
+      } ($args->{GlobalTableProvisionedWriteCapacityAutoScalingSettingsUpdate}))[0];
+    }
+    if (exists $args->{GlobalTableProvisionedWriteCapacityUnits}) {
+      $res{GlobalTableProvisionedWriteCapacityUnits} = (map {
+            int($_)
+      } ($args->{GlobalTableProvisionedWriteCapacityUnits}))[0];
+    }
+    if (exists $args->{ReplicaSettingsUpdate}) {
+      $res{ReplicaSettingsUpdate} = (map {
+            [
+              map {
+                ref($_) eq 'Paws::DynamoDB::ReplicaSettingsUpdate' ? $_ : do {
+                  require Paws::DynamoDB::ReplicaSettingsUpdate;
+                  Paws::DynamoDB::ReplicaSettingsUpdate->new_with_coercions($_);
+                }
+              } @$_
+            ]
+      } ($args->{ReplicaSettingsUpdate}))[0];
+    }
+
+    return $class->new(\%res);
+  }
+
+  sub new_from_xml {
+    my ($class, $xml) = @_;
+
+    my $res = {};
+    for ($xml->childNodes) {
+      if (!defined(my $nodeName = $_->nodeName)) {
+      } elsif ($nodeName eq "GlobalTableBillingMode") {
+        my $key = "GlobalTableBillingMode";
+            $res->{$key} = "" . ( $_->nodeValue // '' );
+      } elsif ($nodeName eq "GlobalTableGlobalSecondaryIndexSettingsUpdate") {
+        my $key = "GlobalTableGlobalSecondaryIndexSettingsUpdate";
+            do {
+              my $tmp = $res->{$key} // [];
+              $res->{$key} = do {
+                require Paws::DynamoDB::GlobalTableGlobalSecondaryIndexSettingsUpdate;
+                Paws::DynamoDB::GlobalTableGlobalSecondaryIndexSettingsUpdate
+                  ->new_from_xml($_);
+              };
+              push @$tmp, $res->{$key};
+              $res->{$key} = $tmp;
+              }
+      } elsif ($nodeName eq "GlobalTableName") {
+        my $key = "GlobalTableName";
+            $res->{$key} = "" . ( $_->nodeValue // '' );
+      } elsif ($nodeName eq "GlobalTableProvisionedWriteCapacityAutoScalingSettingsUpdate") {
+        my $key = "GlobalTableProvisionedWriteCapacityAutoScalingSettingsUpdate";
+            $res->{$key} = do {
+              require Paws::DynamoDB::AutoScalingSettingsUpdate;
+              Paws::DynamoDB::AutoScalingSettingsUpdate->new_from_xml($_);
+            };
+      } elsif ($nodeName eq "GlobalTableProvisionedWriteCapacityUnits") {
+        my $key = "GlobalTableProvisionedWriteCapacityUnits";
+            $res->{$key} = int( $_->nodeValue // 0 );
+      } elsif ($nodeName eq "ReplicaSettingsUpdate") {
+        my $key = "ReplicaSettingsUpdate";
+            do {
+              my $tmp = $res->{$key} // [];
+              $res->{$key} = do {
+                require Paws::DynamoDB::ReplicaSettingsUpdate;
+                Paws::DynamoDB::ReplicaSettingsUpdate->new_from_xml($_);
+              };
+              push @$tmp, $res->{$key};
+              $res->{$key} = $tmp;
+              }
+
+      } else {
+        # warn "Unrecognized element $nodeName";
+      }
+    }
+
+    return $class->new_with_coercions($res);
+  }
+
+  sub to_hash_data {
+    my ($self) = @_;
+
+    my %res;
+    if (exists $self->{GlobalTableBillingMode}) {
+      $res{GlobalTableBillingMode} = (map {
+            "$_"
+      } ($self->GlobalTableBillingMode))[0];
+    }
+    if (exists $self->{GlobalTableGlobalSecondaryIndexSettingsUpdate}) {
+      $res{GlobalTableGlobalSecondaryIndexSettingsUpdate} = (map {
+            [ map { $_->to_hash_data } @$_ ]
+      } ($self->GlobalTableGlobalSecondaryIndexSettingsUpdate))[0];
+    }
+    if (exists $self->{GlobalTableName}) {
+      $res{GlobalTableName} = (map {
+            "$_"
+      } ($self->GlobalTableName))[0];
+    }
+    if (exists $self->{GlobalTableProvisionedWriteCapacityAutoScalingSettingsUpdate}) {
+      $res{GlobalTableProvisionedWriteCapacityAutoScalingSettingsUpdate} = (map {
+            $_->to_hash_data
+      } ($self->GlobalTableProvisionedWriteCapacityAutoScalingSettingsUpdate))[0];
+    }
+    if (exists $self->{GlobalTableProvisionedWriteCapacityUnits}) {
+      $res{GlobalTableProvisionedWriteCapacityUnits} = (map {
+            int($_)
+      } ($self->GlobalTableProvisionedWriteCapacityUnits))[0];
+    }
+    if (exists $self->{ReplicaSettingsUpdate}) {
+      $res{ReplicaSettingsUpdate} = (map {
+            [ map { $_->to_hash_data } @$_ ]
+      } ($self->ReplicaSettingsUpdate))[0];
+    }
+
+    return \%res;
+  }
+
+  sub to_json_data {
+    my ($self) = @_;
+
+    my %res;
+    if (exists $self->{GlobalTableBillingMode}) {
+      $res{GlobalTableBillingMode} = (map {
+            "$_"
+      } ($self->GlobalTableBillingMode))[0];
+    }
+    if (exists $self->{GlobalTableGlobalSecondaryIndexSettingsUpdate}) {
+      $res{GlobalTableGlobalSecondaryIndexSettingsUpdate} = (map {
+            [ map { $_->to_json_data } @$_ ]
+      } ($self->GlobalTableGlobalSecondaryIndexSettingsUpdate))[0];
+    }
+    if (exists $self->{GlobalTableName}) {
+      $res{GlobalTableName} = (map {
+            "$_"
+      } ($self->GlobalTableName))[0];
+    }
+    if (exists $self->{GlobalTableProvisionedWriteCapacityAutoScalingSettingsUpdate}) {
+      $res{GlobalTableProvisionedWriteCapacityAutoScalingSettingsUpdate} = (map {
+            $_->to_json_data
+      } ($self->GlobalTableProvisionedWriteCapacityAutoScalingSettingsUpdate))[0];
+    }
+    if (exists $self->{GlobalTableProvisionedWriteCapacityUnits}) {
+      $res{GlobalTableProvisionedWriteCapacityUnits} = (map {
+            int($_)
+      } ($self->GlobalTableProvisionedWriteCapacityUnits))[0];
+    }
+    if (exists $self->{ReplicaSettingsUpdate}) {
+      $res{ReplicaSettingsUpdate} = (map {
+            [ map { $_->to_json_data } @$_ ]
+      } ($self->ReplicaSettingsUpdate))[0];
+    }
+
+    return \%res;
+  }
+
+  sub to_parameter_data {
+    my ($self, $res, $prefix) = @_;
+    $res //= {};
+    $prefix = defined $prefix ? "$prefix." : "";
+
+
+    if (exists $self->{GlobalTableBillingMode}) {
+      my $key = "${prefix}GlobalTableBillingMode";
+      do {
+            $res->{$key} = "$_";
+      } for $self->GlobalTableBillingMode;
+    }
+
+    if (exists $self->{GlobalTableGlobalSecondaryIndexSettingsUpdate}) {
+      my $key = "${prefix}GlobalTableGlobalSecondaryIndexSettingsUpdate";
+      do {
+            for my $index ( 0 .. ( @$_ - 1 ) ) {
+              my $orig_key = $key;
+              my $key      = sprintf( '%s.member.%d', $orig_key, $index + 1 );
+              my $val      = $_->[$index];
+              do {
+                $_->to_parameter_data( $res, $key );
+                }
+                for $val;
+            }
+      } for $self->GlobalTableGlobalSecondaryIndexSettingsUpdate;
+    }
+
+    if (exists $self->{GlobalTableName}) {
+      my $key = "${prefix}GlobalTableName";
+      do {
+            $res->{$key} = "$_";
+      } for $self->GlobalTableName;
+    }
+
+    if (exists $self->{GlobalTableProvisionedWriteCapacityAutoScalingSettingsUpdate}) {
+      my $key = "${prefix}GlobalTableProvisionedWriteCapacityAutoScalingSettingsUpdate";
+      do {
+            $_->to_parameter_data( $res, $key );
+      } for $self->GlobalTableProvisionedWriteCapacityAutoScalingSettingsUpdate;
+    }
+
+    if (exists $self->{GlobalTableProvisionedWriteCapacityUnits}) {
+      my $key = "${prefix}GlobalTableProvisionedWriteCapacityUnits";
+      do {
+            $res->{$key} = int($_);
+      } for $self->GlobalTableProvisionedWriteCapacityUnits;
+    }
+
+    if (exists $self->{ReplicaSettingsUpdate}) {
+      my $key = "${prefix}ReplicaSettingsUpdate";
+      do {
+            for my $index ( 0 .. ( @$_ - 1 ) ) {
+              my $orig_key = $key;
+              my $key      = sprintf( '%s.member.%d', $orig_key, $index + 1 );
+              my $val      = $_->[$index];
+              do {
+                $_->to_parameter_data( $res, $key );
+                }
+                for $val;
+            }
+      } for $self->ReplicaSettingsUpdate;
+    }
+
+    return $res;
+  }
+
+
+  __PACKAGE__->meta->make_immutable;
 1;
 
 ### main pod documentation begin ###

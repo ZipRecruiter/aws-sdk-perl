@@ -1,21 +1,411 @@
 
 package Paws::DynamoDB::CreateTable;
   use Moose;
-  has AttributeDefinitions => (is => 'ro', isa => 'ArrayRef[Paws::DynamoDB::AttributeDefinition]', required => 1);
-  has BillingMode => (is => 'ro', isa => 'Str');
-  has GlobalSecondaryIndexes => (is => 'ro', isa => 'ArrayRef[Paws::DynamoDB::GlobalSecondaryIndex]');
-  has KeySchema => (is => 'ro', isa => 'ArrayRef[Paws::DynamoDB::KeySchemaElement]', required => 1);
-  has LocalSecondaryIndexes => (is => 'ro', isa => 'ArrayRef[Paws::DynamoDB::LocalSecondaryIndex]');
-  has ProvisionedThroughput => (is => 'ro', isa => 'Paws::DynamoDB::ProvisionedThroughput');
-  has SSESpecification => (is => 'ro', isa => 'Paws::DynamoDB::SSESpecification');
-  has StreamSpecification => (is => 'ro', isa => 'Paws::DynamoDB::StreamSpecification');
-  has TableName => (is => 'ro', isa => 'Str', required => 1);
-
+  use Types::Standard -types;
   use MooseX::ClassAttribute;
+  use namespace::clean -except => 'meta';
+  with 'Paws::API::CallArgs';
+
+  has AttributeDefinitions => (is => 'ro', isa => ArrayRef[InstanceOf['Paws::DynamoDB::AttributeDefinition']], required => 1);
+  has BillingMode => (is => 'ro', isa => Str);
+  has GlobalSecondaryIndexes => (is => 'ro', isa => ArrayRef[InstanceOf['Paws::DynamoDB::GlobalSecondaryIndex']]);
+  has KeySchema => (is => 'ro', isa => ArrayRef[InstanceOf['Paws::DynamoDB::KeySchemaElement']], required => 1);
+  has LocalSecondaryIndexes => (is => 'ro', isa => ArrayRef[InstanceOf['Paws::DynamoDB::LocalSecondaryIndex']]);
+  has ProvisionedThroughput => (is => 'ro', isa => InstanceOf['Paws::DynamoDB::ProvisionedThroughput']);
+  has SSESpecification => (is => 'ro', isa => InstanceOf['Paws::DynamoDB::SSESpecification']);
+  has StreamSpecification => (is => 'ro', isa => InstanceOf['Paws::DynamoDB::StreamSpecification']);
+  has TableName => (is => 'ro', isa => Str, required => 1);
+
 
   class_has _api_call => (isa => 'Str', is => 'ro', default => 'CreateTable');
   class_has _returns => (isa => 'Str', is => 'ro', default => 'Paws::DynamoDB::CreateTableOutput');
   class_has _result_key => (isa => 'Str', is => 'ro');
+
+  sub new_with_coercions {
+    my ($class, $args) = @_;
+
+    my %res = %$args;
+    if (exists $args->{AttributeDefinitions}) {
+      $res{AttributeDefinitions} = (map {
+            [
+              map {
+                ref($_) eq 'Paws::DynamoDB::AttributeDefinition' ? $_ : do {
+                  require Paws::DynamoDB::AttributeDefinition;
+                  Paws::DynamoDB::AttributeDefinition->new_with_coercions($_);
+                }
+              } @$_
+            ]
+      } ($args->{AttributeDefinitions}))[0];
+    }
+    if (exists $args->{BillingMode}) {
+      $res{BillingMode} = (map {
+            "$_"
+      } ($args->{BillingMode}))[0];
+    }
+    if (exists $args->{GlobalSecondaryIndexes}) {
+      $res{GlobalSecondaryIndexes} = (map {
+            [
+              map {
+                ref($_) eq 'Paws::DynamoDB::GlobalSecondaryIndex' ? $_ : do {
+                  require Paws::DynamoDB::GlobalSecondaryIndex;
+                  Paws::DynamoDB::GlobalSecondaryIndex->new_with_coercions($_);
+                }
+              } @$_
+            ]
+      } ($args->{GlobalSecondaryIndexes}))[0];
+    }
+    if (exists $args->{KeySchema}) {
+      $res{KeySchema} = (map {
+            [
+              map {
+                ref($_) eq 'Paws::DynamoDB::KeySchemaElement' ? $_ : do {
+                  require Paws::DynamoDB::KeySchemaElement;
+                  Paws::DynamoDB::KeySchemaElement->new_with_coercions($_);
+                }
+              } @$_
+            ]
+      } ($args->{KeySchema}))[0];
+    }
+    if (exists $args->{LocalSecondaryIndexes}) {
+      $res{LocalSecondaryIndexes} = (map {
+            [
+              map {
+                ref($_) eq 'Paws::DynamoDB::LocalSecondaryIndex' ? $_ : do {
+                  require Paws::DynamoDB::LocalSecondaryIndex;
+                  Paws::DynamoDB::LocalSecondaryIndex->new_with_coercions($_);
+                }
+              } @$_
+            ]
+      } ($args->{LocalSecondaryIndexes}))[0];
+    }
+    if (exists $args->{ProvisionedThroughput}) {
+      $res{ProvisionedThroughput} = (map {
+            ref($_) eq 'Paws::DynamoDB::ProvisionedThroughput' ? $_ : do {
+              require Paws::DynamoDB::ProvisionedThroughput;
+              Paws::DynamoDB::ProvisionedThroughput->new_with_coercions($_);
+              }
+      } ($args->{ProvisionedThroughput}))[0];
+    }
+    if (exists $args->{SSESpecification}) {
+      $res{SSESpecification} = (map {
+            ref($_) eq 'Paws::DynamoDB::SSESpecification' ? $_ : do {
+              require Paws::DynamoDB::SSESpecification;
+              Paws::DynamoDB::SSESpecification->new_with_coercions($_);
+              }
+      } ($args->{SSESpecification}))[0];
+    }
+    if (exists $args->{StreamSpecification}) {
+      $res{StreamSpecification} = (map {
+            ref($_) eq 'Paws::DynamoDB::StreamSpecification' ? $_ : do {
+              require Paws::DynamoDB::StreamSpecification;
+              Paws::DynamoDB::StreamSpecification->new_with_coercions($_);
+              }
+      } ($args->{StreamSpecification}))[0];
+    }
+    if (exists $args->{TableName}) {
+      $res{TableName} = (map {
+            "$_"
+      } ($args->{TableName}))[0];
+    }
+
+    return $class->new(\%res);
+  }
+
+  sub new_from_xml {
+    my ($class, $xml) = @_;
+
+    my $res = {};
+    for ($xml->childNodes) {
+      if (!defined(my $nodeName = $_->nodeName)) {
+      } elsif ($nodeName eq "AttributeDefinitions") {
+        my $key = "AttributeDefinitions";
+            do {
+              my $tmp = $res->{$key} // [];
+              $res->{$key} = do {
+                require Paws::DynamoDB::AttributeDefinition;
+                Paws::DynamoDB::AttributeDefinition->new_from_xml($_);
+              };
+              push @$tmp, $res->{$key};
+              $res->{$key} = $tmp;
+              }
+      } elsif ($nodeName eq "BillingMode") {
+        my $key = "BillingMode";
+            $res->{$key} = "" . ( $_->nodeValue // '' );
+      } elsif ($nodeName eq "GlobalSecondaryIndexes") {
+        my $key = "GlobalSecondaryIndexes";
+            do {
+              my $tmp = $res->{$key} // [];
+              $res->{$key} = do {
+                require Paws::DynamoDB::GlobalSecondaryIndex;
+                Paws::DynamoDB::GlobalSecondaryIndex->new_from_xml($_);
+              };
+              push @$tmp, $res->{$key};
+              $res->{$key} = $tmp;
+              }
+      } elsif ($nodeName eq "KeySchema") {
+        my $key = "KeySchema";
+            do {
+              my $tmp = $res->{$key} // [];
+              $res->{$key} = do {
+                require Paws::DynamoDB::KeySchemaElement;
+                Paws::DynamoDB::KeySchemaElement->new_from_xml($_);
+              };
+              push @$tmp, $res->{$key};
+              $res->{$key} = $tmp;
+              }
+      } elsif ($nodeName eq "LocalSecondaryIndexes") {
+        my $key = "LocalSecondaryIndexes";
+            do {
+              my $tmp = $res->{$key} // [];
+              $res->{$key} = do {
+                require Paws::DynamoDB::LocalSecondaryIndex;
+                Paws::DynamoDB::LocalSecondaryIndex->new_from_xml($_);
+              };
+              push @$tmp, $res->{$key};
+              $res->{$key} = $tmp;
+              }
+      } elsif ($nodeName eq "ProvisionedThroughput") {
+        my $key = "ProvisionedThroughput";
+            $res->{$key} = do {
+              require Paws::DynamoDB::ProvisionedThroughput;
+              Paws::DynamoDB::ProvisionedThroughput->new_from_xml($_);
+            };
+      } elsif ($nodeName eq "SSESpecification") {
+        my $key = "SSESpecification";
+            $res->{$key} = do {
+              require Paws::DynamoDB::SSESpecification;
+              Paws::DynamoDB::SSESpecification->new_from_xml($_);
+            };
+      } elsif ($nodeName eq "StreamSpecification") {
+        my $key = "StreamSpecification";
+            $res->{$key} = do {
+              require Paws::DynamoDB::StreamSpecification;
+              Paws::DynamoDB::StreamSpecification->new_from_xml($_);
+            };
+      } elsif ($nodeName eq "TableName") {
+        my $key = "TableName";
+            $res->{$key} = "" . ( $_->nodeValue // '' );
+
+      } else {
+        # warn "Unrecognized element $nodeName";
+      }
+    }
+
+    return $class->new_with_coercions($res);
+  }
+
+  sub to_hash_data {
+    my ($self) = @_;
+
+    my %res;
+    if (exists $self->{AttributeDefinitions}) {
+      $res{AttributeDefinitions} = (map {
+            [ map { $_->to_hash_data } @$_ ]
+      } ($self->AttributeDefinitions))[0];
+    }
+    if (exists $self->{BillingMode}) {
+      $res{BillingMode} = (map {
+            "$_"
+      } ($self->BillingMode))[0];
+    }
+    if (exists $self->{GlobalSecondaryIndexes}) {
+      $res{GlobalSecondaryIndexes} = (map {
+            [ map { $_->to_hash_data } @$_ ]
+      } ($self->GlobalSecondaryIndexes))[0];
+    }
+    if (exists $self->{KeySchema}) {
+      $res{KeySchema} = (map {
+            [ map { $_->to_hash_data } @$_ ]
+      } ($self->KeySchema))[0];
+    }
+    if (exists $self->{LocalSecondaryIndexes}) {
+      $res{LocalSecondaryIndexes} = (map {
+            [ map { $_->to_hash_data } @$_ ]
+      } ($self->LocalSecondaryIndexes))[0];
+    }
+    if (exists $self->{ProvisionedThroughput}) {
+      $res{ProvisionedThroughput} = (map {
+            $_->to_hash_data
+      } ($self->ProvisionedThroughput))[0];
+    }
+    if (exists $self->{SSESpecification}) {
+      $res{SSESpecification} = (map {
+            $_->to_hash_data
+      } ($self->SSESpecification))[0];
+    }
+    if (exists $self->{StreamSpecification}) {
+      $res{StreamSpecification} = (map {
+            $_->to_hash_data
+      } ($self->StreamSpecification))[0];
+    }
+    if (exists $self->{TableName}) {
+      $res{TableName} = (map {
+            "$_"
+      } ($self->TableName))[0];
+    }
+
+    return \%res;
+  }
+
+  sub to_json_data {
+    my ($self) = @_;
+
+    my %res;
+    if (exists $self->{AttributeDefinitions}) {
+      $res{AttributeDefinitions} = (map {
+            [ map { $_->to_json_data } @$_ ]
+      } ($self->AttributeDefinitions))[0];
+    }
+    if (exists $self->{BillingMode}) {
+      $res{BillingMode} = (map {
+            "$_"
+      } ($self->BillingMode))[0];
+    }
+    if (exists $self->{GlobalSecondaryIndexes}) {
+      $res{GlobalSecondaryIndexes} = (map {
+            [ map { $_->to_json_data } @$_ ]
+      } ($self->GlobalSecondaryIndexes))[0];
+    }
+    if (exists $self->{KeySchema}) {
+      $res{KeySchema} = (map {
+            [ map { $_->to_json_data } @$_ ]
+      } ($self->KeySchema))[0];
+    }
+    if (exists $self->{LocalSecondaryIndexes}) {
+      $res{LocalSecondaryIndexes} = (map {
+            [ map { $_->to_json_data } @$_ ]
+      } ($self->LocalSecondaryIndexes))[0];
+    }
+    if (exists $self->{ProvisionedThroughput}) {
+      $res{ProvisionedThroughput} = (map {
+            $_->to_json_data
+      } ($self->ProvisionedThroughput))[0];
+    }
+    if (exists $self->{SSESpecification}) {
+      $res{SSESpecification} = (map {
+            $_->to_json_data
+      } ($self->SSESpecification))[0];
+    }
+    if (exists $self->{StreamSpecification}) {
+      $res{StreamSpecification} = (map {
+            $_->to_json_data
+      } ($self->StreamSpecification))[0];
+    }
+    if (exists $self->{TableName}) {
+      $res{TableName} = (map {
+            "$_"
+      } ($self->TableName))[0];
+    }
+
+    return \%res;
+  }
+
+  sub to_parameter_data {
+    my ($self, $res, $prefix) = @_;
+    $res //= {};
+    $prefix = defined $prefix ? "$prefix." : "";
+
+
+    if (exists $self->{AttributeDefinitions}) {
+      my $key = "${prefix}AttributeDefinitions";
+      do {
+            for my $index ( 0 .. ( @$_ - 1 ) ) {
+              my $orig_key = $key;
+              my $key      = sprintf( '%s.member.%d', $orig_key, $index + 1 );
+              my $val      = $_->[$index];
+              do {
+                $_->to_parameter_data( $res, $key );
+                }
+                for $val;
+            }
+      } for $self->AttributeDefinitions;
+    }
+
+    if (exists $self->{BillingMode}) {
+      my $key = "${prefix}BillingMode";
+      do {
+            $res->{$key} = "$_";
+      } for $self->BillingMode;
+    }
+
+    if (exists $self->{GlobalSecondaryIndexes}) {
+      my $key = "${prefix}GlobalSecondaryIndexes";
+      do {
+            for my $index ( 0 .. ( @$_ - 1 ) ) {
+              my $orig_key = $key;
+              my $key      = sprintf( '%s.member.%d', $orig_key, $index + 1 );
+              my $val      = $_->[$index];
+              do {
+                $_->to_parameter_data( $res, $key );
+                }
+                for $val;
+            }
+      } for $self->GlobalSecondaryIndexes;
+    }
+
+    if (exists $self->{KeySchema}) {
+      my $key = "${prefix}KeySchema";
+      do {
+            for my $index ( 0 .. ( @$_ - 1 ) ) {
+              my $orig_key = $key;
+              my $key      = sprintf( '%s.member.%d', $orig_key, $index + 1 );
+              my $val      = $_->[$index];
+              do {
+                $_->to_parameter_data( $res, $key );
+                }
+                for $val;
+            }
+      } for $self->KeySchema;
+    }
+
+    if (exists $self->{LocalSecondaryIndexes}) {
+      my $key = "${prefix}LocalSecondaryIndexes";
+      do {
+            for my $index ( 0 .. ( @$_ - 1 ) ) {
+              my $orig_key = $key;
+              my $key      = sprintf( '%s.member.%d', $orig_key, $index + 1 );
+              my $val      = $_->[$index];
+              do {
+                $_->to_parameter_data( $res, $key );
+                }
+                for $val;
+            }
+      } for $self->LocalSecondaryIndexes;
+    }
+
+    if (exists $self->{ProvisionedThroughput}) {
+      my $key = "${prefix}ProvisionedThroughput";
+      do {
+            $_->to_parameter_data( $res, $key );
+      } for $self->ProvisionedThroughput;
+    }
+
+    if (exists $self->{SSESpecification}) {
+      my $key = "${prefix}SSESpecification";
+      do {
+            $_->to_parameter_data( $res, $key );
+      } for $self->SSESpecification;
+    }
+
+    if (exists $self->{StreamSpecification}) {
+      my $key = "${prefix}StreamSpecification";
+      do {
+            $_->to_parameter_data( $res, $key );
+      } for $self->StreamSpecification;
+    }
+
+    if (exists $self->{TableName}) {
+      my $key = "${prefix}TableName";
+      do {
+            $res->{$key} = "$_";
+      } for $self->TableName;
+    }
+
+    return $res;
+  }
+
+
+  __PACKAGE__->meta->make_immutable;
 1;
 
 ### main pod documentation begin ###

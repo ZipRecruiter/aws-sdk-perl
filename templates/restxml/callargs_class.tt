@@ -2,10 +2,15 @@
 [%- iclass = c.input_for_operation(op_name) %]
 package [% c.api %]::[% op_name %];
   use Moose;
+  use Types::Standard -types;
+  use MooseX::ClassAttribute;
+  use namespace::clean -except => 'meta';
+  with 'Paws::API::CallArgs';
+
 [% FOREACH param_name IN iclass.members.keys.sort -%]
   [%- member = c.shape(iclass.members.$param_name.shape) -%]
   [%- traits = [] -%]
-  has [% param_name %] => (is => 'ro', isa => '[% member.perl_type %]'
+  has [% param_name %] => (is => 'ro', isa => [% member.perl_type %]
   [%- IF (iclass.members.$param_name.location == 'header') %], header_name => '[% iclass.members.$param_name.locationName %]'
     [%- IF (param_name == 'ContentMD5'); traits.push('AutoInHeader') %], auto => 'MD5'
     [%- ELSE; traits.push('ParamInHeader') %]
@@ -23,7 +28,6 @@ package [% c.api %]::[% op_name %];
   [%- IF (traits.size) %], traits => [[% FOREACH trait=traits %]'[% trait %]'[% ',' IF (NOT loop.last) %][% END %]][% END -%]
   [%- IF (c.required_in_shape(iclass,param_name)) %], required => 1[% END %]);
 [% END %]
-  use MooseX::ClassAttribute;
 
   class_has _api_call => (isa => 'Str', is => 'ro', default => '[% op_name %]');
   class_has _api_uri  => (isa => 'Str', is => 'ro', default => '[% operation.http.requestUri %]');
@@ -34,6 +38,10 @@ package [% c.api %]::[% op_name %];
     [%- ELSE -%]Paws::API::Response[% END -%]');
   class_has _result_key => (isa => 'Str', is => 'ro');
   [% IF (stream_param) %]class_has _stream_param => (is => 'ro', default => '[% c.to_payload_shape_name(stream_param) %]');[% END %]
+
+[% INCLUDE object_raw_constructor.tt members = iclass.members %]
+
+  __PACKAGE__->meta->make_immutable;
 1;
 
 [% INCLUDE 'callclass_documentation.tt' %]

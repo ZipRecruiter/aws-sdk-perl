@@ -1,7 +1,113 @@
 package Paws::DynamoDB::StreamSpecification;
   use Moose;
-  has StreamEnabled => (is => 'ro', isa => 'Bool');
-  has StreamViewType => (is => 'ro', isa => 'Str');
+  use Types::Standard -types;
+  use namespace::clean -except => 'meta';
+  with 'Paws::API::Object';
+
+  has StreamEnabled => (is => 'ro', isa => Bool);
+  has StreamViewType => (is => 'ro', isa => Str);
+
+  sub new_with_coercions {
+    my ($class, $args) = @_;
+
+    my %res = %$args;
+    if (exists $args->{StreamEnabled}) {
+      $res{StreamEnabled} = (map {
+            0 + !!$_
+      } ($args->{StreamEnabled}))[0];
+    }
+    if (exists $args->{StreamViewType}) {
+      $res{StreamViewType} = (map {
+            "$_"
+      } ($args->{StreamViewType}))[0];
+    }
+
+    return $class->new(\%res);
+  }
+
+  sub new_from_xml {
+    my ($class, $xml) = @_;
+
+    my $res = {};
+    for ($xml->childNodes) {
+      if (!defined(my $nodeName = $_->nodeName)) {
+      } elsif ($nodeName eq "StreamEnabled") {
+        my $key = "StreamEnabled";
+            $res->{$key} =
+              do { my $d = $_->nodeValue // ''; $d eq "true" || $d eq "1" };
+      } elsif ($nodeName eq "StreamViewType") {
+        my $key = "StreamViewType";
+            $res->{$key} = "" . ( $_->nodeValue // '' );
+
+      } else {
+        # warn "Unrecognized element $nodeName";
+      }
+    }
+
+    return $class->new_with_coercions($res);
+  }
+
+  sub to_hash_data {
+    my ($self) = @_;
+
+    my %res;
+    if (exists $self->{StreamEnabled}) {
+      $res{StreamEnabled} = (map {
+            0 + !!$_
+      } ($self->StreamEnabled))[0];
+    }
+    if (exists $self->{StreamViewType}) {
+      $res{StreamViewType} = (map {
+            "$_"
+      } ($self->StreamViewType))[0];
+    }
+
+    return \%res;
+  }
+
+  sub to_json_data {
+    my ($self) = @_;
+
+    my %res;
+    if (exists $self->{StreamEnabled}) {
+      $res{StreamEnabled} = (map {
+            $_ ? \1 : \0
+      } ($self->StreamEnabled))[0];
+    }
+    if (exists $self->{StreamViewType}) {
+      $res{StreamViewType} = (map {
+            "$_"
+      } ($self->StreamViewType))[0];
+    }
+
+    return \%res;
+  }
+
+  sub to_parameter_data {
+    my ($self, $res, $prefix) = @_;
+    $res //= {};
+    $prefix = defined $prefix ? "$prefix." : "";
+
+
+    if (exists $self->{StreamEnabled}) {
+      my $key = "${prefix}StreamEnabled";
+      do {
+            $res->{$key} = $_ ? "true" : "false";
+      } for $self->StreamEnabled;
+    }
+
+    if (exists $self->{StreamViewType}) {
+      my $key = "${prefix}StreamViewType";
+      do {
+            $res->{$key} = "$_";
+      } for $self->StreamViewType;
+    }
+
+    return $res;
+  }
+
+
+  __PACKAGE__->meta->make_immutable;
 1;
 
 ### main pod documentation begin ###

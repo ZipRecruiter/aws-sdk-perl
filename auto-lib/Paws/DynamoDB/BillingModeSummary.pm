@@ -1,7 +1,112 @@
 package Paws::DynamoDB::BillingModeSummary;
   use Moose;
-  has BillingMode => (is => 'ro', isa => 'Str');
-  has LastUpdateToPayPerRequestDateTime => (is => 'ro', isa => 'Str');
+  use Types::Standard -types;
+  use namespace::clean -except => 'meta';
+  with 'Paws::API::Object';
+
+  has BillingMode => (is => 'ro', isa => Str);
+  has LastUpdateToPayPerRequestDateTime => (is => 'ro', isa => Str);
+
+  sub new_with_coercions {
+    my ($class, $args) = @_;
+
+    my %res = %$args;
+    if (exists $args->{BillingMode}) {
+      $res{BillingMode} = (map {
+            "$_"
+      } ($args->{BillingMode}))[0];
+    }
+    if (exists $args->{LastUpdateToPayPerRequestDateTime}) {
+      $res{LastUpdateToPayPerRequestDateTime} = (map {
+            "$_"
+      } ($args->{LastUpdateToPayPerRequestDateTime}))[0];
+    }
+
+    return $class->new(\%res);
+  }
+
+  sub new_from_xml {
+    my ($class, $xml) = @_;
+
+    my $res = {};
+    for ($xml->childNodes) {
+      if (!defined(my $nodeName = $_->nodeName)) {
+      } elsif ($nodeName eq "BillingMode") {
+        my $key = "BillingMode";
+            $res->{$key} = "" . ( $_->nodeValue // '' );
+      } elsif ($nodeName eq "LastUpdateToPayPerRequestDateTime") {
+        my $key = "LastUpdateToPayPerRequestDateTime";
+            $res->{$key} = "" . ( $_->nodeValue // '' );
+
+      } else {
+        # warn "Unrecognized element $nodeName";
+      }
+    }
+
+    return $class->new_with_coercions($res);
+  }
+
+  sub to_hash_data {
+    my ($self) = @_;
+
+    my %res;
+    if (exists $self->{BillingMode}) {
+      $res{BillingMode} = (map {
+            "$_"
+      } ($self->BillingMode))[0];
+    }
+    if (exists $self->{LastUpdateToPayPerRequestDateTime}) {
+      $res{LastUpdateToPayPerRequestDateTime} = (map {
+            "$_"
+      } ($self->LastUpdateToPayPerRequestDateTime))[0];
+    }
+
+    return \%res;
+  }
+
+  sub to_json_data {
+    my ($self) = @_;
+
+    my %res;
+    if (exists $self->{BillingMode}) {
+      $res{BillingMode} = (map {
+            "$_"
+      } ($self->BillingMode))[0];
+    }
+    if (exists $self->{LastUpdateToPayPerRequestDateTime}) {
+      $res{LastUpdateToPayPerRequestDateTime} = (map {
+            "$_"
+      } ($self->LastUpdateToPayPerRequestDateTime))[0];
+    }
+
+    return \%res;
+  }
+
+  sub to_parameter_data {
+    my ($self, $res, $prefix) = @_;
+    $res //= {};
+    $prefix = defined $prefix ? "$prefix." : "";
+
+
+    if (exists $self->{BillingMode}) {
+      my $key = "${prefix}BillingMode";
+      do {
+            $res->{$key} = "$_";
+      } for $self->BillingMode;
+    }
+
+    if (exists $self->{LastUpdateToPayPerRequestDateTime}) {
+      my $key = "${prefix}LastUpdateToPayPerRequestDateTime";
+      do {
+            $res->{$key} = "$_";
+      } for $self->LastUpdateToPayPerRequestDateTime;
+    }
+
+    return $res;
+  }
+
+
+  __PACKAGE__->meta->make_immutable;
 1;
 
 ### main pod documentation begin ###

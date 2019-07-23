@@ -1,14 +1,125 @@
 
 package Paws::DynamoDB::UpdateContinuousBackups;
   use Moose;
-  has PointInTimeRecoverySpecification => (is => 'ro', isa => 'Paws::DynamoDB::PointInTimeRecoverySpecification', required => 1);
-  has TableName => (is => 'ro', isa => 'Str', required => 1);
-
+  use Types::Standard -types;
   use MooseX::ClassAttribute;
+  use namespace::clean -except => 'meta';
+  with 'Paws::API::CallArgs';
+
+  has PointInTimeRecoverySpecification => (is => 'ro', isa => InstanceOf['Paws::DynamoDB::PointInTimeRecoverySpecification'], required => 1);
+  has TableName => (is => 'ro', isa => Str, required => 1);
+
 
   class_has _api_call => (isa => 'Str', is => 'ro', default => 'UpdateContinuousBackups');
   class_has _returns => (isa => 'Str', is => 'ro', default => 'Paws::DynamoDB::UpdateContinuousBackupsOutput');
   class_has _result_key => (isa => 'Str', is => 'ro');
+
+  sub new_with_coercions {
+    my ($class, $args) = @_;
+
+    my %res = %$args;
+    if (exists $args->{PointInTimeRecoverySpecification}) {
+      $res{PointInTimeRecoverySpecification} = (map {
+            ref($_) eq 'Paws::DynamoDB::PointInTimeRecoverySpecification' ? $_ : do {
+              require Paws::DynamoDB::PointInTimeRecoverySpecification;
+              Paws::DynamoDB::PointInTimeRecoverySpecification->new_with_coercions($_);
+              }
+      } ($args->{PointInTimeRecoverySpecification}))[0];
+    }
+    if (exists $args->{TableName}) {
+      $res{TableName} = (map {
+            "$_"
+      } ($args->{TableName}))[0];
+    }
+
+    return $class->new(\%res);
+  }
+
+  sub new_from_xml {
+    my ($class, $xml) = @_;
+
+    my $res = {};
+    for ($xml->childNodes) {
+      if (!defined(my $nodeName = $_->nodeName)) {
+      } elsif ($nodeName eq "PointInTimeRecoverySpecification") {
+        my $key = "PointInTimeRecoverySpecification";
+            $res->{$key} = do {
+              require Paws::DynamoDB::PointInTimeRecoverySpecification;
+              Paws::DynamoDB::PointInTimeRecoverySpecification->new_from_xml($_);
+            };
+      } elsif ($nodeName eq "TableName") {
+        my $key = "TableName";
+            $res->{$key} = "" . ( $_->nodeValue // '' );
+
+      } else {
+        # warn "Unrecognized element $nodeName";
+      }
+    }
+
+    return $class->new_with_coercions($res);
+  }
+
+  sub to_hash_data {
+    my ($self) = @_;
+
+    my %res;
+    if (exists $self->{PointInTimeRecoverySpecification}) {
+      $res{PointInTimeRecoverySpecification} = (map {
+            $_->to_hash_data
+      } ($self->PointInTimeRecoverySpecification))[0];
+    }
+    if (exists $self->{TableName}) {
+      $res{TableName} = (map {
+            "$_"
+      } ($self->TableName))[0];
+    }
+
+    return \%res;
+  }
+
+  sub to_json_data {
+    my ($self) = @_;
+
+    my %res;
+    if (exists $self->{PointInTimeRecoverySpecification}) {
+      $res{PointInTimeRecoverySpecification} = (map {
+            $_->to_json_data
+      } ($self->PointInTimeRecoverySpecification))[0];
+    }
+    if (exists $self->{TableName}) {
+      $res{TableName} = (map {
+            "$_"
+      } ($self->TableName))[0];
+    }
+
+    return \%res;
+  }
+
+  sub to_parameter_data {
+    my ($self, $res, $prefix) = @_;
+    $res //= {};
+    $prefix = defined $prefix ? "$prefix." : "";
+
+
+    if (exists $self->{PointInTimeRecoverySpecification}) {
+      my $key = "${prefix}PointInTimeRecoverySpecification";
+      do {
+            $_->to_parameter_data( $res, $key );
+      } for $self->PointInTimeRecoverySpecification;
+    }
+
+    if (exists $self->{TableName}) {
+      my $key = "${prefix}TableName";
+      do {
+            $res->{$key} = "$_";
+      } for $self->TableName;
+    }
+
+    return $res;
+  }
+
+
+  __PACKAGE__->meta->make_immutable;
 1;
 
 ### main pod documentation begin ###

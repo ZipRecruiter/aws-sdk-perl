@@ -1,7 +1,124 @@
 package Paws::DynamoDB::ReplicaUpdate;
   use Moose;
-  has Create => (is => 'ro', isa => 'Paws::DynamoDB::CreateReplicaAction');
-  has Delete => (is => 'ro', isa => 'Paws::DynamoDB::DeleteReplicaAction');
+  use Types::Standard -types;
+  use namespace::clean -except => 'meta';
+  with 'Paws::API::Object';
+
+  has Create => (is => 'ro', isa => InstanceOf['Paws::DynamoDB::CreateReplicaAction']);
+  has Delete => (is => 'ro', isa => InstanceOf['Paws::DynamoDB::DeleteReplicaAction']);
+
+  sub new_with_coercions {
+    my ($class, $args) = @_;
+
+    my %res = %$args;
+    if (exists $args->{Create}) {
+      $res{Create} = (map {
+            ref($_) eq 'Paws::DynamoDB::CreateReplicaAction' ? $_ : do {
+              require Paws::DynamoDB::CreateReplicaAction;
+              Paws::DynamoDB::CreateReplicaAction->new_with_coercions($_);
+              }
+      } ($args->{Create}))[0];
+    }
+    if (exists $args->{Delete}) {
+      $res{Delete} = (map {
+            ref($_) eq 'Paws::DynamoDB::DeleteReplicaAction' ? $_ : do {
+              require Paws::DynamoDB::DeleteReplicaAction;
+              Paws::DynamoDB::DeleteReplicaAction->new_with_coercions($_);
+              }
+      } ($args->{Delete}))[0];
+    }
+
+    return $class->new(\%res);
+  }
+
+  sub new_from_xml {
+    my ($class, $xml) = @_;
+
+    my $res = {};
+    for ($xml->childNodes) {
+      if (!defined(my $nodeName = $_->nodeName)) {
+      } elsif ($nodeName eq "Create") {
+        my $key = "Create";
+            $res->{$key} = do {
+              require Paws::DynamoDB::CreateReplicaAction;
+              Paws::DynamoDB::CreateReplicaAction->new_from_xml($_);
+            };
+      } elsif ($nodeName eq "Delete") {
+        my $key = "Delete";
+            $res->{$key} = do {
+              require Paws::DynamoDB::DeleteReplicaAction;
+              Paws::DynamoDB::DeleteReplicaAction->new_from_xml($_);
+            };
+
+      } else {
+        # warn "Unrecognized element $nodeName";
+      }
+    }
+
+    return $class->new_with_coercions($res);
+  }
+
+  sub to_hash_data {
+    my ($self) = @_;
+
+    my %res;
+    if (exists $self->{Create}) {
+      $res{Create} = (map {
+            $_->to_hash_data
+      } ($self->Create))[0];
+    }
+    if (exists $self->{Delete}) {
+      $res{Delete} = (map {
+            $_->to_hash_data
+      } ($self->Delete))[0];
+    }
+
+    return \%res;
+  }
+
+  sub to_json_data {
+    my ($self) = @_;
+
+    my %res;
+    if (exists $self->{Create}) {
+      $res{Create} = (map {
+            $_->to_json_data
+      } ($self->Create))[0];
+    }
+    if (exists $self->{Delete}) {
+      $res{Delete} = (map {
+            $_->to_json_data
+      } ($self->Delete))[0];
+    }
+
+    return \%res;
+  }
+
+  sub to_parameter_data {
+    my ($self, $res, $prefix) = @_;
+    $res //= {};
+    $prefix = defined $prefix ? "$prefix." : "";
+
+
+    if (exists $self->{Create}) {
+      my $key = "${prefix}Create";
+      do {
+            $_->to_parameter_data( $res, $key );
+      } for $self->Create;
+    }
+
+    if (exists $self->{Delete}) {
+      my $key = "${prefix}Delete";
+      do {
+            $_->to_parameter_data( $res, $key );
+      } for $self->Delete;
+    }
+
+    return $res;
+  }
+
+
+  __PACKAGE__->meta->make_immutable;
 1;
 
 ### main pod documentation begin ###

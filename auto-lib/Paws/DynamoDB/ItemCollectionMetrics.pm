@@ -1,7 +1,131 @@
 package Paws::DynamoDB::ItemCollectionMetrics;
   use Moose;
-  has ItemCollectionKey => (is => 'ro', isa => 'Paws::DynamoDB::ItemCollectionKeyAttributeMap');
-  has SizeEstimateRangeGB => (is => 'ro', isa => 'ArrayRef[Num]');
+  use Types::Standard -types;
+  use namespace::clean -except => 'meta';
+  with 'Paws::API::Object';
+
+  has ItemCollectionKey => (is => 'ro', isa => InstanceOf['Paws::DynamoDB::ItemCollectionKeyAttributeMap']);
+  has SizeEstimateRangeGB => (is => 'ro', isa => ArrayRef[Num]);
+
+  sub new_with_coercions {
+    my ($class, $args) = @_;
+
+    my %res = %$args;
+    if (exists $args->{ItemCollectionKey}) {
+      $res{ItemCollectionKey} = (map {
+            ref($_) eq 'Paws::DynamoDB::ItemCollectionKeyAttributeMap' ? $_ : do {
+              require Paws::DynamoDB::ItemCollectionKeyAttributeMap;
+              Paws::DynamoDB::ItemCollectionKeyAttributeMap->new_with_coercions($_);
+              }
+      } ($args->{ItemCollectionKey}))[0];
+    }
+    if (exists $args->{SizeEstimateRangeGB}) {
+      $res{SizeEstimateRangeGB} = (map {
+            [ map { 0 + $_ } @$_ ]
+      } ($args->{SizeEstimateRangeGB}))[0];
+    }
+
+    return $class->new(\%res);
+  }
+
+  sub new_from_xml {
+    my ($class, $xml) = @_;
+
+    my $res = {};
+    for ($xml->childNodes) {
+      if (!defined(my $nodeName = $_->nodeName)) {
+      } elsif ($nodeName eq "ItemCollectionKey") {
+        my $key = "ItemCollectionKey";
+            do {
+              require Paws::DynamoDB::ItemCollectionKeyAttributeMap;
+              Paws::DynamoDB::ItemCollectionKeyAttributeMap->read_xml( $_, $res, $key );
+            };
+      } elsif ($nodeName eq "SizeEstimateRangeGB") {
+        my $key = "SizeEstimateRangeGB";
+            do {
+              my $tmp = $res->{$key} // [];
+              $res->{$key} = 0 + ( $_->nodeValue // 0 );
+              push @$tmp, $res->{$key};
+              $res->{$key} = $tmp;
+              }
+
+      } else {
+        # warn "Unrecognized element $nodeName";
+      }
+    }
+
+    return $class->new_with_coercions($res);
+  }
+
+  sub to_hash_data {
+    my ($self) = @_;
+
+    my %res;
+    if (exists $self->{ItemCollectionKey}) {
+      $res{ItemCollectionKey} = (map {
+            $_->to_hash_data
+      } ($self->ItemCollectionKey))[0];
+    }
+    if (exists $self->{SizeEstimateRangeGB}) {
+      $res{SizeEstimateRangeGB} = (map {
+            [ map { 0 + $_ } @$_ ]
+      } ($self->SizeEstimateRangeGB))[0];
+    }
+
+    return \%res;
+  }
+
+  sub to_json_data {
+    my ($self) = @_;
+
+    my %res;
+    if (exists $self->{ItemCollectionKey}) {
+      $res{ItemCollectionKey} = (map {
+            $_->to_json_data
+      } ($self->ItemCollectionKey))[0];
+    }
+    if (exists $self->{SizeEstimateRangeGB}) {
+      $res{SizeEstimateRangeGB} = (map {
+            [ map { 0 + $_ } @$_ ]
+      } ($self->SizeEstimateRangeGB))[0];
+    }
+
+    return \%res;
+  }
+
+  sub to_parameter_data {
+    my ($self, $res, $prefix) = @_;
+    $res //= {};
+    $prefix = defined $prefix ? "$prefix." : "";
+
+
+    if (exists $self->{ItemCollectionKey}) {
+      my $key = "${prefix}ItemCollectionKey";
+      do {
+            $_->to_parameter_data( $res, $key );
+      } for $self->ItemCollectionKey;
+    }
+
+    if (exists $self->{SizeEstimateRangeGB}) {
+      my $key = "${prefix}SizeEstimateRangeGB";
+      do {
+            for my $index ( 0 .. ( @$_ - 1 ) ) {
+              my $orig_key = $key;
+              my $key      = sprintf( '%s.member.%d', $orig_key, $index + 1 );
+              my $val      = $_->[$index];
+              do {
+                $res->{$key} = 0 + $_;
+                }
+                for $val;
+            }
+      } for $self->SizeEstimateRangeGB;
+    }
+
+    return $res;
+  }
+
+
+  __PACKAGE__->meta->make_immutable;
 1;
 
 ### main pod documentation begin ###

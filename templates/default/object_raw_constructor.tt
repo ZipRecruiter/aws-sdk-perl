@@ -1,0 +1,231 @@
+  sub new_with_coercions {
+    my ($class, $args) = @_;
+
+    my %res = %$args;
+[% FOREACH param_name IN members.keys.sort -%]
+  [%- member_shape_name = members.$param_name.shape -%]
+  [%- member = c.shape(member_shape_name) -%]
+    if (exists $args->{[% param_name %]}) {
+      $res{[% param_name %]} = (map {
+[% FILTER indent('        ') %]
+[%- c.perltidy_source(member.type_information.create_perl) %]
+[%- END %]
+      } ($args->{[% param_name %]}))[0];
+    }
+[% END -%]
+
+    return $class->new(\%res);
+  }
+[%- IF !enum %]
+
+  sub new_from_xml {
+    my ($class, $xml) = @_;
+
+    my $res = {};
+    for ($xml->childNodes) {
+      if (!defined(my $nodeName = $_->nodeName)) {
+[% FOREACH param_name IN members.keys.sort -%]
+  [%- member_shape_name = members.$param_name.shape -%]
+  [%- member = c.shape(member_shape_name) -%]
+      } elsif ($nodeName eq "[% member.locationName || param_name %]") {
+        my $key = "[% param_name %]";
+[% FILTER indent('        ') %]
+[%- c.perltidy_source(member.type_information.from_xml) %]
+[%- END %]
+[% END %]
+      } else {
+        # warn "Unrecognized element $nodeName";
+      }
+    }
+
+    return $class->new_with_coercions($res);
+  }
+[%- END %]
+
+  sub to_hash_data {
+    my ($self) = @_;
+
+    my %res;
+[% FOREACH param_name IN members.keys.sort -%]
+  [%- member_shape_name = members.$param_name.shape -%]
+  [%- member = c.shape(member_shape_name) -%]
+  [%- request_name = param_name -%]
+    if (exists $self->{[% param_name %]}) {
+      $res{[% request_name %]} = (map {
+[% FILTER indent('        ') %]
+[%- c.perltidy_source(member.type_information.to_hash) %]
+[%- END %]
+      } ($self->[% param_name %]))[0];
+    }
+[% END -%]
+
+    return \%res;
+  }
+
+  sub to_json_data {
+    my ($self) = @_;
+
+    my %res;
+[% FOREACH param_name IN members.keys.sort -%]
+  [%- member_shape_name = members.$param_name.shape -%]
+  [%- member = c.shape(member_shape_name) -%]
+  [%- NEXT IF rest == 1 && members.$param_name.location == "header" -%]
+  [%- NEXT IF rest == 1 && members.$param_name.location == "querystring" -%]
+  [%- NEXT IF rest == 1 && members.$param_name.location == "uri" -%]
+  [%- NEXT IF rest == 1 && member.streaming == 1 -%]
+  [%- request_name = param_name -%]
+  [%- IF (member.type == 'list' and member.member.locationName.defined) -%]
+    [%- request_name = member.member.locationName -%]
+  [%- ELSIF members.${param_name}.locationName -%]
+    [%- request_name = members.${param_name}.locationName -%]
+  [%- ELSIF member.members.xmlname AND member.members.xmlname != 'item' -%]
+    [%- request_name = member.members.xmlname -%]
+  [%- END -%]
+    if (exists $self->{[% param_name %]}) {
+      $res{[% request_name %]} = (map {
+[% FILTER indent('        ') %]
+[%- c.perltidy_source(member.type_information.to_json) %]
+[%- END %]
+      } ($self->[% param_name %]))[0];
+    }
+[% END -%]
+
+    return \%res;
+  }
+
+  sub to_parameter_data {
+    my ($self, $res, $prefix) = @_;
+    $res //= {};
+    $prefix = defined $prefix ? "$prefix." : "";
+[%- IF enum %]
+    my $cnt = 1;
+[%- END %]
+
+[% FOREACH param_name IN members.keys.sort -%]
+  [%- member_shape_name = members.$param_name.shape -%]
+  [%- member = c.shape(member_shape_name) -%]
+  [%- NEXT IF rest == 1 && members.$param_name.location == "header" -%]
+  [%- NEXT IF rest == 1 && members.$param_name.location == "querystring" -%]
+  [%- NEXT IF rest == 1 && members.$param_name.location == "uri" -%]
+  [%- NEXT IF rest == 1 && member.streaming == 1 -%]
+  [%- request_name = param_name -%]
+  [%- IF (member.type == 'list' and member.member.locationName.defined) -%]
+    [%- request_name = member.member.locationName -%]
+  [%- ELSIF members.${param_name}.locationName -%]
+    [%- request_name = members.${param_name}.locationName -%]
+  [%- ELSIF member.members.xmlname AND member.members.xmlname != 'item' -%]
+    [%- request_name = member.members.xmlname -%]
+  [%- END -%]
+[%- IF enum %]
+    if (exists $self->{[% param_name %]}) {
+      $res->{"${prefix}${cnt}.Name"} = "[% request_name %]";
+      my $key = "${prefix}${cnt}.Value";
+      $cnt++;
+      do {
+[% FILTER indent('        ') %]
+[%- c.perltidy_source(member.type_information.to_parameter) %]
+[%- END %]
+      } for $self->[% param_name %];
+    }
+[%- ELSE %]
+    if (exists $self->{[% param_name %]}) {
+      my $key = "${prefix}[% request_name %]";
+      do {
+[% FILTER indent('        ') %]
+[%- c.perltidy_source(member.type_information.to_parameter) %]
+[%- END %]
+      } for $self->[% param_name %];
+    }
+
+[%- END %]
+[%- END %]
+    return $res;
+  }
+[%- IF rest %]
+
+  sub to_uri_data {
+    my ($self) = @_;
+    my $res = {};
+[% FOREACH param_name IN members.keys.sort -%]
+  [%- member_shape_name = members.$param_name.shape -%]
+  [%- member = c.shape(member_shape_name) -%]
+  [%- NEXT IF members.$param_name.location != "uri" -%]
+  [%- request_name = members.$param_name.locationName -%]
+    if (exists $self->{[% param_name %]}) {
+      my $key = "[% request_name %]";
+      do {
+[% FILTER indent('        ') %]
+[%- c.perltidy_source(member.type_information.to_parameter) %]
+[%- END %]
+      } for $self->[% param_name %];
+    }
+
+[%- END %]
+    return $res;
+  }
+[%- END %]
+[%- IF rest %]
+
+  sub to_header_data {
+    my ($self) = @_;
+    my $res = {};
+[% FOREACH param_name IN members.keys.sort -%]
+
+  [%- member_shape_name = members.$param_name.shape -%]
+  [%- member = c.shape(member_shape_name) -%]
+  [%- NEXT IF members.$param_name.location != "header" -%]
+  [%- request_name = members.$param_name.locationName -%]
+    if (exists $self->{[% param_name %]}) {
+      my $key = "[% request_name %]";
+      do {
+[% FILTER indent('        ') %]
+[%- c.perltidy_source(member.type_information.to_parameter) %]
+[%- END %]
+      } for $self->[% param_name %];
+    }
+
+[%- END %]
+    return $res;
+  }
+[%- END %]
+[%- IF rest %]
+
+  sub to_query_data {
+    my ($self) = @_;
+    my $res = {};
+[% FOREACH param_name IN members.keys.sort -%]
+  [%- member_shape_name = members.$param_name.shape -%]
+  [%- member = c.shape(member_shape_name) -%]
+  [%- NEXT IF members.$param_name.location != "querystring" -%]
+  [%- request_name = members.$param_name.locationName -%]
+    if (exists $self->{[% param_name %]}) {
+      my $key = "[% request_name %]";
+      do {
+[% FILTER indent('        ') %]
+[%- c.perltidy_source(member.type_information.to_parameter) %]
+[%- END %]
+      } for $self->[% param_name %];
+    }
+
+[%- END %]
+    return $res;
+  }
+[%- END %]
+[%- IF rest %]
+
+  sub to_body_data {
+[% found = 0 -%]
+[%- FOREACH param_name IN members.keys.sort -%]
+  [%- member_shape_name = members.$param_name.shape -%]
+  [%- member = c.shape(member_shape_name) -%]
+  [%- NEXT UNLESS member.streaming -%]
+  [%- found = 1 -%]
+    return shift->[% param_name %];
+  [%- LAST -%]
+[%- END -%]
+[%- IF !found -%]
+    my $data = shift->to_json_data;
+    return keys %$data ? encode_json($data) : '';
+[%- END %]
+  }
+[%- END %]

@@ -1,11 +1,16 @@
-[%- IF (c.enums.size) -%]
-use Moose::Util::TypeConstraints;
-[%- FOR enum_name IN c.enums.keys.sort %]
-enum '[% enum_name %]', [[% FOR val IN c.enums.$enum_name %]'[% val %]',[% END %]];
-[%- END %]
-[%- END -%]
 package [% c.api %];
   use Moose;
+[% IF (c.enums.size) -%]
+  use Moose::Util::TypeConstraints;
+[%- END -%]
+  use namespace::clean -except => 'meta';
+[%- IF (c.enums.size) -%]
+
+[%- FOR enum_name IN c.enums.keys.sort %]
+  enum '[% enum_name %]', [[% FOR val IN c.enums.$enum_name %]'[% val %]',[% END %]];
+[%- END %]
+[%- END -%]
+
   sub service { '[% c.service %]' }
   sub signing_name { '[% c.signing_name %]' }
   sub version { '[% c.version %]' }
@@ -34,7 +39,8 @@ package [% c.api %];
   [%- op_name = c.api_struct.operations.$op.name %]
   sub [% op_name %] {
     my $self = shift;
-    my $call_object = $self->new_with_coercions('[% c.api %]::[% op_name %]', @_);
+    require [% c.api %]::[% op_name %];
+    my $call_object = [% c.api %]::[% op_name %]->new_with_coercions({ @_ });
     return $self->caller->do_call($self, $call_object);
   }
   [%- END %]
@@ -42,6 +48,7 @@ package [% c.api %];
 
   sub operations { qw/[% FOR op IN c.api_struct.operations.keys.sort; op _ ' '; END %]/ }
 
+  __PACKAGE__->meta->make_immutable;
 1;
 
 [% INCLUDE 'service_documentation.tt' %]

@@ -1,7 +1,112 @@
 package Paws::DynamoDB::ProvisionedThroughput;
   use Moose;
-  has ReadCapacityUnits => (is => 'ro', isa => 'Int', required => 1);
-  has WriteCapacityUnits => (is => 'ro', isa => 'Int', required => 1);
+  use Types::Standard -types;
+  use namespace::clean -except => 'meta';
+  with 'Paws::API::Object';
+
+  has ReadCapacityUnits => (is => 'ro', isa => Int, required => 1);
+  has WriteCapacityUnits => (is => 'ro', isa => Int, required => 1);
+
+  sub new_with_coercions {
+    my ($class, $args) = @_;
+
+    my %res = %$args;
+    if (exists $args->{ReadCapacityUnits}) {
+      $res{ReadCapacityUnits} = (map {
+            int($_)
+      } ($args->{ReadCapacityUnits}))[0];
+    }
+    if (exists $args->{WriteCapacityUnits}) {
+      $res{WriteCapacityUnits} = (map {
+            int($_)
+      } ($args->{WriteCapacityUnits}))[0];
+    }
+
+    return $class->new(\%res);
+  }
+
+  sub new_from_xml {
+    my ($class, $xml) = @_;
+
+    my $res = {};
+    for ($xml->childNodes) {
+      if (!defined(my $nodeName = $_->nodeName)) {
+      } elsif ($nodeName eq "ReadCapacityUnits") {
+        my $key = "ReadCapacityUnits";
+            $res->{$key} = int( $_->nodeValue // 0 );
+      } elsif ($nodeName eq "WriteCapacityUnits") {
+        my $key = "WriteCapacityUnits";
+            $res->{$key} = int( $_->nodeValue // 0 );
+
+      } else {
+        # warn "Unrecognized element $nodeName";
+      }
+    }
+
+    return $class->new_with_coercions($res);
+  }
+
+  sub to_hash_data {
+    my ($self) = @_;
+
+    my %res;
+    if (exists $self->{ReadCapacityUnits}) {
+      $res{ReadCapacityUnits} = (map {
+            int($_)
+      } ($self->ReadCapacityUnits))[0];
+    }
+    if (exists $self->{WriteCapacityUnits}) {
+      $res{WriteCapacityUnits} = (map {
+            int($_)
+      } ($self->WriteCapacityUnits))[0];
+    }
+
+    return \%res;
+  }
+
+  sub to_json_data {
+    my ($self) = @_;
+
+    my %res;
+    if (exists $self->{ReadCapacityUnits}) {
+      $res{ReadCapacityUnits} = (map {
+            int($_)
+      } ($self->ReadCapacityUnits))[0];
+    }
+    if (exists $self->{WriteCapacityUnits}) {
+      $res{WriteCapacityUnits} = (map {
+            int($_)
+      } ($self->WriteCapacityUnits))[0];
+    }
+
+    return \%res;
+  }
+
+  sub to_parameter_data {
+    my ($self, $res, $prefix) = @_;
+    $res //= {};
+    $prefix = defined $prefix ? "$prefix." : "";
+
+
+    if (exists $self->{ReadCapacityUnits}) {
+      my $key = "${prefix}ReadCapacityUnits";
+      do {
+            $res->{$key} = int($_);
+      } for $self->ReadCapacityUnits;
+    }
+
+    if (exists $self->{WriteCapacityUnits}) {
+      my $key = "${prefix}WriteCapacityUnits";
+      do {
+            $res->{$key} = int($_);
+      } for $self->WriteCapacityUnits;
+    }
+
+    return $res;
+  }
+
+
+  __PACKAGE__->meta->make_immutable;
 1;
 
 ### main pod documentation begin ###

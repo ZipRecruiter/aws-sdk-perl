@@ -1,14 +1,119 @@
 
 package Paws::DynamoDB::ListTables;
   use Moose;
-  has ExclusiveStartTableName => (is => 'ro', isa => 'Str');
-  has Limit => (is => 'ro', isa => 'Int');
-
+  use Types::Standard -types;
   use MooseX::ClassAttribute;
+  use namespace::clean -except => 'meta';
+  with 'Paws::API::CallArgs';
+
+  has ExclusiveStartTableName => (is => 'ro', isa => Str);
+  has Limit => (is => 'ro', isa => Int);
+
 
   class_has _api_call => (isa => 'Str', is => 'ro', default => 'ListTables');
   class_has _returns => (isa => 'Str', is => 'ro', default => 'Paws::DynamoDB::ListTablesOutput');
   class_has _result_key => (isa => 'Str', is => 'ro');
+
+  sub new_with_coercions {
+    my ($class, $args) = @_;
+
+    my %res = %$args;
+    if (exists $args->{ExclusiveStartTableName}) {
+      $res{ExclusiveStartTableName} = (map {
+            "$_"
+      } ($args->{ExclusiveStartTableName}))[0];
+    }
+    if (exists $args->{Limit}) {
+      $res{Limit} = (map {
+            int($_)
+      } ($args->{Limit}))[0];
+    }
+
+    return $class->new(\%res);
+  }
+
+  sub new_from_xml {
+    my ($class, $xml) = @_;
+
+    my $res = {};
+    for ($xml->childNodes) {
+      if (!defined(my $nodeName = $_->nodeName)) {
+      } elsif ($nodeName eq "ExclusiveStartTableName") {
+        my $key = "ExclusiveStartTableName";
+            $res->{$key} = "" . ( $_->nodeValue // '' );
+      } elsif ($nodeName eq "Limit") {
+        my $key = "Limit";
+            $res->{$key} = int( $_->nodeValue // 0 );
+
+      } else {
+        # warn "Unrecognized element $nodeName";
+      }
+    }
+
+    return $class->new_with_coercions($res);
+  }
+
+  sub to_hash_data {
+    my ($self) = @_;
+
+    my %res;
+    if (exists $self->{ExclusiveStartTableName}) {
+      $res{ExclusiveStartTableName} = (map {
+            "$_"
+      } ($self->ExclusiveStartTableName))[0];
+    }
+    if (exists $self->{Limit}) {
+      $res{Limit} = (map {
+            int($_)
+      } ($self->Limit))[0];
+    }
+
+    return \%res;
+  }
+
+  sub to_json_data {
+    my ($self) = @_;
+
+    my %res;
+    if (exists $self->{ExclusiveStartTableName}) {
+      $res{ExclusiveStartTableName} = (map {
+            "$_"
+      } ($self->ExclusiveStartTableName))[0];
+    }
+    if (exists $self->{Limit}) {
+      $res{Limit} = (map {
+            int($_)
+      } ($self->Limit))[0];
+    }
+
+    return \%res;
+  }
+
+  sub to_parameter_data {
+    my ($self, $res, $prefix) = @_;
+    $res //= {};
+    $prefix = defined $prefix ? "$prefix." : "";
+
+
+    if (exists $self->{ExclusiveStartTableName}) {
+      my $key = "${prefix}ExclusiveStartTableName";
+      do {
+            $res->{$key} = "$_";
+      } for $self->ExclusiveStartTableName;
+    }
+
+    if (exists $self->{Limit}) {
+      my $key = "${prefix}Limit";
+      do {
+            $res->{$key} = int($_);
+      } for $self->Limit;
+    }
+
+    return $res;
+  }
+
+
+  __PACKAGE__->meta->make_immutable;
 1;
 
 ### main pod documentation begin ###

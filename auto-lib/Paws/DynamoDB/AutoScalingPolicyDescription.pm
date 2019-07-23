@@ -1,7 +1,125 @@
 package Paws::DynamoDB::AutoScalingPolicyDescription;
   use Moose;
-  has PolicyName => (is => 'ro', isa => 'Str');
-  has TargetTrackingScalingPolicyConfiguration => (is => 'ro', isa => 'Paws::DynamoDB::AutoScalingTargetTrackingScalingPolicyConfigurationDescription');
+  use Types::Standard -types;
+  use namespace::clean -except => 'meta';
+  with 'Paws::API::Object';
+
+  has PolicyName => (is => 'ro', isa => Str);
+  has TargetTrackingScalingPolicyConfiguration => (is => 'ro', isa => InstanceOf['Paws::DynamoDB::AutoScalingTargetTrackingScalingPolicyConfigurationDescription']);
+
+  sub new_with_coercions {
+    my ($class, $args) = @_;
+
+    my %res = %$args;
+    if (exists $args->{PolicyName}) {
+      $res{PolicyName} = (map {
+            "$_"
+      } ($args->{PolicyName}))[0];
+    }
+    if (exists $args->{TargetTrackingScalingPolicyConfiguration}) {
+      $res{TargetTrackingScalingPolicyConfiguration} = (map {
+            ref($_) eq
+        'Paws::DynamoDB::AutoScalingTargetTrackingScalingPolicyConfigurationDescription'
+              ? $_
+              : do {
+              require
+                Paws::DynamoDB::AutoScalingTargetTrackingScalingPolicyConfigurationDescription;
+              Paws::DynamoDB::AutoScalingTargetTrackingScalingPolicyConfigurationDescription
+                ->new_with_coercions($_);
+              }
+      } ($args->{TargetTrackingScalingPolicyConfiguration}))[0];
+    }
+
+    return $class->new(\%res);
+  }
+
+  sub new_from_xml {
+    my ($class, $xml) = @_;
+
+    my $res = {};
+    for ($xml->childNodes) {
+      if (!defined(my $nodeName = $_->nodeName)) {
+      } elsif ($nodeName eq "PolicyName") {
+        my $key = "PolicyName";
+            $res->{$key} = "" . ( $_->nodeValue // '' );
+      } elsif ($nodeName eq "TargetTrackingScalingPolicyConfiguration") {
+        my $key = "TargetTrackingScalingPolicyConfiguration";
+            $res->{$key} = do {
+              require
+                Paws::DynamoDB::AutoScalingTargetTrackingScalingPolicyConfigurationDescription;
+              Paws::DynamoDB::AutoScalingTargetTrackingScalingPolicyConfigurationDescription
+                ->new_from_xml($_);
+            };
+
+      } else {
+        # warn "Unrecognized element $nodeName";
+      }
+    }
+
+    return $class->new_with_coercions($res);
+  }
+
+  sub to_hash_data {
+    my ($self) = @_;
+
+    my %res;
+    if (exists $self->{PolicyName}) {
+      $res{PolicyName} = (map {
+            "$_"
+      } ($self->PolicyName))[0];
+    }
+    if (exists $self->{TargetTrackingScalingPolicyConfiguration}) {
+      $res{TargetTrackingScalingPolicyConfiguration} = (map {
+            $_->to_hash_data
+      } ($self->TargetTrackingScalingPolicyConfiguration))[0];
+    }
+
+    return \%res;
+  }
+
+  sub to_json_data {
+    my ($self) = @_;
+
+    my %res;
+    if (exists $self->{PolicyName}) {
+      $res{PolicyName} = (map {
+            "$_"
+      } ($self->PolicyName))[0];
+    }
+    if (exists $self->{TargetTrackingScalingPolicyConfiguration}) {
+      $res{TargetTrackingScalingPolicyConfiguration} = (map {
+            $_->to_json_data
+      } ($self->TargetTrackingScalingPolicyConfiguration))[0];
+    }
+
+    return \%res;
+  }
+
+  sub to_parameter_data {
+    my ($self, $res, $prefix) = @_;
+    $res //= {};
+    $prefix = defined $prefix ? "$prefix." : "";
+
+
+    if (exists $self->{PolicyName}) {
+      my $key = "${prefix}PolicyName";
+      do {
+            $res->{$key} = "$_";
+      } for $self->PolicyName;
+    }
+
+    if (exists $self->{TargetTrackingScalingPolicyConfiguration}) {
+      my $key = "${prefix}TargetTrackingScalingPolicyConfiguration";
+      do {
+            $_->to_parameter_data( $res, $key );
+      } for $self->TargetTrackingScalingPolicyConfiguration;
+    }
+
+    return $res;
+  }
+
+
+  __PACKAGE__->meta->make_immutable;
 1;
 
 ### main pod documentation begin ###

@@ -1,14 +1,142 @@
 
 package Paws::DynamoDB::TransactGetItems;
   use Moose;
-  has ReturnConsumedCapacity => (is => 'ro', isa => 'Str');
-  has TransactItems => (is => 'ro', isa => 'ArrayRef[Paws::DynamoDB::TransactGetItem]', required => 1);
-
+  use Types::Standard -types;
   use MooseX::ClassAttribute;
+  use namespace::clean -except => 'meta';
+  with 'Paws::API::CallArgs';
+
+  has ReturnConsumedCapacity => (is => 'ro', isa => Str);
+  has TransactItems => (is => 'ro', isa => ArrayRef[InstanceOf['Paws::DynamoDB::TransactGetItem']], required => 1);
+
 
   class_has _api_call => (isa => 'Str', is => 'ro', default => 'TransactGetItems');
   class_has _returns => (isa => 'Str', is => 'ro', default => 'Paws::DynamoDB::TransactGetItemsOutput');
   class_has _result_key => (isa => 'Str', is => 'ro');
+
+  sub new_with_coercions {
+    my ($class, $args) = @_;
+
+    my %res = %$args;
+    if (exists $args->{ReturnConsumedCapacity}) {
+      $res{ReturnConsumedCapacity} = (map {
+            "$_"
+      } ($args->{ReturnConsumedCapacity}))[0];
+    }
+    if (exists $args->{TransactItems}) {
+      $res{TransactItems} = (map {
+            [
+              map {
+                ref($_) eq 'Paws::DynamoDB::TransactGetItem' ? $_ : do {
+                  require Paws::DynamoDB::TransactGetItem;
+                  Paws::DynamoDB::TransactGetItem->new_with_coercions($_);
+                }
+              } @$_
+            ]
+      } ($args->{TransactItems}))[0];
+    }
+
+    return $class->new(\%res);
+  }
+
+  sub new_from_xml {
+    my ($class, $xml) = @_;
+
+    my $res = {};
+    for ($xml->childNodes) {
+      if (!defined(my $nodeName = $_->nodeName)) {
+      } elsif ($nodeName eq "ReturnConsumedCapacity") {
+        my $key = "ReturnConsumedCapacity";
+            $res->{$key} = "" . ( $_->nodeValue // '' );
+      } elsif ($nodeName eq "TransactItems") {
+        my $key = "TransactItems";
+            do {
+              my $tmp = $res->{$key} // [];
+              $res->{$key} = do {
+                require Paws::DynamoDB::TransactGetItem;
+                Paws::DynamoDB::TransactGetItem->new_from_xml($_);
+              };
+              push @$tmp, $res->{$key};
+              $res->{$key} = $tmp;
+              }
+
+      } else {
+        # warn "Unrecognized element $nodeName";
+      }
+    }
+
+    return $class->new_with_coercions($res);
+  }
+
+  sub to_hash_data {
+    my ($self) = @_;
+
+    my %res;
+    if (exists $self->{ReturnConsumedCapacity}) {
+      $res{ReturnConsumedCapacity} = (map {
+            "$_"
+      } ($self->ReturnConsumedCapacity))[0];
+    }
+    if (exists $self->{TransactItems}) {
+      $res{TransactItems} = (map {
+            [ map { $_->to_hash_data } @$_ ]
+      } ($self->TransactItems))[0];
+    }
+
+    return \%res;
+  }
+
+  sub to_json_data {
+    my ($self) = @_;
+
+    my %res;
+    if (exists $self->{ReturnConsumedCapacity}) {
+      $res{ReturnConsumedCapacity} = (map {
+            "$_"
+      } ($self->ReturnConsumedCapacity))[0];
+    }
+    if (exists $self->{TransactItems}) {
+      $res{TransactItems} = (map {
+            [ map { $_->to_json_data } @$_ ]
+      } ($self->TransactItems))[0];
+    }
+
+    return \%res;
+  }
+
+  sub to_parameter_data {
+    my ($self, $res, $prefix) = @_;
+    $res //= {};
+    $prefix = defined $prefix ? "$prefix." : "";
+
+
+    if (exists $self->{ReturnConsumedCapacity}) {
+      my $key = "${prefix}ReturnConsumedCapacity";
+      do {
+            $res->{$key} = "$_";
+      } for $self->ReturnConsumedCapacity;
+    }
+
+    if (exists $self->{TransactItems}) {
+      my $key = "${prefix}TransactItems";
+      do {
+            for my $index ( 0 .. ( @$_ - 1 ) ) {
+              my $orig_key = $key;
+              my $key      = sprintf( '%s.member.%d', $orig_key, $index + 1 );
+              my $val      = $_->[$index];
+              do {
+                $_->to_parameter_data( $res, $key );
+                }
+                for $val;
+            }
+      } for $self->TransactItems;
+    }
+
+    return $res;
+  }
+
+
+  __PACKAGE__->meta->make_immutable;
 1;
 
 ### main pod documentation begin ###

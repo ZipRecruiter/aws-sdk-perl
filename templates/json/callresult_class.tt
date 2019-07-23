@@ -3,9 +3,13 @@
 [%- IF (iclass) %]
 package [% c.api %]::[% c.shapename_for_operation_output(op_name) %];
   use Moose;
+  use Types::Standard -types;
+  use namespace::clean -except => 'meta';
+  with 'Paws::API::CallResult';
+
 [% FOREACH param_name IN iclass.members.keys.sort -%]
   [%- member = c.shape(iclass.members.$param_name.shape) -%]
-  has [% param_name %] => (is => 'ro', isa => '[% member.perl_type %]'
+  has [% param_name %] => (is => 'ro', isa => [% member.perl_type %]
   [%- IF (iclass.members.${param_name}.locationName) %], traits => ['NameInRequest'], request_name => '[% iclass.members.${param_name}.locationName %]' [% END %]
   [%- IF (iclass.members.$param_name.streaming == 1) %], traits => ['ParamInBody'][% END %]
   [%- IF (c.required_in_shape(iclass,param_name)) %], required => 1[% END %]);
@@ -13,5 +17,9 @@ package [% c.api %]::[% c.shapename_for_operation_output(op_name) %];
   has _request_id => (is => 'ro', isa => 'Str');
 [%- END %]
 
-[% INCLUDE 'class_documentation.tt' %]
+[% INCLUDE object_raw_constructor.tt members = iclass.members %]
+
+  __PACKAGE__->meta->make_immutable;
 1;
+
+[% INCLUDE 'class_documentation.tt' %]

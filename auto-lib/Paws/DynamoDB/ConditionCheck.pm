@@ -1,11 +1,234 @@
 package Paws::DynamoDB::ConditionCheck;
   use Moose;
-  has ConditionExpression => (is => 'ro', isa => 'Str', required => 1);
-  has ExpressionAttributeNames => (is => 'ro', isa => 'Paws::DynamoDB::ExpressionAttributeNameMap');
-  has ExpressionAttributeValues => (is => 'ro', isa => 'Paws::DynamoDB::ExpressionAttributeValueMap');
-  has Key => (is => 'ro', isa => 'Paws::DynamoDB::Key', required => 1);
-  has ReturnValuesOnConditionCheckFailure => (is => 'ro', isa => 'Str');
-  has TableName => (is => 'ro', isa => 'Str', required => 1);
+  use Types::Standard -types;
+  use namespace::clean -except => 'meta';
+  with 'Paws::API::Object';
+
+  has ConditionExpression => (is => 'ro', isa => Str, required => 1);
+  has ExpressionAttributeNames => (is => 'ro', isa => InstanceOf['Paws::DynamoDB::ExpressionAttributeNameMap']);
+  has ExpressionAttributeValues => (is => 'ro', isa => InstanceOf['Paws::DynamoDB::ExpressionAttributeValueMap']);
+  has Key => (is => 'ro', isa => InstanceOf['Paws::DynamoDB::Key'], required => 1);
+  has ReturnValuesOnConditionCheckFailure => (is => 'ro', isa => Str);
+  has TableName => (is => 'ro', isa => Str, required => 1);
+
+  sub new_with_coercions {
+    my ($class, $args) = @_;
+
+    my %res = %$args;
+    if (exists $args->{ConditionExpression}) {
+      $res{ConditionExpression} = (map {
+            "$_"
+      } ($args->{ConditionExpression}))[0];
+    }
+    if (exists $args->{ExpressionAttributeNames}) {
+      $res{ExpressionAttributeNames} = (map {
+            ref($_) eq 'Paws::DynamoDB::ExpressionAttributeNameMap' ? $_ : do {
+              require Paws::DynamoDB::ExpressionAttributeNameMap;
+              Paws::DynamoDB::ExpressionAttributeNameMap->new_with_coercions($_);
+              }
+      } ($args->{ExpressionAttributeNames}))[0];
+    }
+    if (exists $args->{ExpressionAttributeValues}) {
+      $res{ExpressionAttributeValues} = (map {
+            ref($_) eq 'Paws::DynamoDB::ExpressionAttributeValueMap' ? $_ : do {
+              require Paws::DynamoDB::ExpressionAttributeValueMap;
+              Paws::DynamoDB::ExpressionAttributeValueMap->new_with_coercions($_);
+              }
+      } ($args->{ExpressionAttributeValues}))[0];
+    }
+    if (exists $args->{Key}) {
+      $res{Key} = (map {
+            ref($_) eq 'Paws::DynamoDB::Key' ? $_ : do {
+              require Paws::DynamoDB::Key;
+              Paws::DynamoDB::Key->new_with_coercions($_);
+              }
+      } ($args->{Key}))[0];
+    }
+    if (exists $args->{ReturnValuesOnConditionCheckFailure}) {
+      $res{ReturnValuesOnConditionCheckFailure} = (map {
+            "$_"
+      } ($args->{ReturnValuesOnConditionCheckFailure}))[0];
+    }
+    if (exists $args->{TableName}) {
+      $res{TableName} = (map {
+            "$_"
+      } ($args->{TableName}))[0];
+    }
+
+    return $class->new(\%res);
+  }
+
+  sub new_from_xml {
+    my ($class, $xml) = @_;
+
+    my $res = {};
+    for ($xml->childNodes) {
+      if (!defined(my $nodeName = $_->nodeName)) {
+      } elsif ($nodeName eq "ConditionExpression") {
+        my $key = "ConditionExpression";
+            $res->{$key} = "" . ( $_->nodeValue // '' );
+      } elsif ($nodeName eq "ExpressionAttributeNames") {
+        my $key = "ExpressionAttributeNames";
+            do {
+              require Paws::DynamoDB::ExpressionAttributeNameMap;
+              Paws::DynamoDB::ExpressionAttributeNameMap->read_xml( $_, $res, $key );
+            };
+      } elsif ($nodeName eq "ExpressionAttributeValues") {
+        my $key = "ExpressionAttributeValues";
+            do {
+              require Paws::DynamoDB::ExpressionAttributeValueMap;
+              Paws::DynamoDB::ExpressionAttributeValueMap->read_xml( $_, $res, $key );
+            };
+      } elsif ($nodeName eq "Key") {
+        my $key = "Key";
+            do {
+              require Paws::DynamoDB::Key;
+              Paws::DynamoDB::Key->read_xml( $_, $res, $key );
+            };
+      } elsif ($nodeName eq "ReturnValuesOnConditionCheckFailure") {
+        my $key = "ReturnValuesOnConditionCheckFailure";
+            $res->{$key} = "" . ( $_->nodeValue // '' );
+      } elsif ($nodeName eq "TableName") {
+        my $key = "TableName";
+            $res->{$key} = "" . ( $_->nodeValue // '' );
+
+      } else {
+        # warn "Unrecognized element $nodeName";
+      }
+    }
+
+    return $class->new_with_coercions($res);
+  }
+
+  sub to_hash_data {
+    my ($self) = @_;
+
+    my %res;
+    if (exists $self->{ConditionExpression}) {
+      $res{ConditionExpression} = (map {
+            "$_"
+      } ($self->ConditionExpression))[0];
+    }
+    if (exists $self->{ExpressionAttributeNames}) {
+      $res{ExpressionAttributeNames} = (map {
+            $_->to_hash_data
+      } ($self->ExpressionAttributeNames))[0];
+    }
+    if (exists $self->{ExpressionAttributeValues}) {
+      $res{ExpressionAttributeValues} = (map {
+            $_->to_hash_data
+      } ($self->ExpressionAttributeValues))[0];
+    }
+    if (exists $self->{Key}) {
+      $res{Key} = (map {
+            $_->to_hash_data
+      } ($self->Key))[0];
+    }
+    if (exists $self->{ReturnValuesOnConditionCheckFailure}) {
+      $res{ReturnValuesOnConditionCheckFailure} = (map {
+            "$_"
+      } ($self->ReturnValuesOnConditionCheckFailure))[0];
+    }
+    if (exists $self->{TableName}) {
+      $res{TableName} = (map {
+            "$_"
+      } ($self->TableName))[0];
+    }
+
+    return \%res;
+  }
+
+  sub to_json_data {
+    my ($self) = @_;
+
+    my %res;
+    if (exists $self->{ConditionExpression}) {
+      $res{ConditionExpression} = (map {
+            "$_"
+      } ($self->ConditionExpression))[0];
+    }
+    if (exists $self->{ExpressionAttributeNames}) {
+      $res{ExpressionAttributeNames} = (map {
+            $_->to_json_data
+      } ($self->ExpressionAttributeNames))[0];
+    }
+    if (exists $self->{ExpressionAttributeValues}) {
+      $res{ExpressionAttributeValues} = (map {
+            $_->to_json_data
+      } ($self->ExpressionAttributeValues))[0];
+    }
+    if (exists $self->{Key}) {
+      $res{Key} = (map {
+            $_->to_json_data
+      } ($self->Key))[0];
+    }
+    if (exists $self->{ReturnValuesOnConditionCheckFailure}) {
+      $res{ReturnValuesOnConditionCheckFailure} = (map {
+            "$_"
+      } ($self->ReturnValuesOnConditionCheckFailure))[0];
+    }
+    if (exists $self->{TableName}) {
+      $res{TableName} = (map {
+            "$_"
+      } ($self->TableName))[0];
+    }
+
+    return \%res;
+  }
+
+  sub to_parameter_data {
+    my ($self, $res, $prefix) = @_;
+    $res //= {};
+    $prefix = defined $prefix ? "$prefix." : "";
+
+
+    if (exists $self->{ConditionExpression}) {
+      my $key = "${prefix}ConditionExpression";
+      do {
+            $res->{$key} = "$_";
+      } for $self->ConditionExpression;
+    }
+
+    if (exists $self->{ExpressionAttributeNames}) {
+      my $key = "${prefix}ExpressionAttributeNames";
+      do {
+            $_->to_parameter_data( $res, $key );
+      } for $self->ExpressionAttributeNames;
+    }
+
+    if (exists $self->{ExpressionAttributeValues}) {
+      my $key = "${prefix}ExpressionAttributeValues";
+      do {
+            $_->to_parameter_data( $res, $key );
+      } for $self->ExpressionAttributeValues;
+    }
+
+    if (exists $self->{Key}) {
+      my $key = "${prefix}Key";
+      do {
+            $_->to_parameter_data( $res, $key );
+      } for $self->Key;
+    }
+
+    if (exists $self->{ReturnValuesOnConditionCheckFailure}) {
+      my $key = "${prefix}ReturnValuesOnConditionCheckFailure";
+      do {
+            $res->{$key} = "$_";
+      } for $self->ReturnValuesOnConditionCheckFailure;
+    }
+
+    if (exists $self->{TableName}) {
+      my $key = "${prefix}TableName";
+      do {
+            $res->{$key} = "$_";
+      } for $self->TableName;
+    }
+
+    return $res;
+  }
+
+
+  __PACKAGE__->meta->make_immutable;
 1;
 
 ### main pod documentation begin ###

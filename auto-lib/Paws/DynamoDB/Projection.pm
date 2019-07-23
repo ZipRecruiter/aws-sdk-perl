@@ -1,7 +1,117 @@
 package Paws::DynamoDB::Projection;
   use Moose;
-  has NonKeyAttributes => (is => 'ro', isa => 'ArrayRef[Str|Undef]');
-  has ProjectionType => (is => 'ro', isa => 'Str');
+  use Types::Standard -types;
+  use namespace::clean -except => 'meta';
+  with 'Paws::API::Object';
+
+  has NonKeyAttributes => (is => 'ro', isa => ArrayRef[Maybe[Str]]);
+  has ProjectionType => (is => 'ro', isa => Str);
+
+  sub new_with_coercions {
+    my ($class, $args) = @_;
+
+    my %res = %$args;
+    if (exists $args->{NonKeyAttributes}) {
+      $res{NonKeyAttributes} = (map {
+            [ map { defined($_) ? "$_" : undef } @$_ ]
+      } ($args->{NonKeyAttributes}))[0];
+    }
+    if (exists $args->{ProjectionType}) {
+      $res{ProjectionType} = (map {
+            "$_"
+      } ($args->{ProjectionType}))[0];
+    }
+
+    return $class->new(\%res);
+  }
+
+  sub new_from_xml {
+    my ($class, $xml) = @_;
+
+    my $res = {};
+    for ($xml->childNodes) {
+      if (!defined(my $nodeName = $_->nodeName)) {
+      } elsif ($nodeName eq "NonKeyAttributes") {
+        my $key = "NonKeyAttributes";
+            $res->{$key} = "" . ( $_->nodeValue // '' );
+      } elsif ($nodeName eq "ProjectionType") {
+        my $key = "ProjectionType";
+            $res->{$key} = "" . ( $_->nodeValue // '' );
+
+      } else {
+        # warn "Unrecognized element $nodeName";
+      }
+    }
+
+    return $class->new_with_coercions($res);
+  }
+
+  sub to_hash_data {
+    my ($self) = @_;
+
+    my %res;
+    if (exists $self->{NonKeyAttributes}) {
+      $res{NonKeyAttributes} = (map {
+            [ map { defined($_) ? "$_" : undef } @$_ ]
+      } ($self->NonKeyAttributes))[0];
+    }
+    if (exists $self->{ProjectionType}) {
+      $res{ProjectionType} = (map {
+            "$_"
+      } ($self->ProjectionType))[0];
+    }
+
+    return \%res;
+  }
+
+  sub to_json_data {
+    my ($self) = @_;
+
+    my %res;
+    if (exists $self->{NonKeyAttributes}) {
+      $res{NonKeyAttributes} = (map {
+            [ map { defined($_) ? "$_" : undef } @$_ ]
+      } ($self->NonKeyAttributes))[0];
+    }
+    if (exists $self->{ProjectionType}) {
+      $res{ProjectionType} = (map {
+            "$_"
+      } ($self->ProjectionType))[0];
+    }
+
+    return \%res;
+  }
+
+  sub to_parameter_data {
+    my ($self, $res, $prefix) = @_;
+    $res //= {};
+    $prefix = defined $prefix ? "$prefix." : "";
+
+
+    if (exists $self->{NonKeyAttributes}) {
+      my $key = "${prefix}NonKeyAttributes";
+      do {
+            for my $index ( 0 .. ( @$_ - 1 ) ) {
+              my $orig_key = $key;
+              my $key      = sprintf( '%s.member.%d', $orig_key, $index + 1 );
+              my $val      = $_->[$index];
+              $res->{$key} = defined($val) ? "$val" : undef;
+            }
+      } for $self->NonKeyAttributes;
+    }
+
+    if (exists $self->{ProjectionType}) {
+      my $key = "${prefix}ProjectionType";
+      do {
+            $res->{$key} = "$_";
+      } for $self->ProjectionType;
+    }
+
+    return $res;
+  }
+
+
+  __PACKAGE__->meta->make_immutable;
 1;
 
 ### main pod documentation begin ###
@@ -39,7 +149,7 @@ key attributes, which are automatically projected.
 =head1 ATTRIBUTES
 
 
-=head2 NonKeyAttributes => ArrayRef[Str|Undef]
+=head2 NonKeyAttributes => ArrayRef[Maybe[Str]]
 
   Represents the non-key attribute names which will be projected into the
 index.

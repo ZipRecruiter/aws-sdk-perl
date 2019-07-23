@@ -1,8 +1,70 @@
 package Paws::DynamoDB::KeyConditions;
   use Moose;
-  with 'Paws::API::StrToObjMapParser';
+  use Types::Standard -types;
+  use namespace::clean -except => 'meta';
+  with 'Paws::API::MapStr';
 
-  has Map => (is => 'ro', isa => 'HashRef[Paws::DynamoDB::Condition]');
+  has Map => (is => 'ro', isa => HashRef[InstanceOf['Paws::DynamoDB::Condition']]);
+
+  sub new_with_coercions {
+    my ($class, $args) = @_;
+    return $class->new({
+      Map => {
+        map {
+          ( $_ => (map {
+            ref($_) eq 'Paws::DynamoDB::Condition' ? $_ : do {
+              require Paws::DynamoDB::Condition;
+              Paws::DynamoDB::Condition->new_with_coercions($_);
+              }
+          } ($args->{$_}))[0] );
+        } keys %$args,
+      }
+    });
+  }
+
+  sub to_json_data {
+    my ($self) = @_;
+    return {
+      map {
+        ( $_ => (map {
+          $_->to_json_data
+        } ($self->Map->{$_}))[0] );
+      } keys %{$self->Map}
+    };
+  }
+
+  sub to_hash_data {
+    my ($self) = @_;
+    return {
+      map {
+        ( $_ => (map {
+          $_->to_hash_data
+        } ($self->Map->{$_}))[0] );
+      } keys %{$self->Map}
+    };
+  }
+
+  sub to_parameter_data {
+    my ($self, $res, $prefix) = @_;
+    $res //= {};
+    $prefix = defined $prefix ? "$prefix." : "";
+
+    my $map = $self->Map;
+
+    my $i = 1;
+    for my $map_key (keys %$map) {
+      $res->{"${prefix}${i}.Name"} = $map_key;
+      my $key = "${prefix}${i}.Value";
+      do {
+          $_->to_parameter_data( $res, $key );
+      } for $map->{$map_key};
+      $i++;
+    }
+
+    return $res;
+  }
+
+  __PACKAGE__->meta->make_immutable;
 1;
 
 ### main pod documentation begin ###

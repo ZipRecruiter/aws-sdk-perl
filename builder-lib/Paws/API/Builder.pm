@@ -13,6 +13,7 @@ package Paws::API::Builder {
   use Text::Wrap;
   use Data::Munge;
   use Perl::Tidy;
+  use Scalar::Util qw(weaken);
 
   use v5.10;
 
@@ -566,51 +567,183 @@ package Paws::API::Builder {
 
   use Carp;
 
-  sub get_caller_class_type {
+  sub get_shape_type_information {
     my ($self, $for_shape) = @_;
-    my $param_props = $self->shape($for_shape);
+    weaken(my $param_props = $self->shape($for_shape));
+    return $param_props->{type_information} if $param_props->{type_information};
 
-    my $type;
     if (not exists $param_props->{ type }) {
       confess "Shape $for_shape doesn't have a type entry in def " . Dumper($param_props);
-    } elsif (exists $param_props->{ type } and $param_props->{ type } eq 'list') {
-      $self->flattened_arrays(1) if ($param_props->{ flattened });
+    }
+
+    my $type = $param_props->{ type };
+    my $res = {
+      name => $for_shape,
+      type => $type,
+      depth => 0,
+      shape => $param_props,
+      deepest_shape => $param_props,
+    };
+
+    # to_json: $_ will be set to the entity that needs to be "JSON-ified"
+    # to_parameter: $_ will be set to the entity, $res will be the
+    #           result hashref, $key will be the key (or key prefix).
+    #           Should be a blob of code that writes the necessary
+    #           keys into %res.
+    if ($type eq 'list') {
+      if ($param_props->{ flattened }) {
+        $self->flattened_arrays(1);
+        $res->{flattened} = 1;
+      }
       die "Invalid list type: " . Dumper($param_props) if (not defined $param_props->{member}->{shape});
-      my $inner_type = $self->get_caller_class_type($param_props->{member}->{shape});
-      $inner_type = 'Str|Undef' if ($inner_type eq 'Str');
-      $type = "ArrayRef[$inner_type]";
-    } elsif (exists $param_props->{ type } and $param_props->{ type } eq 'timestamp') {
+      my $inner_info = $self->get_shape_type_information($param_props->{member}->{shape});
+      weaken($res->{deepest_shape} = $inner_info->{deepest_shape});
+      weaken($res->{value_shape} = $inner_info->{shape});
+      $res->{depth} = $inner_info->{depth} + 1;
+      if ($inner_info->{perl_type} eq "Str") {
+        $res->{perl_type} = "ArrayRef[Maybe[Str]]";
+        $res->{create_perl} = '[ map { defined($_) ? "$_" : undef } @$_ ]';
+        $res->{to_json} = $res->{create_perl};
+        $res->{to_hash} = $res->{create_perl};
+        $res->{from_xml} = q{$res->{$key} = "".($_->nodeValue//'');};
+        $res->{to_parameter} = <<'EOS';
+for my $index (0..(@$_ - 1)) {
+  my $orig_key = $key;
+  my $key = sprintf(<KEYSTR>, $orig_key, $index + 1);
+  my $val = $_->[$index];
+  $res->{$key} = defined($val) ? "$val" : undef;
+}
+EOS
+      } else {
+        $res->{perl_type} = "ArrayRef[" . $inner_info->{perl_type} . "]";
+        $res->{create_perl} = '[ map { ' . $inner_info->{create_perl} . ' } @$_ ]';
+        $res->{to_json} = '[ map { ' . $inner_info->{to_json} . ' } @$_ ]';
+        $res->{to_hash} = '[ map { ' . $inner_info->{to_hash} . ' } @$_ ]';
+        # this is pretty terrible, but it'll do for now.
+        $res->{from_xml} = <<'EOS1' . $inner_info->{from_xml} . <<'EOS2';
+do {
+  my $tmp = $res->{$key} // [];
+EOS1
+  push @$tmp, $res->{$key};
+  $res->{$key} = $tmp;
+}
+EOS2
+        $res->{to_parameter} = <<'EOS1' . $inner_info->{to_parameter} . <<'EOS2';
+for my $index (0..(@$_ - 1)) {
+  my $orig_key = $key;
+  my $key = sprintf(<KEYSTR>, $orig_key, $index + 1);
+  my $val = $_->[$index];
+  do {
+EOS1
+  } for $val;
+}
+EOS2
+      }
+      if ($res->{flattened}) {
+        $res->{to_parameter} =~ s/<KEYSTR>/'\%s.\%d'/;
+      } else {
+        $res->{to_parameter} =~ s/<KEYSTR>/'\%s.member.\%d'/;
+      }
+    } elsif ($type eq 'timestamp') {
       # TODO: Paws::API::TimeStamp
-      $type = 'Str';
-    } elsif (exists $param_props->{ type } and $param_props->{ type } eq 'long') {
+      $res->{perl_type} = "Str";
+      $res->{create_perl} = q{"$_"};
+      $res->{from_xml} = q{$res->{$key} = "".($_->nodeValue//'');};
+      $res->{to_json} = $res->{create_perl};
+      $res->{to_parameter} = q!$res->{$key} = "$_";!;
+      $res->{to_hash} = $res->{create_perl};
+    } elsif ($type eq 'long') {
       #TODO: Check
-      $type = 'Int';
-    } elsif (exists $param_props->{ type } and $param_props->{ type } eq 'double') {
+      $res->{perl_type} = "Int";
+      $res->{create_perl} = q{int($_)};
+      $res->{from_xml} = q{$res->{$key} = int($_->nodeValue//0);};
+      $res->{to_json} = $res->{create_perl};
+      $res->{to_parameter} = q!$res->{$key} = int($_);!;
+      $res->{to_hash} = $res->{create_perl};
+    } elsif ($type eq 'integer') {
+      $res->{perl_type} = "Int";
+      $res->{create_perl} = q{int($_)};
+      $res->{from_xml} = q{$res->{$key} = int($_->nodeValue//0);};
+      $res->{to_json} = $res->{create_perl};
+      $res->{to_parameter} = q!$res->{$key} = int($_);!;
+      $res->{to_hash} = $res->{create_perl};
+    } elsif ($type eq 'double') {
       #TODO: Check
-      $type = 'Num';
-    } elsif (exists $param_props->{ type } and $param_props->{ type } eq 'float') {
+      $res->{perl_type} = "Num";
+      $res->{create_perl} = q{0+$_};
+      $res->{from_xml} = q{$res->{$key} = 0+($_->nodeValue//0);};
+      $res->{to_json} = $res->{create_perl};
+      $res->{to_parameter} = q!$res->{$key} = 0+$_;!;
+      $res->{to_hash} = $res->{create_perl};
+    } elsif ($type eq 'float') {
       #TODO: Check
-      $type = 'Num';
-    } elsif (exists $param_props->{ type } and $param_props->{ type } eq 'boolean') {
+      $res->{perl_type} = "Num";
+      $res->{create_perl} = q{0+$_};
+      $res->{from_xml} = q{$res->{$key} = 0+($_->nodeValue//0);};
+      $res->{to_json} = $res->{create_perl};
+      $res->{to_parameter} = q!$res->{$key} = 0+$_;!;
+      $res->{to_hash} = $res->{create_perl};
+    } elsif ($type eq 'boolean') {
       # TODO: Bool
-      $type = 'Bool';
-    } elsif (exists $param_props->{ type } and $param_props->{ type } eq 'integer') {
-      $type = 'Int';
-    } elsif (exists $param_props->{ type } and $param_props->{ type } eq 'string') {
-      $type = 'Str';
-    } elsif (exists $param_props->{ type } and $param_props->{ type } eq 'blob') {
+      $res->{perl_type} = "Bool";
+      $res->{create_perl} = q{0+!!$_};
+      $res->{from_xml} = q!$res->{$key} = do { my $d = $_->nodeValue // ''; $d eq "true" || $d eq "1" };!;
+      $res->{to_json} = '$_ ? \1 : \0';
+      $res->{to_parameter} = q!$res->{$key} = $_ ? "true" : "false";!;
+      $res->{to_hash} = $res->{create_perl};
+    } elsif ($type eq 'string') {
+      $res->{perl_type} = "Str";
+      $res->{create_perl} = q{"$_"};
+      $res->{from_xml} = q{$res->{$key} = "".($_->nodeValue//'');};
+      $res->{to_json} = $res->{create_perl};
+      $res->{to_parameter} = q!$res->{$key} = "$_";!;
+      $res->{to_hash} = $res->{create_perl};
+    } elsif ($type eq 'blob') {
       # TODO: check
-      $type = 'Str';
-    } elsif (exists $param_props->{ type } and $param_props->{ type } eq 'map') {
-      $type = $self->namespace_shape($for_shape);
-    } elsif (exists $param_props->{ type } and $param_props->{ type } eq 'structure') {
-      $type = $self->namespace_shape($for_shape);
+      $res->{perl_type} = "Str";
+      $res->{create_perl} = q{"$_"};
+      $res->{from_xml} = q{$res->{$key} = "".($_->nodeValue//'');};
+      $res->{to_json} = $res->{create_perl};
+      $res->{to_parameter} = q!$res->{$key} = "$_";!;
+      $res->{to_hash} = $res->{create_perl};
+    } elsif ($type eq 'map') {
+      my $keys_shape = $self->shape($param_props->{key}->{shape});
+      my $values_shape = $self->shape($param_props->{value}->{shape});
+      $res->{perl_class} = $self->namespace_shape($for_shape);
+      $res->{perl_type} = "InstanceOf['" . $res->{perl_class} . "']";
+      $res->{create_perl} =
+        sprintf('ref($_) eq \'%s\' ? $_ : do { require %s; %s->new_with_coercions($_) }',
+                ($res->{perl_class}) x 3);
+      $res->{from_xml} = sprintf('do { require %s; %s->read_xml($_, $res, $key) };',
+                                 ($res->{perl_class}) x 2);
+      $res->{to_json} = q{$_->to_json_data};
+      $res->{to_parameter} = q!$_->to_parameter_data($res, $key);!;
+      $res->{to_hash} = q{$_->to_hash_data};
+      weaken($res->{values_shape} = $values_shape);
+      weaken($res->{keys_shape} = $keys_shape);
+    } elsif ($type eq 'structure') {
+      $res->{perl_class} = $self->namespace_shape($for_shape);
+      $res->{perl_type} = "InstanceOf['" . $res->{perl_class} . "']";
+      $res->{from_xml} = sprintf('$res->{$key} = do { require %s; %s->new_from_xml($_) };',
+                                 ($res->{perl_class}) x 2);
+      $res->{create_perl} =
+        sprintf('ref($_) eq \'%s\' ? $_ : do { require %s; %s->new_with_coercions($_) }',
+                ($res->{perl_class}) x 3);
+      $res->{to_json} = q{$_->to_json_data};
+      $res->{to_hash} = q{$_->to_hash_data};
+      $res->{to_parameter} = q!$_->to_parameter_data($res, $key);!;
+    } else {
+      die "Unknown type: $for_shape $type";
     }
-    if (not defined $type) {
-      p $param_props;
-      die "Unknown type: $for_shape $param_props->{ type }";
-    }
-    return $type;
+
+    $param_props->{type_information} = $res;
+    return $res;
+  }
+
+  sub get_caller_class_type {
+    my ($self, $for_shape) = @_;
+
+    return $self->get_shape_type_information($for_shape)->{perl_type};
   }
 
   sub generate_example_code {
@@ -1002,6 +1135,7 @@ package Paws::API::Builder {
 
   sub perl_type_to_pod {
     my ($self, $type) = @_;
+    $type =~ s/InstanceOf\['(.+?)'\]/$1/;
     if ($type =~ m/^(\w+Ref)\[(.+?)\]$/) {
       my ($param_type, $inner_type) = ($1, $2);
       return "$param_type\[L<$inner_type>\]" if ($type =~ m/\:\:/);
@@ -1120,6 +1254,19 @@ package Paws::API::Builder {
     return $shape_name;
   }
 
+  sub resolve_map_depth_and_type {
+    my ($self, $values_shape, $cur_depth) = @_;
+    $cur_depth //= 0;
+
+    if ($values_shape->{type} eq "list") {
+      return $self->resolve_map_depth_and_type(
+        $self->shape($values_shape->{member}->{shape}),
+        $cur_depth + 1
+      );
+    }
+    return ($values_shape, $cur_depth);
+  }
+
   sub make_inner_class {
     my $self = shift;
     my $iclass = shift;
@@ -1129,44 +1276,31 @@ package Paws::API::Builder {
 
     my $output = '';
     if ($iclass->{type} eq 'map') {
-      my $keys_shape = $self->shape($iclass->{key}->{shape});
-      my $values_shape = $self->shape($iclass->{value}->{shape});
+      my $keys_shape = $iclass->{type_information}{keys_shape};
+      my $values_shape = $iclass->{type_information}{values_shape};
 
       if ($keys_shape->{enum}){
-        $self->process_template('map_enum.tt', { c => $self, iclass => $iclass, inner_class => $inner_class, keys_shape => $keys_shape, values_shape => $values_shape, });
-      } elsif ($keys_shape->{type} eq 'string' and $values_shape->{type} eq 'string') {
-        $self->process_template('map_str_to_native.tt', { c => $self, iclass => $iclass, inner_class => $inner_class, keys_shape => $keys_shape, values_shape => $values_shape, map_class => 'HashRef[Maybe[Str]]' });
-      } elsif ($keys_shape->{type} eq 'string' and $values_shape->{type} eq 'boolean') {
-        $self->process_template('map_str_to_native.tt', { c => $self, iclass => $iclass, inner_class => $inner_class, keys_shape => $keys_shape, values_shape => $values_shape, map_class => 'HashRef[Str]' });
-      } elsif ($keys_shape->{type} eq 'string' and $values_shape->{type} eq 'float') {
-        $self->process_template('map_str_to_native.tt', { c => $self, iclass => $iclass, inner_class => $inner_class, keys_shape => $keys_shape, values_shape => $values_shape, map_class => 'HashRef[Num]' });
-      } elsif ($keys_shape->{type} eq 'string' and $values_shape->{type} eq 'integer') {
-        $self->process_template('map_str_to_native.tt', { c => $self, iclass => $iclass, inner_class => $inner_class, keys_shape => $keys_shape, values_shape => $values_shape, map_class => 'HashRef[Int]' });
-      } elsif ($keys_shape->{type} eq 'string' and $values_shape->{type} eq 'double') {
-        $self->process_template('map_str_to_native.tt', { c => $self, iclass => $iclass, inner_class => $inner_class, keys_shape => $keys_shape, values_shape => $values_shape, map_class => 'HashRef[Num]' });
-      } elsif ($keys_shape->{type} eq 'string' and $values_shape->{type} eq 'list') {
-        my $type = $self->get_caller_class_type($iclass->{value}->{shape});
-
-        #Sometimes it's a list of objects, and sometimes it's a list of native things
-        my $inner_shape = $self->shape($values_shape->{member}->{shape});
-
-        if ($inner_shape->{type} eq 'structure'){
-          $self->process_template('map_str_to_obj.tt', { c => $self, iclass => $iclass, inner_class => $inner_class, keys_shape => $keys_shape, values_shape => $values_shape, map_class => "HashRef[$type]" });
-        } else {
-          if ($type =~ /::/) {
-            $self->process_template('map_str_to_obj.tt', { c => $self, iclass => $iclass, inner_class => $inner_class, keys_shape => $keys_shape, values_shape => $values_shape, map_class => "HashRef[$type]" });
-          } else {
-            $self->process_template('map_str_to_native.tt', { c => $self, iclass => $iclass, inner_class => $inner_class, keys_shape => $keys_shape, values_shape => $values_shape, map_class => "HashRef[$type]" });
-          }
-        }
-      } elsif ($keys_shape->{type} eq 'string' and $values_shape->{type} eq 'structure') {
-        my $type = $self->get_caller_class_type($iclass->{value}->{shape});
-        $self->process_template('map_str_to_obj.tt', { c => $self, iclass => $iclass, inner_class => $inner_class, keys_shape => $keys_shape, values_shape => $values_shape, map_class => "HashRef[$type]" });
-      } elsif ($keys_shape->{type} eq 'string' and $values_shape->{type} eq 'map') {
-        my $type = $self->get_caller_class_type($iclass->{value}->{shape});
-        $self->process_template('map_str_to_obj.tt', { c => $self, iclass => $iclass, inner_class => $inner_class, keys_shape => $keys_shape, values_shape => $values_shape, map_class => "HashRef[$type]" });
+        $self->process_template('map_enum.tt', {
+          c => $self,
+          iclass => $iclass,
+          inner_class => $inner_class,
+          keys_shape => $keys_shape,
+          values_shape => $values_shape,
+        });
+      } elsif ($keys_shape->{type} eq "string") {
+        $self->process_template("map_str.tt", {
+          c => $self,
+          iclass => $iclass,
+          inner_class => $inner_class,
+          keys_shape => $keys_shape,
+          values_shape => $values_shape,
+        });
       } else {
-        die "Unrecognized Map type in query API " . Dumper($iclass) . ' keys_shape ' . Dumper($keys_shape) . ' values_shape' . Dumper($values_shape);
+        die "don't know how to handle key shape for map: " . &Data::Printer::np({
+          keys => $keys_shape,
+          values => $values_shape,
+          top => $iclass,
+        });
       }
     } elsif ($iclass->{type} eq 'structure') {
       $self->process_template('object.tt', { c => $self, iclass => $iclass, inner_class => $inner_class });

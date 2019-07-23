@@ -1,29 +1,546 @@
 
 package Paws::DynamoDB::Query;
   use Moose;
-  has AttributesToGet => (is => 'ro', isa => 'ArrayRef[Str|Undef]');
-  has ConditionalOperator => (is => 'ro', isa => 'Str');
-  has ConsistentRead => (is => 'ro', isa => 'Bool');
-  has ExclusiveStartKey => (is => 'ro', isa => 'Paws::DynamoDB::Key');
-  has ExpressionAttributeNames => (is => 'ro', isa => 'Paws::DynamoDB::ExpressionAttributeNameMap');
-  has ExpressionAttributeValues => (is => 'ro', isa => 'Paws::DynamoDB::ExpressionAttributeValueMap');
-  has FilterExpression => (is => 'ro', isa => 'Str');
-  has IndexName => (is => 'ro', isa => 'Str');
-  has KeyConditionExpression => (is => 'ro', isa => 'Str');
-  has KeyConditions => (is => 'ro', isa => 'Paws::DynamoDB::KeyConditions');
-  has Limit => (is => 'ro', isa => 'Int');
-  has ProjectionExpression => (is => 'ro', isa => 'Str');
-  has QueryFilter => (is => 'ro', isa => 'Paws::DynamoDB::FilterConditionMap');
-  has ReturnConsumedCapacity => (is => 'ro', isa => 'Str');
-  has ScanIndexForward => (is => 'ro', isa => 'Bool');
-  has Select => (is => 'ro', isa => 'Str');
-  has TableName => (is => 'ro', isa => 'Str', required => 1);
-
+  use Types::Standard -types;
   use MooseX::ClassAttribute;
+  use namespace::clean -except => 'meta';
+  with 'Paws::API::CallArgs';
+
+  has AttributesToGet => (is => 'ro', isa => ArrayRef[Maybe[Str]]);
+  has ConditionalOperator => (is => 'ro', isa => Str);
+  has ConsistentRead => (is => 'ro', isa => Bool);
+  has ExclusiveStartKey => (is => 'ro', isa => InstanceOf['Paws::DynamoDB::Key']);
+  has ExpressionAttributeNames => (is => 'ro', isa => InstanceOf['Paws::DynamoDB::ExpressionAttributeNameMap']);
+  has ExpressionAttributeValues => (is => 'ro', isa => InstanceOf['Paws::DynamoDB::ExpressionAttributeValueMap']);
+  has FilterExpression => (is => 'ro', isa => Str);
+  has IndexName => (is => 'ro', isa => Str);
+  has KeyConditionExpression => (is => 'ro', isa => Str);
+  has KeyConditions => (is => 'ro', isa => InstanceOf['Paws::DynamoDB::KeyConditions']);
+  has Limit => (is => 'ro', isa => Int);
+  has ProjectionExpression => (is => 'ro', isa => Str);
+  has QueryFilter => (is => 'ro', isa => InstanceOf['Paws::DynamoDB::FilterConditionMap']);
+  has ReturnConsumedCapacity => (is => 'ro', isa => Str);
+  has ScanIndexForward => (is => 'ro', isa => Bool);
+  has Select => (is => 'ro', isa => Str);
+  has TableName => (is => 'ro', isa => Str, required => 1);
+
 
   class_has _api_call => (isa => 'Str', is => 'ro', default => 'Query');
   class_has _returns => (isa => 'Str', is => 'ro', default => 'Paws::DynamoDB::QueryOutput');
   class_has _result_key => (isa => 'Str', is => 'ro');
+
+  sub new_with_coercions {
+    my ($class, $args) = @_;
+
+    my %res = %$args;
+    if (exists $args->{AttributesToGet}) {
+      $res{AttributesToGet} = (map {
+            [ map { defined($_) ? "$_" : undef } @$_ ]
+      } ($args->{AttributesToGet}))[0];
+    }
+    if (exists $args->{ConditionalOperator}) {
+      $res{ConditionalOperator} = (map {
+            "$_"
+      } ($args->{ConditionalOperator}))[0];
+    }
+    if (exists $args->{ConsistentRead}) {
+      $res{ConsistentRead} = (map {
+            0 + !!$_
+      } ($args->{ConsistentRead}))[0];
+    }
+    if (exists $args->{ExclusiveStartKey}) {
+      $res{ExclusiveStartKey} = (map {
+            ref($_) eq 'Paws::DynamoDB::Key' ? $_ : do {
+              require Paws::DynamoDB::Key;
+              Paws::DynamoDB::Key->new_with_coercions($_);
+              }
+      } ($args->{ExclusiveStartKey}))[0];
+    }
+    if (exists $args->{ExpressionAttributeNames}) {
+      $res{ExpressionAttributeNames} = (map {
+            ref($_) eq 'Paws::DynamoDB::ExpressionAttributeNameMap' ? $_ : do {
+              require Paws::DynamoDB::ExpressionAttributeNameMap;
+              Paws::DynamoDB::ExpressionAttributeNameMap->new_with_coercions($_);
+              }
+      } ($args->{ExpressionAttributeNames}))[0];
+    }
+    if (exists $args->{ExpressionAttributeValues}) {
+      $res{ExpressionAttributeValues} = (map {
+            ref($_) eq 'Paws::DynamoDB::ExpressionAttributeValueMap' ? $_ : do {
+              require Paws::DynamoDB::ExpressionAttributeValueMap;
+              Paws::DynamoDB::ExpressionAttributeValueMap->new_with_coercions($_);
+              }
+      } ($args->{ExpressionAttributeValues}))[0];
+    }
+    if (exists $args->{FilterExpression}) {
+      $res{FilterExpression} = (map {
+            "$_"
+      } ($args->{FilterExpression}))[0];
+    }
+    if (exists $args->{IndexName}) {
+      $res{IndexName} = (map {
+            "$_"
+      } ($args->{IndexName}))[0];
+    }
+    if (exists $args->{KeyConditionExpression}) {
+      $res{KeyConditionExpression} = (map {
+            "$_"
+      } ($args->{KeyConditionExpression}))[0];
+    }
+    if (exists $args->{KeyConditions}) {
+      $res{KeyConditions} = (map {
+            ref($_) eq 'Paws::DynamoDB::KeyConditions' ? $_ : do {
+              require Paws::DynamoDB::KeyConditions;
+              Paws::DynamoDB::KeyConditions->new_with_coercions($_);
+              }
+      } ($args->{KeyConditions}))[0];
+    }
+    if (exists $args->{Limit}) {
+      $res{Limit} = (map {
+            int($_)
+      } ($args->{Limit}))[0];
+    }
+    if (exists $args->{ProjectionExpression}) {
+      $res{ProjectionExpression} = (map {
+            "$_"
+      } ($args->{ProjectionExpression}))[0];
+    }
+    if (exists $args->{QueryFilter}) {
+      $res{QueryFilter} = (map {
+            ref($_) eq 'Paws::DynamoDB::FilterConditionMap' ? $_ : do {
+              require Paws::DynamoDB::FilterConditionMap;
+              Paws::DynamoDB::FilterConditionMap->new_with_coercions($_);
+              }
+      } ($args->{QueryFilter}))[0];
+    }
+    if (exists $args->{ReturnConsumedCapacity}) {
+      $res{ReturnConsumedCapacity} = (map {
+            "$_"
+      } ($args->{ReturnConsumedCapacity}))[0];
+    }
+    if (exists $args->{ScanIndexForward}) {
+      $res{ScanIndexForward} = (map {
+            0 + !!$_
+      } ($args->{ScanIndexForward}))[0];
+    }
+    if (exists $args->{Select}) {
+      $res{Select} = (map {
+            "$_"
+      } ($args->{Select}))[0];
+    }
+    if (exists $args->{TableName}) {
+      $res{TableName} = (map {
+            "$_"
+      } ($args->{TableName}))[0];
+    }
+
+    return $class->new(\%res);
+  }
+
+  sub new_from_xml {
+    my ($class, $xml) = @_;
+
+    my $res = {};
+    for ($xml->childNodes) {
+      if (!defined(my $nodeName = $_->nodeName)) {
+      } elsif ($nodeName eq "AttributesToGet") {
+        my $key = "AttributesToGet";
+            $res->{$key} = "" . ( $_->nodeValue // '' );
+      } elsif ($nodeName eq "ConditionalOperator") {
+        my $key = "ConditionalOperator";
+            $res->{$key} = "" . ( $_->nodeValue // '' );
+      } elsif ($nodeName eq "ConsistentRead") {
+        my $key = "ConsistentRead";
+            $res->{$key} =
+              do { my $d = $_->nodeValue // ''; $d eq "true" || $d eq "1" };
+      } elsif ($nodeName eq "ExclusiveStartKey") {
+        my $key = "ExclusiveStartKey";
+            do {
+              require Paws::DynamoDB::Key;
+              Paws::DynamoDB::Key->read_xml( $_, $res, $key );
+            };
+      } elsif ($nodeName eq "ExpressionAttributeNames") {
+        my $key = "ExpressionAttributeNames";
+            do {
+              require Paws::DynamoDB::ExpressionAttributeNameMap;
+              Paws::DynamoDB::ExpressionAttributeNameMap->read_xml( $_, $res, $key );
+            };
+      } elsif ($nodeName eq "ExpressionAttributeValues") {
+        my $key = "ExpressionAttributeValues";
+            do {
+              require Paws::DynamoDB::ExpressionAttributeValueMap;
+              Paws::DynamoDB::ExpressionAttributeValueMap->read_xml( $_, $res, $key );
+            };
+      } elsif ($nodeName eq "FilterExpression") {
+        my $key = "FilterExpression";
+            $res->{$key} = "" . ( $_->nodeValue // '' );
+      } elsif ($nodeName eq "IndexName") {
+        my $key = "IndexName";
+            $res->{$key} = "" . ( $_->nodeValue // '' );
+      } elsif ($nodeName eq "KeyConditionExpression") {
+        my $key = "KeyConditionExpression";
+            $res->{$key} = "" . ( $_->nodeValue // '' );
+      } elsif ($nodeName eq "KeyConditions") {
+        my $key = "KeyConditions";
+            do {
+              require Paws::DynamoDB::KeyConditions;
+              Paws::DynamoDB::KeyConditions->read_xml( $_, $res, $key );
+            };
+      } elsif ($nodeName eq "Limit") {
+        my $key = "Limit";
+            $res->{$key} = int( $_->nodeValue // 0 );
+      } elsif ($nodeName eq "ProjectionExpression") {
+        my $key = "ProjectionExpression";
+            $res->{$key} = "" . ( $_->nodeValue // '' );
+      } elsif ($nodeName eq "QueryFilter") {
+        my $key = "QueryFilter";
+            do {
+              require Paws::DynamoDB::FilterConditionMap;
+              Paws::DynamoDB::FilterConditionMap->read_xml( $_, $res, $key );
+            };
+      } elsif ($nodeName eq "ReturnConsumedCapacity") {
+        my $key = "ReturnConsumedCapacity";
+            $res->{$key} = "" . ( $_->nodeValue // '' );
+      } elsif ($nodeName eq "ScanIndexForward") {
+        my $key = "ScanIndexForward";
+            $res->{$key} =
+              do { my $d = $_->nodeValue // ''; $d eq "true" || $d eq "1" };
+      } elsif ($nodeName eq "Select") {
+        my $key = "Select";
+            $res->{$key} = "" . ( $_->nodeValue // '' );
+      } elsif ($nodeName eq "TableName") {
+        my $key = "TableName";
+            $res->{$key} = "" . ( $_->nodeValue // '' );
+
+      } else {
+        # warn "Unrecognized element $nodeName";
+      }
+    }
+
+    return $class->new_with_coercions($res);
+  }
+
+  sub to_hash_data {
+    my ($self) = @_;
+
+    my %res;
+    if (exists $self->{AttributesToGet}) {
+      $res{AttributesToGet} = (map {
+            [ map { defined($_) ? "$_" : undef } @$_ ]
+      } ($self->AttributesToGet))[0];
+    }
+    if (exists $self->{ConditionalOperator}) {
+      $res{ConditionalOperator} = (map {
+            "$_"
+      } ($self->ConditionalOperator))[0];
+    }
+    if (exists $self->{ConsistentRead}) {
+      $res{ConsistentRead} = (map {
+            0 + !!$_
+      } ($self->ConsistentRead))[0];
+    }
+    if (exists $self->{ExclusiveStartKey}) {
+      $res{ExclusiveStartKey} = (map {
+            $_->to_hash_data
+      } ($self->ExclusiveStartKey))[0];
+    }
+    if (exists $self->{ExpressionAttributeNames}) {
+      $res{ExpressionAttributeNames} = (map {
+            $_->to_hash_data
+      } ($self->ExpressionAttributeNames))[0];
+    }
+    if (exists $self->{ExpressionAttributeValues}) {
+      $res{ExpressionAttributeValues} = (map {
+            $_->to_hash_data
+      } ($self->ExpressionAttributeValues))[0];
+    }
+    if (exists $self->{FilterExpression}) {
+      $res{FilterExpression} = (map {
+            "$_"
+      } ($self->FilterExpression))[0];
+    }
+    if (exists $self->{IndexName}) {
+      $res{IndexName} = (map {
+            "$_"
+      } ($self->IndexName))[0];
+    }
+    if (exists $self->{KeyConditionExpression}) {
+      $res{KeyConditionExpression} = (map {
+            "$_"
+      } ($self->KeyConditionExpression))[0];
+    }
+    if (exists $self->{KeyConditions}) {
+      $res{KeyConditions} = (map {
+            $_->to_hash_data
+      } ($self->KeyConditions))[0];
+    }
+    if (exists $self->{Limit}) {
+      $res{Limit} = (map {
+            int($_)
+      } ($self->Limit))[0];
+    }
+    if (exists $self->{ProjectionExpression}) {
+      $res{ProjectionExpression} = (map {
+            "$_"
+      } ($self->ProjectionExpression))[0];
+    }
+    if (exists $self->{QueryFilter}) {
+      $res{QueryFilter} = (map {
+            $_->to_hash_data
+      } ($self->QueryFilter))[0];
+    }
+    if (exists $self->{ReturnConsumedCapacity}) {
+      $res{ReturnConsumedCapacity} = (map {
+            "$_"
+      } ($self->ReturnConsumedCapacity))[0];
+    }
+    if (exists $self->{ScanIndexForward}) {
+      $res{ScanIndexForward} = (map {
+            0 + !!$_
+      } ($self->ScanIndexForward))[0];
+    }
+    if (exists $self->{Select}) {
+      $res{Select} = (map {
+            "$_"
+      } ($self->Select))[0];
+    }
+    if (exists $self->{TableName}) {
+      $res{TableName} = (map {
+            "$_"
+      } ($self->TableName))[0];
+    }
+
+    return \%res;
+  }
+
+  sub to_json_data {
+    my ($self) = @_;
+
+    my %res;
+    if (exists $self->{AttributesToGet}) {
+      $res{AttributesToGet} = (map {
+            [ map { defined($_) ? "$_" : undef } @$_ ]
+      } ($self->AttributesToGet))[0];
+    }
+    if (exists $self->{ConditionalOperator}) {
+      $res{ConditionalOperator} = (map {
+            "$_"
+      } ($self->ConditionalOperator))[0];
+    }
+    if (exists $self->{ConsistentRead}) {
+      $res{ConsistentRead} = (map {
+            $_ ? \1 : \0
+      } ($self->ConsistentRead))[0];
+    }
+    if (exists $self->{ExclusiveStartKey}) {
+      $res{ExclusiveStartKey} = (map {
+            $_->to_json_data
+      } ($self->ExclusiveStartKey))[0];
+    }
+    if (exists $self->{ExpressionAttributeNames}) {
+      $res{ExpressionAttributeNames} = (map {
+            $_->to_json_data
+      } ($self->ExpressionAttributeNames))[0];
+    }
+    if (exists $self->{ExpressionAttributeValues}) {
+      $res{ExpressionAttributeValues} = (map {
+            $_->to_json_data
+      } ($self->ExpressionAttributeValues))[0];
+    }
+    if (exists $self->{FilterExpression}) {
+      $res{FilterExpression} = (map {
+            "$_"
+      } ($self->FilterExpression))[0];
+    }
+    if (exists $self->{IndexName}) {
+      $res{IndexName} = (map {
+            "$_"
+      } ($self->IndexName))[0];
+    }
+    if (exists $self->{KeyConditionExpression}) {
+      $res{KeyConditionExpression} = (map {
+            "$_"
+      } ($self->KeyConditionExpression))[0];
+    }
+    if (exists $self->{KeyConditions}) {
+      $res{KeyConditions} = (map {
+            $_->to_json_data
+      } ($self->KeyConditions))[0];
+    }
+    if (exists $self->{Limit}) {
+      $res{Limit} = (map {
+            int($_)
+      } ($self->Limit))[0];
+    }
+    if (exists $self->{ProjectionExpression}) {
+      $res{ProjectionExpression} = (map {
+            "$_"
+      } ($self->ProjectionExpression))[0];
+    }
+    if (exists $self->{QueryFilter}) {
+      $res{QueryFilter} = (map {
+            $_->to_json_data
+      } ($self->QueryFilter))[0];
+    }
+    if (exists $self->{ReturnConsumedCapacity}) {
+      $res{ReturnConsumedCapacity} = (map {
+            "$_"
+      } ($self->ReturnConsumedCapacity))[0];
+    }
+    if (exists $self->{ScanIndexForward}) {
+      $res{ScanIndexForward} = (map {
+            $_ ? \1 : \0
+      } ($self->ScanIndexForward))[0];
+    }
+    if (exists $self->{Select}) {
+      $res{Select} = (map {
+            "$_"
+      } ($self->Select))[0];
+    }
+    if (exists $self->{TableName}) {
+      $res{TableName} = (map {
+            "$_"
+      } ($self->TableName))[0];
+    }
+
+    return \%res;
+  }
+
+  sub to_parameter_data {
+    my ($self, $res, $prefix) = @_;
+    $res //= {};
+    $prefix = defined $prefix ? "$prefix." : "";
+
+
+    if (exists $self->{AttributesToGet}) {
+      my $key = "${prefix}AttributesToGet";
+      do {
+            for my $index ( 0 .. ( @$_ - 1 ) ) {
+              my $orig_key = $key;
+              my $key      = sprintf( '%s.member.%d', $orig_key, $index + 1 );
+              my $val      = $_->[$index];
+              $res->{$key} = defined($val) ? "$val" : undef;
+            }
+      } for $self->AttributesToGet;
+    }
+
+    if (exists $self->{ConditionalOperator}) {
+      my $key = "${prefix}ConditionalOperator";
+      do {
+            $res->{$key} = "$_";
+      } for $self->ConditionalOperator;
+    }
+
+    if (exists $self->{ConsistentRead}) {
+      my $key = "${prefix}ConsistentRead";
+      do {
+            $res->{$key} = $_ ? "true" : "false";
+      } for $self->ConsistentRead;
+    }
+
+    if (exists $self->{ExclusiveStartKey}) {
+      my $key = "${prefix}ExclusiveStartKey";
+      do {
+            $_->to_parameter_data( $res, $key );
+      } for $self->ExclusiveStartKey;
+    }
+
+    if (exists $self->{ExpressionAttributeNames}) {
+      my $key = "${prefix}ExpressionAttributeNames";
+      do {
+            $_->to_parameter_data( $res, $key );
+      } for $self->ExpressionAttributeNames;
+    }
+
+    if (exists $self->{ExpressionAttributeValues}) {
+      my $key = "${prefix}ExpressionAttributeValues";
+      do {
+            $_->to_parameter_data( $res, $key );
+      } for $self->ExpressionAttributeValues;
+    }
+
+    if (exists $self->{FilterExpression}) {
+      my $key = "${prefix}FilterExpression";
+      do {
+            $res->{$key} = "$_";
+      } for $self->FilterExpression;
+    }
+
+    if (exists $self->{IndexName}) {
+      my $key = "${prefix}IndexName";
+      do {
+            $res->{$key} = "$_";
+      } for $self->IndexName;
+    }
+
+    if (exists $self->{KeyConditionExpression}) {
+      my $key = "${prefix}KeyConditionExpression";
+      do {
+            $res->{$key} = "$_";
+      } for $self->KeyConditionExpression;
+    }
+
+    if (exists $self->{KeyConditions}) {
+      my $key = "${prefix}KeyConditions";
+      do {
+            $_->to_parameter_data( $res, $key );
+      } for $self->KeyConditions;
+    }
+
+    if (exists $self->{Limit}) {
+      my $key = "${prefix}Limit";
+      do {
+            $res->{$key} = int($_);
+      } for $self->Limit;
+    }
+
+    if (exists $self->{ProjectionExpression}) {
+      my $key = "${prefix}ProjectionExpression";
+      do {
+            $res->{$key} = "$_";
+      } for $self->ProjectionExpression;
+    }
+
+    if (exists $self->{QueryFilter}) {
+      my $key = "${prefix}QueryFilter";
+      do {
+            $_->to_parameter_data( $res, $key );
+      } for $self->QueryFilter;
+    }
+
+    if (exists $self->{ReturnConsumedCapacity}) {
+      my $key = "${prefix}ReturnConsumedCapacity";
+      do {
+            $res->{$key} = "$_";
+      } for $self->ReturnConsumedCapacity;
+    }
+
+    if (exists $self->{ScanIndexForward}) {
+      my $key = "${prefix}ScanIndexForward";
+      do {
+            $res->{$key} = $_ ? "true" : "false";
+      } for $self->ScanIndexForward;
+    }
+
+    if (exists $self->{Select}) {
+      my $key = "${prefix}Select";
+      do {
+            $res->{$key} = "$_";
+      } for $self->Select;
+    }
+
+    if (exists $self->{TableName}) {
+      my $key = "${prefix}TableName";
+      do {
+            $res->{$key} = "$_";
+      } for $self->TableName;
+    }
+
+    return $res;
+  }
+
+
+  __PACKAGE__->meta->make_immutable;
 1;
 
 ### main pod documentation begin ###
@@ -73,7 +590,7 @@ For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/dyn
 =head1 ATTRIBUTES
 
 
-=head2 AttributesToGet => ArrayRef[Str|Undef]
+=head2 AttributesToGet => ArrayRef[Maybe[Str]]
 
 This is a legacy parameter. Use C<ProjectionExpression> instead. For
 more information, see AttributesToGet

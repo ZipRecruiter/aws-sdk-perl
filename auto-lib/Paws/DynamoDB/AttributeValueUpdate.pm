@@ -1,7 +1,118 @@
 package Paws::DynamoDB::AttributeValueUpdate;
   use Moose;
-  has Action => (is => 'ro', isa => 'Str');
-  has Value => (is => 'ro', isa => 'Paws::DynamoDB::AttributeValue');
+  use Types::Standard -types;
+  use namespace::clean -except => 'meta';
+  with 'Paws::API::Object';
+
+  has Action => (is => 'ro', isa => Str);
+  has Value => (is => 'ro', isa => InstanceOf['Paws::DynamoDB::AttributeValue']);
+
+  sub new_with_coercions {
+    my ($class, $args) = @_;
+
+    my %res = %$args;
+    if (exists $args->{Action}) {
+      $res{Action} = (map {
+            "$_"
+      } ($args->{Action}))[0];
+    }
+    if (exists $args->{Value}) {
+      $res{Value} = (map {
+            ref($_) eq 'Paws::DynamoDB::AttributeValue' ? $_ : do {
+              require Paws::DynamoDB::AttributeValue;
+              Paws::DynamoDB::AttributeValue->new_with_coercions($_);
+              }
+      } ($args->{Value}))[0];
+    }
+
+    return $class->new(\%res);
+  }
+
+  sub new_from_xml {
+    my ($class, $xml) = @_;
+
+    my $res = {};
+    for ($xml->childNodes) {
+      if (!defined(my $nodeName = $_->nodeName)) {
+      } elsif ($nodeName eq "Action") {
+        my $key = "Action";
+            $res->{$key} = "" . ( $_->nodeValue // '' );
+      } elsif ($nodeName eq "Value") {
+        my $key = "Value";
+            $res->{$key} = do {
+              require Paws::DynamoDB::AttributeValue;
+              Paws::DynamoDB::AttributeValue->new_from_xml($_);
+            };
+
+      } else {
+        # warn "Unrecognized element $nodeName";
+      }
+    }
+
+    return $class->new_with_coercions($res);
+  }
+
+  sub to_hash_data {
+    my ($self) = @_;
+
+    my %res;
+    if (exists $self->{Action}) {
+      $res{Action} = (map {
+            "$_"
+      } ($self->Action))[0];
+    }
+    if (exists $self->{Value}) {
+      $res{Value} = (map {
+            $_->to_hash_data
+      } ($self->Value))[0];
+    }
+
+    return \%res;
+  }
+
+  sub to_json_data {
+    my ($self) = @_;
+
+    my %res;
+    if (exists $self->{Action}) {
+      $res{Action} = (map {
+            "$_"
+      } ($self->Action))[0];
+    }
+    if (exists $self->{Value}) {
+      $res{Value} = (map {
+            $_->to_json_data
+      } ($self->Value))[0];
+    }
+
+    return \%res;
+  }
+
+  sub to_parameter_data {
+    my ($self, $res, $prefix) = @_;
+    $res //= {};
+    $prefix = defined $prefix ? "$prefix." : "";
+
+
+    if (exists $self->{Action}) {
+      my $key = "${prefix}Action";
+      do {
+            $res->{$key} = "$_";
+      } for $self->Action;
+    }
+
+    if (exists $self->{Value}) {
+      my $key = "${prefix}Value";
+      do {
+            $_->to_parameter_data( $res, $key );
+      } for $self->Value;
+    }
+
+    return $res;
+  }
+
+
+  __PACKAGE__->meta->make_immutable;
 1;
 
 ### main pod documentation begin ###

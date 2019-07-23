@@ -1,5 +1,6 @@
 package Paws::DynamoDB;
   use Moose;
+  use namespace::clean -except => 'meta';
   sub service { 'dynamodb' }
   sub signing_name { 'dynamodb' }
   sub version { '2012-08-10' }
@@ -44,182 +45,218 @@ package Paws::DynamoDB;
   
   sub BatchGetItem {
     my $self = shift;
-    my $call_object = $self->new_with_coercions('Paws::DynamoDB::BatchGetItem', @_);
+    require Paws::DynamoDB::BatchGetItem;
+    my $call_object = Paws::DynamoDB::BatchGetItem->new_with_coercions({ @_ });
     return $self->caller->do_call($self, $call_object);
   }
   sub BatchWriteItem {
     my $self = shift;
-    my $call_object = $self->new_with_coercions('Paws::DynamoDB::BatchWriteItem', @_);
+    require Paws::DynamoDB::BatchWriteItem;
+    my $call_object = Paws::DynamoDB::BatchWriteItem->new_with_coercions({ @_ });
     return $self->caller->do_call($self, $call_object);
   }
   sub CreateBackup {
     my $self = shift;
-    my $call_object = $self->new_with_coercions('Paws::DynamoDB::CreateBackup', @_);
+    require Paws::DynamoDB::CreateBackup;
+    my $call_object = Paws::DynamoDB::CreateBackup->new_with_coercions({ @_ });
     return $self->caller->do_call($self, $call_object);
   }
   sub CreateGlobalTable {
     my $self = shift;
-    my $call_object = $self->new_with_coercions('Paws::DynamoDB::CreateGlobalTable', @_);
+    require Paws::DynamoDB::CreateGlobalTable;
+    my $call_object = Paws::DynamoDB::CreateGlobalTable->new_with_coercions({ @_ });
     return $self->caller->do_call($self, $call_object);
   }
   sub CreateTable {
     my $self = shift;
-    my $call_object = $self->new_with_coercions('Paws::DynamoDB::CreateTable', @_);
+    require Paws::DynamoDB::CreateTable;
+    my $call_object = Paws::DynamoDB::CreateTable->new_with_coercions({ @_ });
     return $self->caller->do_call($self, $call_object);
   }
   sub DeleteBackup {
     my $self = shift;
-    my $call_object = $self->new_with_coercions('Paws::DynamoDB::DeleteBackup', @_);
+    require Paws::DynamoDB::DeleteBackup;
+    my $call_object = Paws::DynamoDB::DeleteBackup->new_with_coercions({ @_ });
     return $self->caller->do_call($self, $call_object);
   }
   sub DeleteItem {
     my $self = shift;
-    my $call_object = $self->new_with_coercions('Paws::DynamoDB::DeleteItem', @_);
+    require Paws::DynamoDB::DeleteItem;
+    my $call_object = Paws::DynamoDB::DeleteItem->new_with_coercions({ @_ });
     return $self->caller->do_call($self, $call_object);
   }
   sub DeleteTable {
     my $self = shift;
-    my $call_object = $self->new_with_coercions('Paws::DynamoDB::DeleteTable', @_);
+    require Paws::DynamoDB::DeleteTable;
+    my $call_object = Paws::DynamoDB::DeleteTable->new_with_coercions({ @_ });
     return $self->caller->do_call($self, $call_object);
   }
   sub DescribeBackup {
     my $self = shift;
-    my $call_object = $self->new_with_coercions('Paws::DynamoDB::DescribeBackup', @_);
+    require Paws::DynamoDB::DescribeBackup;
+    my $call_object = Paws::DynamoDB::DescribeBackup->new_with_coercions({ @_ });
     return $self->caller->do_call($self, $call_object);
   }
   sub DescribeContinuousBackups {
     my $self = shift;
-    my $call_object = $self->new_with_coercions('Paws::DynamoDB::DescribeContinuousBackups', @_);
+    require Paws::DynamoDB::DescribeContinuousBackups;
+    my $call_object = Paws::DynamoDB::DescribeContinuousBackups->new_with_coercions({ @_ });
     return $self->caller->do_call($self, $call_object);
   }
   sub DescribeEndpoints {
     my $self = shift;
-    my $call_object = $self->new_with_coercions('Paws::DynamoDB::DescribeEndpoints', @_);
+    require Paws::DynamoDB::DescribeEndpoints;
+    my $call_object = Paws::DynamoDB::DescribeEndpoints->new_with_coercions({ @_ });
     return $self->caller->do_call($self, $call_object);
   }
   sub DescribeGlobalTable {
     my $self = shift;
-    my $call_object = $self->new_with_coercions('Paws::DynamoDB::DescribeGlobalTable', @_);
+    require Paws::DynamoDB::DescribeGlobalTable;
+    my $call_object = Paws::DynamoDB::DescribeGlobalTable->new_with_coercions({ @_ });
     return $self->caller->do_call($self, $call_object);
   }
   sub DescribeGlobalTableSettings {
     my $self = shift;
-    my $call_object = $self->new_with_coercions('Paws::DynamoDB::DescribeGlobalTableSettings', @_);
+    require Paws::DynamoDB::DescribeGlobalTableSettings;
+    my $call_object = Paws::DynamoDB::DescribeGlobalTableSettings->new_with_coercions({ @_ });
     return $self->caller->do_call($self, $call_object);
   }
   sub DescribeLimits {
     my $self = shift;
-    my $call_object = $self->new_with_coercions('Paws::DynamoDB::DescribeLimits', @_);
+    require Paws::DynamoDB::DescribeLimits;
+    my $call_object = Paws::DynamoDB::DescribeLimits->new_with_coercions({ @_ });
     return $self->caller->do_call($self, $call_object);
   }
   sub DescribeTable {
     my $self = shift;
-    my $call_object = $self->new_with_coercions('Paws::DynamoDB::DescribeTable', @_);
+    require Paws::DynamoDB::DescribeTable;
+    my $call_object = Paws::DynamoDB::DescribeTable->new_with_coercions({ @_ });
     return $self->caller->do_call($self, $call_object);
   }
   sub DescribeTimeToLive {
     my $self = shift;
-    my $call_object = $self->new_with_coercions('Paws::DynamoDB::DescribeTimeToLive', @_);
+    require Paws::DynamoDB::DescribeTimeToLive;
+    my $call_object = Paws::DynamoDB::DescribeTimeToLive->new_with_coercions({ @_ });
     return $self->caller->do_call($self, $call_object);
   }
   sub GetItem {
     my $self = shift;
-    my $call_object = $self->new_with_coercions('Paws::DynamoDB::GetItem', @_);
+    require Paws::DynamoDB::GetItem;
+    my $call_object = Paws::DynamoDB::GetItem->new_with_coercions({ @_ });
     return $self->caller->do_call($self, $call_object);
   }
   sub ListBackups {
     my $self = shift;
-    my $call_object = $self->new_with_coercions('Paws::DynamoDB::ListBackups', @_);
+    require Paws::DynamoDB::ListBackups;
+    my $call_object = Paws::DynamoDB::ListBackups->new_with_coercions({ @_ });
     return $self->caller->do_call($self, $call_object);
   }
   sub ListGlobalTables {
     my $self = shift;
-    my $call_object = $self->new_with_coercions('Paws::DynamoDB::ListGlobalTables', @_);
+    require Paws::DynamoDB::ListGlobalTables;
+    my $call_object = Paws::DynamoDB::ListGlobalTables->new_with_coercions({ @_ });
     return $self->caller->do_call($self, $call_object);
   }
   sub ListTables {
     my $self = shift;
-    my $call_object = $self->new_with_coercions('Paws::DynamoDB::ListTables', @_);
+    require Paws::DynamoDB::ListTables;
+    my $call_object = Paws::DynamoDB::ListTables->new_with_coercions({ @_ });
     return $self->caller->do_call($self, $call_object);
   }
   sub ListTagsOfResource {
     my $self = shift;
-    my $call_object = $self->new_with_coercions('Paws::DynamoDB::ListTagsOfResource', @_);
+    require Paws::DynamoDB::ListTagsOfResource;
+    my $call_object = Paws::DynamoDB::ListTagsOfResource->new_with_coercions({ @_ });
     return $self->caller->do_call($self, $call_object);
   }
   sub PutItem {
     my $self = shift;
-    my $call_object = $self->new_with_coercions('Paws::DynamoDB::PutItem', @_);
+    require Paws::DynamoDB::PutItem;
+    my $call_object = Paws::DynamoDB::PutItem->new_with_coercions({ @_ });
     return $self->caller->do_call($self, $call_object);
   }
   sub Query {
     my $self = shift;
-    my $call_object = $self->new_with_coercions('Paws::DynamoDB::Query', @_);
+    require Paws::DynamoDB::Query;
+    my $call_object = Paws::DynamoDB::Query->new_with_coercions({ @_ });
     return $self->caller->do_call($self, $call_object);
   }
   sub RestoreTableFromBackup {
     my $self = shift;
-    my $call_object = $self->new_with_coercions('Paws::DynamoDB::RestoreTableFromBackup', @_);
+    require Paws::DynamoDB::RestoreTableFromBackup;
+    my $call_object = Paws::DynamoDB::RestoreTableFromBackup->new_with_coercions({ @_ });
     return $self->caller->do_call($self, $call_object);
   }
   sub RestoreTableToPointInTime {
     my $self = shift;
-    my $call_object = $self->new_with_coercions('Paws::DynamoDB::RestoreTableToPointInTime', @_);
+    require Paws::DynamoDB::RestoreTableToPointInTime;
+    my $call_object = Paws::DynamoDB::RestoreTableToPointInTime->new_with_coercions({ @_ });
     return $self->caller->do_call($self, $call_object);
   }
   sub Scan {
     my $self = shift;
-    my $call_object = $self->new_with_coercions('Paws::DynamoDB::Scan', @_);
+    require Paws::DynamoDB::Scan;
+    my $call_object = Paws::DynamoDB::Scan->new_with_coercions({ @_ });
     return $self->caller->do_call($self, $call_object);
   }
   sub TagResource {
     my $self = shift;
-    my $call_object = $self->new_with_coercions('Paws::DynamoDB::TagResource', @_);
+    require Paws::DynamoDB::TagResource;
+    my $call_object = Paws::DynamoDB::TagResource->new_with_coercions({ @_ });
     return $self->caller->do_call($self, $call_object);
   }
   sub TransactGetItems {
     my $self = shift;
-    my $call_object = $self->new_with_coercions('Paws::DynamoDB::TransactGetItems', @_);
+    require Paws::DynamoDB::TransactGetItems;
+    my $call_object = Paws::DynamoDB::TransactGetItems->new_with_coercions({ @_ });
     return $self->caller->do_call($self, $call_object);
   }
   sub TransactWriteItems {
     my $self = shift;
-    my $call_object = $self->new_with_coercions('Paws::DynamoDB::TransactWriteItems', @_);
+    require Paws::DynamoDB::TransactWriteItems;
+    my $call_object = Paws::DynamoDB::TransactWriteItems->new_with_coercions({ @_ });
     return $self->caller->do_call($self, $call_object);
   }
   sub UntagResource {
     my $self = shift;
-    my $call_object = $self->new_with_coercions('Paws::DynamoDB::UntagResource', @_);
+    require Paws::DynamoDB::UntagResource;
+    my $call_object = Paws::DynamoDB::UntagResource->new_with_coercions({ @_ });
     return $self->caller->do_call($self, $call_object);
   }
   sub UpdateContinuousBackups {
     my $self = shift;
-    my $call_object = $self->new_with_coercions('Paws::DynamoDB::UpdateContinuousBackups', @_);
+    require Paws::DynamoDB::UpdateContinuousBackups;
+    my $call_object = Paws::DynamoDB::UpdateContinuousBackups->new_with_coercions({ @_ });
     return $self->caller->do_call($self, $call_object);
   }
   sub UpdateGlobalTable {
     my $self = shift;
-    my $call_object = $self->new_with_coercions('Paws::DynamoDB::UpdateGlobalTable', @_);
+    require Paws::DynamoDB::UpdateGlobalTable;
+    my $call_object = Paws::DynamoDB::UpdateGlobalTable->new_with_coercions({ @_ });
     return $self->caller->do_call($self, $call_object);
   }
   sub UpdateGlobalTableSettings {
     my $self = shift;
-    my $call_object = $self->new_with_coercions('Paws::DynamoDB::UpdateGlobalTableSettings', @_);
+    require Paws::DynamoDB::UpdateGlobalTableSettings;
+    my $call_object = Paws::DynamoDB::UpdateGlobalTableSettings->new_with_coercions({ @_ });
     return $self->caller->do_call($self, $call_object);
   }
   sub UpdateItem {
     my $self = shift;
-    my $call_object = $self->new_with_coercions('Paws::DynamoDB::UpdateItem', @_);
+    require Paws::DynamoDB::UpdateItem;
+    my $call_object = Paws::DynamoDB::UpdateItem->new_with_coercions({ @_ });
     return $self->caller->do_call($self, $call_object);
   }
   sub UpdateTable {
     my $self = shift;
-    my $call_object = $self->new_with_coercions('Paws::DynamoDB::UpdateTable', @_);
+    require Paws::DynamoDB::UpdateTable;
+    my $call_object = Paws::DynamoDB::UpdateTable->new_with_coercions({ @_ });
     return $self->caller->do_call($self, $call_object);
   }
   sub UpdateTimeToLive {
     my $self = shift;
-    my $call_object = $self->new_with_coercions('Paws::DynamoDB::UpdateTimeToLive', @_);
+    require Paws::DynamoDB::UpdateTimeToLive;
+    my $call_object = Paws::DynamoDB::UpdateTimeToLive->new_with_coercions({ @_ });
     return $self->caller->do_call($self, $call_object);
   }
   
@@ -354,6 +391,7 @@ package Paws::DynamoDB;
 
   sub operations { qw/BatchGetItem BatchWriteItem CreateBackup CreateGlobalTable CreateTable DeleteBackup DeleteItem DeleteTable DescribeBackup DescribeContinuousBackups DescribeEndpoints DescribeGlobalTable DescribeGlobalTableSettings DescribeLimits DescribeTable DescribeTimeToLive GetItem ListBackups ListGlobalTables ListTables ListTagsOfResource PutItem Query RestoreTableFromBackup RestoreTableToPointInTime Scan TagResource TransactGetItems TransactWriteItems UntagResource UpdateContinuousBackups UpdateGlobalTable UpdateGlobalTableSettings UpdateItem UpdateTable UpdateTimeToLive / }
 
+  __PACKAGE__->meta->make_immutable;
 1;
 
 ### main pod documentation begin ###
@@ -1130,7 +1168,7 @@ table.
 
 =item TableName => Str
 
-=item [AttributesToGet => ArrayRef[Str|Undef]]
+=item [AttributesToGet => ArrayRef[Maybe[Str]]]
 
 =item [ConsistentRead => Bool]
 
@@ -1375,7 +1413,7 @@ in the I<Amazon DynamoDB Developer Guide>.
 
 =item TableName => Str
 
-=item [AttributesToGet => ArrayRef[Str|Undef]]
+=item [AttributesToGet => ArrayRef[Maybe[Str]]]
 
 =item [ConditionalOperator => Str]
 
@@ -1623,7 +1661,7 @@ Point in time recovery settings
 
 =item TableName => Str
 
-=item [AttributesToGet => ArrayRef[Str|Undef]]
+=item [AttributesToGet => ArrayRef[Maybe[Str]]]
 
 =item [ConditionalOperator => Str]
 
@@ -1872,7 +1910,7 @@ There is a user error, such as an invalid data format.
 
 =item ResourceArn => Str
 
-=item TagKeys => ArrayRef[Str|Undef]
+=item TagKeys => ArrayRef[Maybe[Str]]
 
 
 =back
@@ -2187,9 +2225,9 @@ If passed a sub as first parameter, it will call the sub for each element found 
 If not, it will return a a L<Paws::DynamoDB::ListTagsOfResourceOutput> instance with all the C<param>s;  from all the responses. Please take into account that this mode can potentially consume vasts ammounts of memory.
 
 
-=head2 QueryAll(sub { },TableName => Str, [AttributesToGet => ArrayRef[Str|Undef], ConditionalOperator => Str, ConsistentRead => Bool, ExclusiveStartKey => L<Paws::DynamoDB::Key>, ExpressionAttributeNames => L<Paws::DynamoDB::ExpressionAttributeNameMap>, ExpressionAttributeValues => L<Paws::DynamoDB::ExpressionAttributeValueMap>, FilterExpression => Str, IndexName => Str, KeyConditionExpression => Str, KeyConditions => L<Paws::DynamoDB::KeyConditions>, Limit => Int, ProjectionExpression => Str, QueryFilter => L<Paws::DynamoDB::FilterConditionMap>, ReturnConsumedCapacity => Str, ScanIndexForward => Bool, Select => Str])
+=head2 QueryAll(sub { },TableName => Str, [AttributesToGet => ArrayRef[Maybe[Str]], ConditionalOperator => Str, ConsistentRead => Bool, ExclusiveStartKey => L<Paws::DynamoDB::Key>, ExpressionAttributeNames => L<Paws::DynamoDB::ExpressionAttributeNameMap>, ExpressionAttributeValues => L<Paws::DynamoDB::ExpressionAttributeValueMap>, FilterExpression => Str, IndexName => Str, KeyConditionExpression => Str, KeyConditions => L<Paws::DynamoDB::KeyConditions>, Limit => Int, ProjectionExpression => Str, QueryFilter => L<Paws::DynamoDB::FilterConditionMap>, ReturnConsumedCapacity => Str, ScanIndexForward => Bool, Select => Str])
 
-=head2 QueryAll(TableName => Str, [AttributesToGet => ArrayRef[Str|Undef], ConditionalOperator => Str, ConsistentRead => Bool, ExclusiveStartKey => L<Paws::DynamoDB::Key>, ExpressionAttributeNames => L<Paws::DynamoDB::ExpressionAttributeNameMap>, ExpressionAttributeValues => L<Paws::DynamoDB::ExpressionAttributeValueMap>, FilterExpression => Str, IndexName => Str, KeyConditionExpression => Str, KeyConditions => L<Paws::DynamoDB::KeyConditions>, Limit => Int, ProjectionExpression => Str, QueryFilter => L<Paws::DynamoDB::FilterConditionMap>, ReturnConsumedCapacity => Str, ScanIndexForward => Bool, Select => Str])
+=head2 QueryAll(TableName => Str, [AttributesToGet => ArrayRef[Maybe[Str]], ConditionalOperator => Str, ConsistentRead => Bool, ExclusiveStartKey => L<Paws::DynamoDB::Key>, ExpressionAttributeNames => L<Paws::DynamoDB::ExpressionAttributeNameMap>, ExpressionAttributeValues => L<Paws::DynamoDB::ExpressionAttributeValueMap>, FilterExpression => Str, IndexName => Str, KeyConditionExpression => Str, KeyConditions => L<Paws::DynamoDB::KeyConditions>, Limit => Int, ProjectionExpression => Str, QueryFilter => L<Paws::DynamoDB::FilterConditionMap>, ReturnConsumedCapacity => Str, ScanIndexForward => Bool, Select => Str])
 
 
 If passed a sub as first parameter, it will call the sub for each element found in :
@@ -2203,9 +2241,9 @@ If passed a sub as first parameter, it will call the sub for each element found 
 If not, it will return a a L<Paws::DynamoDB::QueryOutput> instance with all the C<param>s; andC<param>s; andC<param>s;  from all the responses. Please take into account that this mode can potentially consume vasts ammounts of memory.
 
 
-=head2 ScanAll(sub { },TableName => Str, [AttributesToGet => ArrayRef[Str|Undef], ConditionalOperator => Str, ConsistentRead => Bool, ExclusiveStartKey => L<Paws::DynamoDB::Key>, ExpressionAttributeNames => L<Paws::DynamoDB::ExpressionAttributeNameMap>, ExpressionAttributeValues => L<Paws::DynamoDB::ExpressionAttributeValueMap>, FilterExpression => Str, IndexName => Str, Limit => Int, ProjectionExpression => Str, ReturnConsumedCapacity => Str, ScanFilter => L<Paws::DynamoDB::FilterConditionMap>, Segment => Int, Select => Str, TotalSegments => Int])
+=head2 ScanAll(sub { },TableName => Str, [AttributesToGet => ArrayRef[Maybe[Str]], ConditionalOperator => Str, ConsistentRead => Bool, ExclusiveStartKey => L<Paws::DynamoDB::Key>, ExpressionAttributeNames => L<Paws::DynamoDB::ExpressionAttributeNameMap>, ExpressionAttributeValues => L<Paws::DynamoDB::ExpressionAttributeValueMap>, FilterExpression => Str, IndexName => Str, Limit => Int, ProjectionExpression => Str, ReturnConsumedCapacity => Str, ScanFilter => L<Paws::DynamoDB::FilterConditionMap>, Segment => Int, Select => Str, TotalSegments => Int])
 
-=head2 ScanAll(TableName => Str, [AttributesToGet => ArrayRef[Str|Undef], ConditionalOperator => Str, ConsistentRead => Bool, ExclusiveStartKey => L<Paws::DynamoDB::Key>, ExpressionAttributeNames => L<Paws::DynamoDB::ExpressionAttributeNameMap>, ExpressionAttributeValues => L<Paws::DynamoDB::ExpressionAttributeValueMap>, FilterExpression => Str, IndexName => Str, Limit => Int, ProjectionExpression => Str, ReturnConsumedCapacity => Str, ScanFilter => L<Paws::DynamoDB::FilterConditionMap>, Segment => Int, Select => Str, TotalSegments => Int])
+=head2 ScanAll(TableName => Str, [AttributesToGet => ArrayRef[Maybe[Str]], ConditionalOperator => Str, ConsistentRead => Bool, ExclusiveStartKey => L<Paws::DynamoDB::Key>, ExpressionAttributeNames => L<Paws::DynamoDB::ExpressionAttributeNameMap>, ExpressionAttributeValues => L<Paws::DynamoDB::ExpressionAttributeValueMap>, FilterExpression => Str, IndexName => Str, Limit => Int, ProjectionExpression => Str, ReturnConsumedCapacity => Str, ScanFilter => L<Paws::DynamoDB::FilterConditionMap>, Segment => Int, Select => Str, TotalSegments => Int])
 
 
 If passed a sub as first parameter, it will call the sub for each element found in :

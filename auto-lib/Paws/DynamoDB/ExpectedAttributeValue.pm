@@ -1,9 +1,194 @@
 package Paws::DynamoDB::ExpectedAttributeValue;
   use Moose;
-  has AttributeValueList => (is => 'ro', isa => 'ArrayRef[Paws::DynamoDB::AttributeValue]');
-  has ComparisonOperator => (is => 'ro', isa => 'Str');
-  has Exists => (is => 'ro', isa => 'Bool');
-  has Value => (is => 'ro', isa => 'Paws::DynamoDB::AttributeValue');
+  use Types::Standard -types;
+  use namespace::clean -except => 'meta';
+  with 'Paws::API::Object';
+
+  has AttributeValueList => (is => 'ro', isa => ArrayRef[InstanceOf['Paws::DynamoDB::AttributeValue']]);
+  has ComparisonOperator => (is => 'ro', isa => Str);
+  has Exists => (is => 'ro', isa => Bool);
+  has Value => (is => 'ro', isa => InstanceOf['Paws::DynamoDB::AttributeValue']);
+
+  sub new_with_coercions {
+    my ($class, $args) = @_;
+
+    my %res = %$args;
+    if (exists $args->{AttributeValueList}) {
+      $res{AttributeValueList} = (map {
+            [
+              map {
+                ref($_) eq 'Paws::DynamoDB::AttributeValue' ? $_ : do {
+                  require Paws::DynamoDB::AttributeValue;
+                  Paws::DynamoDB::AttributeValue->new_with_coercions($_);
+                }
+              } @$_
+            ]
+      } ($args->{AttributeValueList}))[0];
+    }
+    if (exists $args->{ComparisonOperator}) {
+      $res{ComparisonOperator} = (map {
+            "$_"
+      } ($args->{ComparisonOperator}))[0];
+    }
+    if (exists $args->{Exists}) {
+      $res{Exists} = (map {
+            0 + !!$_
+      } ($args->{Exists}))[0];
+    }
+    if (exists $args->{Value}) {
+      $res{Value} = (map {
+            ref($_) eq 'Paws::DynamoDB::AttributeValue' ? $_ : do {
+              require Paws::DynamoDB::AttributeValue;
+              Paws::DynamoDB::AttributeValue->new_with_coercions($_);
+              }
+      } ($args->{Value}))[0];
+    }
+
+    return $class->new(\%res);
+  }
+
+  sub new_from_xml {
+    my ($class, $xml) = @_;
+
+    my $res = {};
+    for ($xml->childNodes) {
+      if (!defined(my $nodeName = $_->nodeName)) {
+      } elsif ($nodeName eq "AttributeValueList") {
+        my $key = "AttributeValueList";
+            do {
+              my $tmp = $res->{$key} // [];
+              $res->{$key} = do {
+                require Paws::DynamoDB::AttributeValue;
+                Paws::DynamoDB::AttributeValue->new_from_xml($_);
+              };
+              push @$tmp, $res->{$key};
+              $res->{$key} = $tmp;
+              }
+      } elsif ($nodeName eq "ComparisonOperator") {
+        my $key = "ComparisonOperator";
+            $res->{$key} = "" . ( $_->nodeValue // '' );
+      } elsif ($nodeName eq "Exists") {
+        my $key = "Exists";
+            $res->{$key} =
+              do { my $d = $_->nodeValue // ''; $d eq "true" || $d eq "1" };
+      } elsif ($nodeName eq "Value") {
+        my $key = "Value";
+            $res->{$key} = do {
+              require Paws::DynamoDB::AttributeValue;
+              Paws::DynamoDB::AttributeValue->new_from_xml($_);
+            };
+
+      } else {
+        # warn "Unrecognized element $nodeName";
+      }
+    }
+
+    return $class->new_with_coercions($res);
+  }
+
+  sub to_hash_data {
+    my ($self) = @_;
+
+    my %res;
+    if (exists $self->{AttributeValueList}) {
+      $res{AttributeValueList} = (map {
+            [ map { $_->to_hash_data } @$_ ]
+      } ($self->AttributeValueList))[0];
+    }
+    if (exists $self->{ComparisonOperator}) {
+      $res{ComparisonOperator} = (map {
+            "$_"
+      } ($self->ComparisonOperator))[0];
+    }
+    if (exists $self->{Exists}) {
+      $res{Exists} = (map {
+            0 + !!$_
+      } ($self->Exists))[0];
+    }
+    if (exists $self->{Value}) {
+      $res{Value} = (map {
+            $_->to_hash_data
+      } ($self->Value))[0];
+    }
+
+    return \%res;
+  }
+
+  sub to_json_data {
+    my ($self) = @_;
+
+    my %res;
+    if (exists $self->{AttributeValueList}) {
+      $res{AttributeValueList} = (map {
+            [ map { $_->to_json_data } @$_ ]
+      } ($self->AttributeValueList))[0];
+    }
+    if (exists $self->{ComparisonOperator}) {
+      $res{ComparisonOperator} = (map {
+            "$_"
+      } ($self->ComparisonOperator))[0];
+    }
+    if (exists $self->{Exists}) {
+      $res{Exists} = (map {
+            $_ ? \1 : \0
+      } ($self->Exists))[0];
+    }
+    if (exists $self->{Value}) {
+      $res{Value} = (map {
+            $_->to_json_data
+      } ($self->Value))[0];
+    }
+
+    return \%res;
+  }
+
+  sub to_parameter_data {
+    my ($self, $res, $prefix) = @_;
+    $res //= {};
+    $prefix = defined $prefix ? "$prefix." : "";
+
+
+    if (exists $self->{AttributeValueList}) {
+      my $key = "${prefix}AttributeValueList";
+      do {
+            for my $index ( 0 .. ( @$_ - 1 ) ) {
+              my $orig_key = $key;
+              my $key      = sprintf( '%s.member.%d', $orig_key, $index + 1 );
+              my $val      = $_->[$index];
+              do {
+                $_->to_parameter_data( $res, $key );
+                }
+                for $val;
+            }
+      } for $self->AttributeValueList;
+    }
+
+    if (exists $self->{ComparisonOperator}) {
+      my $key = "${prefix}ComparisonOperator";
+      do {
+            $res->{$key} = "$_";
+      } for $self->ComparisonOperator;
+    }
+
+    if (exists $self->{Exists}) {
+      my $key = "${prefix}Exists";
+      do {
+            $res->{$key} = $_ ? "true" : "false";
+      } for $self->Exists;
+    }
+
+    if (exists $self->{Value}) {
+      my $key = "${prefix}Value";
+      do {
+            $_->to_parameter_data( $res, $key );
+      } for $self->Value;
+    }
+
+    return $res;
+  }
+
+
+  __PACKAGE__->meta->make_immutable;
 1;
 
 ### main pod documentation begin ###

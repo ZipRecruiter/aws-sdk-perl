@@ -1,6 +1,87 @@
 package Paws::DynamoDB::PointInTimeRecoverySpecification;
   use Moose;
-  has PointInTimeRecoveryEnabled => (is => 'ro', isa => 'Bool', required => 1);
+  use Types::Standard -types;
+  use namespace::clean -except => 'meta';
+  with 'Paws::API::Object';
+
+  has PointInTimeRecoveryEnabled => (is => 'ro', isa => Bool, required => 1);
+
+  sub new_with_coercions {
+    my ($class, $args) = @_;
+
+    my %res = %$args;
+    if (exists $args->{PointInTimeRecoveryEnabled}) {
+      $res{PointInTimeRecoveryEnabled} = (map {
+            0 + !!$_
+      } ($args->{PointInTimeRecoveryEnabled}))[0];
+    }
+
+    return $class->new(\%res);
+  }
+
+  sub new_from_xml {
+    my ($class, $xml) = @_;
+
+    my $res = {};
+    for ($xml->childNodes) {
+      if (!defined(my $nodeName = $_->nodeName)) {
+      } elsif ($nodeName eq "PointInTimeRecoveryEnabled") {
+        my $key = "PointInTimeRecoveryEnabled";
+            $res->{$key} =
+              do { my $d = $_->nodeValue // ''; $d eq "true" || $d eq "1" };
+
+      } else {
+        # warn "Unrecognized element $nodeName";
+      }
+    }
+
+    return $class->new_with_coercions($res);
+  }
+
+  sub to_hash_data {
+    my ($self) = @_;
+
+    my %res;
+    if (exists $self->{PointInTimeRecoveryEnabled}) {
+      $res{PointInTimeRecoveryEnabled} = (map {
+            0 + !!$_
+      } ($self->PointInTimeRecoveryEnabled))[0];
+    }
+
+    return \%res;
+  }
+
+  sub to_json_data {
+    my ($self) = @_;
+
+    my %res;
+    if (exists $self->{PointInTimeRecoveryEnabled}) {
+      $res{PointInTimeRecoveryEnabled} = (map {
+            $_ ? \1 : \0
+      } ($self->PointInTimeRecoveryEnabled))[0];
+    }
+
+    return \%res;
+  }
+
+  sub to_parameter_data {
+    my ($self, $res, $prefix) = @_;
+    $res //= {};
+    $prefix = defined $prefix ? "$prefix." : "";
+
+
+    if (exists $self->{PointInTimeRecoveryEnabled}) {
+      my $key = "${prefix}PointInTimeRecoveryEnabled";
+      do {
+            $res->{$key} = $_ ? "true" : "false";
+      } for $self->PointInTimeRecoveryEnabled;
+    }
+
+    return $res;
+  }
+
+
+  __PACKAGE__->meta->make_immutable;
 1;
 
 ### main pod documentation begin ###

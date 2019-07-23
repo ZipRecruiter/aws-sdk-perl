@@ -1,14 +1,125 @@
 
 package Paws::DynamoDB::BatchGetItem;
   use Moose;
-  has RequestItems => (is => 'ro', isa => 'Paws::DynamoDB::BatchGetRequestMap', required => 1);
-  has ReturnConsumedCapacity => (is => 'ro', isa => 'Str');
-
+  use Types::Standard -types;
   use MooseX::ClassAttribute;
+  use namespace::clean -except => 'meta';
+  with 'Paws::API::CallArgs';
+
+  has RequestItems => (is => 'ro', isa => InstanceOf['Paws::DynamoDB::BatchGetRequestMap'], required => 1);
+  has ReturnConsumedCapacity => (is => 'ro', isa => Str);
+
 
   class_has _api_call => (isa => 'Str', is => 'ro', default => 'BatchGetItem');
   class_has _returns => (isa => 'Str', is => 'ro', default => 'Paws::DynamoDB::BatchGetItemOutput');
   class_has _result_key => (isa => 'Str', is => 'ro');
+
+  sub new_with_coercions {
+    my ($class, $args) = @_;
+
+    my %res = %$args;
+    if (exists $args->{RequestItems}) {
+      $res{RequestItems} = (map {
+            ref($_) eq 'Paws::DynamoDB::BatchGetRequestMap' ? $_ : do {
+              require Paws::DynamoDB::BatchGetRequestMap;
+              Paws::DynamoDB::BatchGetRequestMap->new_with_coercions($_);
+              }
+      } ($args->{RequestItems}))[0];
+    }
+    if (exists $args->{ReturnConsumedCapacity}) {
+      $res{ReturnConsumedCapacity} = (map {
+            "$_"
+      } ($args->{ReturnConsumedCapacity}))[0];
+    }
+
+    return $class->new(\%res);
+  }
+
+  sub new_from_xml {
+    my ($class, $xml) = @_;
+
+    my $res = {};
+    for ($xml->childNodes) {
+      if (!defined(my $nodeName = $_->nodeName)) {
+      } elsif ($nodeName eq "RequestItems") {
+        my $key = "RequestItems";
+            do {
+              require Paws::DynamoDB::BatchGetRequestMap;
+              Paws::DynamoDB::BatchGetRequestMap->read_xml( $_, $res, $key );
+            };
+      } elsif ($nodeName eq "ReturnConsumedCapacity") {
+        my $key = "ReturnConsumedCapacity";
+            $res->{$key} = "" . ( $_->nodeValue // '' );
+
+      } else {
+        # warn "Unrecognized element $nodeName";
+      }
+    }
+
+    return $class->new_with_coercions($res);
+  }
+
+  sub to_hash_data {
+    my ($self) = @_;
+
+    my %res;
+    if (exists $self->{RequestItems}) {
+      $res{RequestItems} = (map {
+            $_->to_hash_data
+      } ($self->RequestItems))[0];
+    }
+    if (exists $self->{ReturnConsumedCapacity}) {
+      $res{ReturnConsumedCapacity} = (map {
+            "$_"
+      } ($self->ReturnConsumedCapacity))[0];
+    }
+
+    return \%res;
+  }
+
+  sub to_json_data {
+    my ($self) = @_;
+
+    my %res;
+    if (exists $self->{RequestItems}) {
+      $res{RequestItems} = (map {
+            $_->to_json_data
+      } ($self->RequestItems))[0];
+    }
+    if (exists $self->{ReturnConsumedCapacity}) {
+      $res{ReturnConsumedCapacity} = (map {
+            "$_"
+      } ($self->ReturnConsumedCapacity))[0];
+    }
+
+    return \%res;
+  }
+
+  sub to_parameter_data {
+    my ($self, $res, $prefix) = @_;
+    $res //= {};
+    $prefix = defined $prefix ? "$prefix." : "";
+
+
+    if (exists $self->{RequestItems}) {
+      my $key = "${prefix}RequestItems";
+      do {
+            $_->to_parameter_data( $res, $key );
+      } for $self->RequestItems;
+    }
+
+    if (exists $self->{ReturnConsumedCapacity}) {
+      my $key = "${prefix}ReturnConsumedCapacity";
+      do {
+            $res->{$key} = "$_";
+      } for $self->ReturnConsumedCapacity;
+    }
+
+    return $res;
+  }
+
+
+  __PACKAGE__->meta->make_immutable;
 1;
 
 ### main pod documentation begin ###

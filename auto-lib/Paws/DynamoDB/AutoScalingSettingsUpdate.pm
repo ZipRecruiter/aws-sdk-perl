@@ -1,10 +1,197 @@
 package Paws::DynamoDB::AutoScalingSettingsUpdate;
   use Moose;
-  has AutoScalingDisabled => (is => 'ro', isa => 'Bool');
-  has AutoScalingRoleArn => (is => 'ro', isa => 'Str');
-  has MaximumUnits => (is => 'ro', isa => 'Int');
-  has MinimumUnits => (is => 'ro', isa => 'Int');
-  has ScalingPolicyUpdate => (is => 'ro', isa => 'Paws::DynamoDB::AutoScalingPolicyUpdate');
+  use Types::Standard -types;
+  use namespace::clean -except => 'meta';
+  with 'Paws::API::Object';
+
+  has AutoScalingDisabled => (is => 'ro', isa => Bool);
+  has AutoScalingRoleArn => (is => 'ro', isa => Str);
+  has MaximumUnits => (is => 'ro', isa => Int);
+  has MinimumUnits => (is => 'ro', isa => Int);
+  has ScalingPolicyUpdate => (is => 'ro', isa => InstanceOf['Paws::DynamoDB::AutoScalingPolicyUpdate']);
+
+  sub new_with_coercions {
+    my ($class, $args) = @_;
+
+    my %res = %$args;
+    if (exists $args->{AutoScalingDisabled}) {
+      $res{AutoScalingDisabled} = (map {
+            0 + !!$_
+      } ($args->{AutoScalingDisabled}))[0];
+    }
+    if (exists $args->{AutoScalingRoleArn}) {
+      $res{AutoScalingRoleArn} = (map {
+            "$_"
+      } ($args->{AutoScalingRoleArn}))[0];
+    }
+    if (exists $args->{MaximumUnits}) {
+      $res{MaximumUnits} = (map {
+            int($_)
+      } ($args->{MaximumUnits}))[0];
+    }
+    if (exists $args->{MinimumUnits}) {
+      $res{MinimumUnits} = (map {
+            int($_)
+      } ($args->{MinimumUnits}))[0];
+    }
+    if (exists $args->{ScalingPolicyUpdate}) {
+      $res{ScalingPolicyUpdate} = (map {
+            ref($_) eq 'Paws::DynamoDB::AutoScalingPolicyUpdate' ? $_ : do {
+              require Paws::DynamoDB::AutoScalingPolicyUpdate;
+              Paws::DynamoDB::AutoScalingPolicyUpdate->new_with_coercions($_);
+              }
+      } ($args->{ScalingPolicyUpdate}))[0];
+    }
+
+    return $class->new(\%res);
+  }
+
+  sub new_from_xml {
+    my ($class, $xml) = @_;
+
+    my $res = {};
+    for ($xml->childNodes) {
+      if (!defined(my $nodeName = $_->nodeName)) {
+      } elsif ($nodeName eq "AutoScalingDisabled") {
+        my $key = "AutoScalingDisabled";
+            $res->{$key} =
+              do { my $d = $_->nodeValue // ''; $d eq "true" || $d eq "1" };
+      } elsif ($nodeName eq "AutoScalingRoleArn") {
+        my $key = "AutoScalingRoleArn";
+            $res->{$key} = "" . ( $_->nodeValue // '' );
+      } elsif ($nodeName eq "MaximumUnits") {
+        my $key = "MaximumUnits";
+            $res->{$key} = int( $_->nodeValue // 0 );
+      } elsif ($nodeName eq "MinimumUnits") {
+        my $key = "MinimumUnits";
+            $res->{$key} = int( $_->nodeValue // 0 );
+      } elsif ($nodeName eq "ScalingPolicyUpdate") {
+        my $key = "ScalingPolicyUpdate";
+            $res->{$key} = do {
+              require Paws::DynamoDB::AutoScalingPolicyUpdate;
+              Paws::DynamoDB::AutoScalingPolicyUpdate->new_from_xml($_);
+            };
+
+      } else {
+        # warn "Unrecognized element $nodeName";
+      }
+    }
+
+    return $class->new_with_coercions($res);
+  }
+
+  sub to_hash_data {
+    my ($self) = @_;
+
+    my %res;
+    if (exists $self->{AutoScalingDisabled}) {
+      $res{AutoScalingDisabled} = (map {
+            0 + !!$_
+      } ($self->AutoScalingDisabled))[0];
+    }
+    if (exists $self->{AutoScalingRoleArn}) {
+      $res{AutoScalingRoleArn} = (map {
+            "$_"
+      } ($self->AutoScalingRoleArn))[0];
+    }
+    if (exists $self->{MaximumUnits}) {
+      $res{MaximumUnits} = (map {
+            int($_)
+      } ($self->MaximumUnits))[0];
+    }
+    if (exists $self->{MinimumUnits}) {
+      $res{MinimumUnits} = (map {
+            int($_)
+      } ($self->MinimumUnits))[0];
+    }
+    if (exists $self->{ScalingPolicyUpdate}) {
+      $res{ScalingPolicyUpdate} = (map {
+            $_->to_hash_data
+      } ($self->ScalingPolicyUpdate))[0];
+    }
+
+    return \%res;
+  }
+
+  sub to_json_data {
+    my ($self) = @_;
+
+    my %res;
+    if (exists $self->{AutoScalingDisabled}) {
+      $res{AutoScalingDisabled} = (map {
+            $_ ? \1 : \0
+      } ($self->AutoScalingDisabled))[0];
+    }
+    if (exists $self->{AutoScalingRoleArn}) {
+      $res{AutoScalingRoleArn} = (map {
+            "$_"
+      } ($self->AutoScalingRoleArn))[0];
+    }
+    if (exists $self->{MaximumUnits}) {
+      $res{MaximumUnits} = (map {
+            int($_)
+      } ($self->MaximumUnits))[0];
+    }
+    if (exists $self->{MinimumUnits}) {
+      $res{MinimumUnits} = (map {
+            int($_)
+      } ($self->MinimumUnits))[0];
+    }
+    if (exists $self->{ScalingPolicyUpdate}) {
+      $res{ScalingPolicyUpdate} = (map {
+            $_->to_json_data
+      } ($self->ScalingPolicyUpdate))[0];
+    }
+
+    return \%res;
+  }
+
+  sub to_parameter_data {
+    my ($self, $res, $prefix) = @_;
+    $res //= {};
+    $prefix = defined $prefix ? "$prefix." : "";
+
+
+    if (exists $self->{AutoScalingDisabled}) {
+      my $key = "${prefix}AutoScalingDisabled";
+      do {
+            $res->{$key} = $_ ? "true" : "false";
+      } for $self->AutoScalingDisabled;
+    }
+
+    if (exists $self->{AutoScalingRoleArn}) {
+      my $key = "${prefix}AutoScalingRoleArn";
+      do {
+            $res->{$key} = "$_";
+      } for $self->AutoScalingRoleArn;
+    }
+
+    if (exists $self->{MaximumUnits}) {
+      my $key = "${prefix}MaximumUnits";
+      do {
+            $res->{$key} = int($_);
+      } for $self->MaximumUnits;
+    }
+
+    if (exists $self->{MinimumUnits}) {
+      my $key = "${prefix}MinimumUnits";
+      do {
+            $res->{$key} = int($_);
+      } for $self->MinimumUnits;
+    }
+
+    if (exists $self->{ScalingPolicyUpdate}) {
+      my $key = "${prefix}ScalingPolicyUpdate";
+      do {
+            $_->to_parameter_data( $res, $key );
+      } for $self->ScalingPolicyUpdate;
+    }
+
+    return $res;
+  }
+
+
+  __PACKAGE__->meta->make_immutable;
 1;
 
 ### main pod documentation begin ###

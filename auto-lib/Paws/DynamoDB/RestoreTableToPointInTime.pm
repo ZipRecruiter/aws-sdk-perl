@@ -1,16 +1,172 @@
 
 package Paws::DynamoDB::RestoreTableToPointInTime;
   use Moose;
-  has RestoreDateTime => (is => 'ro', isa => 'Str');
-  has SourceTableName => (is => 'ro', isa => 'Str', required => 1);
-  has TargetTableName => (is => 'ro', isa => 'Str', required => 1);
-  has UseLatestRestorableTime => (is => 'ro', isa => 'Bool');
-
+  use Types::Standard -types;
   use MooseX::ClassAttribute;
+  use namespace::clean -except => 'meta';
+  with 'Paws::API::CallArgs';
+
+  has RestoreDateTime => (is => 'ro', isa => Str);
+  has SourceTableName => (is => 'ro', isa => Str, required => 1);
+  has TargetTableName => (is => 'ro', isa => Str, required => 1);
+  has UseLatestRestorableTime => (is => 'ro', isa => Bool);
+
 
   class_has _api_call => (isa => 'Str', is => 'ro', default => 'RestoreTableToPointInTime');
   class_has _returns => (isa => 'Str', is => 'ro', default => 'Paws::DynamoDB::RestoreTableToPointInTimeOutput');
   class_has _result_key => (isa => 'Str', is => 'ro');
+
+  sub new_with_coercions {
+    my ($class, $args) = @_;
+
+    my %res = %$args;
+    if (exists $args->{RestoreDateTime}) {
+      $res{RestoreDateTime} = (map {
+            "$_"
+      } ($args->{RestoreDateTime}))[0];
+    }
+    if (exists $args->{SourceTableName}) {
+      $res{SourceTableName} = (map {
+            "$_"
+      } ($args->{SourceTableName}))[0];
+    }
+    if (exists $args->{TargetTableName}) {
+      $res{TargetTableName} = (map {
+            "$_"
+      } ($args->{TargetTableName}))[0];
+    }
+    if (exists $args->{UseLatestRestorableTime}) {
+      $res{UseLatestRestorableTime} = (map {
+            0 + !!$_
+      } ($args->{UseLatestRestorableTime}))[0];
+    }
+
+    return $class->new(\%res);
+  }
+
+  sub new_from_xml {
+    my ($class, $xml) = @_;
+
+    my $res = {};
+    for ($xml->childNodes) {
+      if (!defined(my $nodeName = $_->nodeName)) {
+      } elsif ($nodeName eq "RestoreDateTime") {
+        my $key = "RestoreDateTime";
+            $res->{$key} = "" . ( $_->nodeValue // '' );
+      } elsif ($nodeName eq "SourceTableName") {
+        my $key = "SourceTableName";
+            $res->{$key} = "" . ( $_->nodeValue // '' );
+      } elsif ($nodeName eq "TargetTableName") {
+        my $key = "TargetTableName";
+            $res->{$key} = "" . ( $_->nodeValue // '' );
+      } elsif ($nodeName eq "UseLatestRestorableTime") {
+        my $key = "UseLatestRestorableTime";
+            $res->{$key} =
+              do { my $d = $_->nodeValue // ''; $d eq "true" || $d eq "1" };
+
+      } else {
+        # warn "Unrecognized element $nodeName";
+      }
+    }
+
+    return $class->new_with_coercions($res);
+  }
+
+  sub to_hash_data {
+    my ($self) = @_;
+
+    my %res;
+    if (exists $self->{RestoreDateTime}) {
+      $res{RestoreDateTime} = (map {
+            "$_"
+      } ($self->RestoreDateTime))[0];
+    }
+    if (exists $self->{SourceTableName}) {
+      $res{SourceTableName} = (map {
+            "$_"
+      } ($self->SourceTableName))[0];
+    }
+    if (exists $self->{TargetTableName}) {
+      $res{TargetTableName} = (map {
+            "$_"
+      } ($self->TargetTableName))[0];
+    }
+    if (exists $self->{UseLatestRestorableTime}) {
+      $res{UseLatestRestorableTime} = (map {
+            0 + !!$_
+      } ($self->UseLatestRestorableTime))[0];
+    }
+
+    return \%res;
+  }
+
+  sub to_json_data {
+    my ($self) = @_;
+
+    my %res;
+    if (exists $self->{RestoreDateTime}) {
+      $res{RestoreDateTime} = (map {
+            "$_"
+      } ($self->RestoreDateTime))[0];
+    }
+    if (exists $self->{SourceTableName}) {
+      $res{SourceTableName} = (map {
+            "$_"
+      } ($self->SourceTableName))[0];
+    }
+    if (exists $self->{TargetTableName}) {
+      $res{TargetTableName} = (map {
+            "$_"
+      } ($self->TargetTableName))[0];
+    }
+    if (exists $self->{UseLatestRestorableTime}) {
+      $res{UseLatestRestorableTime} = (map {
+            $_ ? \1 : \0
+      } ($self->UseLatestRestorableTime))[0];
+    }
+
+    return \%res;
+  }
+
+  sub to_parameter_data {
+    my ($self, $res, $prefix) = @_;
+    $res //= {};
+    $prefix = defined $prefix ? "$prefix." : "";
+
+
+    if (exists $self->{RestoreDateTime}) {
+      my $key = "${prefix}RestoreDateTime";
+      do {
+            $res->{$key} = "$_";
+      } for $self->RestoreDateTime;
+    }
+
+    if (exists $self->{SourceTableName}) {
+      my $key = "${prefix}SourceTableName";
+      do {
+            $res->{$key} = "$_";
+      } for $self->SourceTableName;
+    }
+
+    if (exists $self->{TargetTableName}) {
+      my $key = "${prefix}TargetTableName";
+      do {
+            $res->{$key} = "$_";
+      } for $self->TargetTableName;
+    }
+
+    if (exists $self->{UseLatestRestorableTime}) {
+      my $key = "${prefix}UseLatestRestorableTime";
+      do {
+            $res->{$key} = $_ ? "true" : "false";
+      } for $self->UseLatestRestorableTime;
+    }
+
+    return $res;
+  }
+
+
+  __PACKAGE__->meta->make_immutable;
 1;
 
 ### main pod documentation begin ###

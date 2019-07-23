@@ -1,19 +1,267 @@
 
 package Paws::DynamoDB::GetItem;
   use Moose;
-  has AttributesToGet => (is => 'ro', isa => 'ArrayRef[Str|Undef]');
-  has ConsistentRead => (is => 'ro', isa => 'Bool');
-  has ExpressionAttributeNames => (is => 'ro', isa => 'Paws::DynamoDB::ExpressionAttributeNameMap');
-  has Key => (is => 'ro', isa => 'Paws::DynamoDB::Key', required => 1);
-  has ProjectionExpression => (is => 'ro', isa => 'Str');
-  has ReturnConsumedCapacity => (is => 'ro', isa => 'Str');
-  has TableName => (is => 'ro', isa => 'Str', required => 1);
-
+  use Types::Standard -types;
   use MooseX::ClassAttribute;
+  use namespace::clean -except => 'meta';
+  with 'Paws::API::CallArgs';
+
+  has AttributesToGet => (is => 'ro', isa => ArrayRef[Maybe[Str]]);
+  has ConsistentRead => (is => 'ro', isa => Bool);
+  has ExpressionAttributeNames => (is => 'ro', isa => InstanceOf['Paws::DynamoDB::ExpressionAttributeNameMap']);
+  has Key => (is => 'ro', isa => InstanceOf['Paws::DynamoDB::Key'], required => 1);
+  has ProjectionExpression => (is => 'ro', isa => Str);
+  has ReturnConsumedCapacity => (is => 'ro', isa => Str);
+  has TableName => (is => 'ro', isa => Str, required => 1);
+
 
   class_has _api_call => (isa => 'Str', is => 'ro', default => 'GetItem');
   class_has _returns => (isa => 'Str', is => 'ro', default => 'Paws::DynamoDB::GetItemOutput');
   class_has _result_key => (isa => 'Str', is => 'ro');
+
+  sub new_with_coercions {
+    my ($class, $args) = @_;
+
+    my %res = %$args;
+    if (exists $args->{AttributesToGet}) {
+      $res{AttributesToGet} = (map {
+            [ map { defined($_) ? "$_" : undef } @$_ ]
+      } ($args->{AttributesToGet}))[0];
+    }
+    if (exists $args->{ConsistentRead}) {
+      $res{ConsistentRead} = (map {
+            0 + !!$_
+      } ($args->{ConsistentRead}))[0];
+    }
+    if (exists $args->{ExpressionAttributeNames}) {
+      $res{ExpressionAttributeNames} = (map {
+            ref($_) eq 'Paws::DynamoDB::ExpressionAttributeNameMap' ? $_ : do {
+              require Paws::DynamoDB::ExpressionAttributeNameMap;
+              Paws::DynamoDB::ExpressionAttributeNameMap->new_with_coercions($_);
+              }
+      } ($args->{ExpressionAttributeNames}))[0];
+    }
+    if (exists $args->{Key}) {
+      $res{Key} = (map {
+            ref($_) eq 'Paws::DynamoDB::Key' ? $_ : do {
+              require Paws::DynamoDB::Key;
+              Paws::DynamoDB::Key->new_with_coercions($_);
+              }
+      } ($args->{Key}))[0];
+    }
+    if (exists $args->{ProjectionExpression}) {
+      $res{ProjectionExpression} = (map {
+            "$_"
+      } ($args->{ProjectionExpression}))[0];
+    }
+    if (exists $args->{ReturnConsumedCapacity}) {
+      $res{ReturnConsumedCapacity} = (map {
+            "$_"
+      } ($args->{ReturnConsumedCapacity}))[0];
+    }
+    if (exists $args->{TableName}) {
+      $res{TableName} = (map {
+            "$_"
+      } ($args->{TableName}))[0];
+    }
+
+    return $class->new(\%res);
+  }
+
+  sub new_from_xml {
+    my ($class, $xml) = @_;
+
+    my $res = {};
+    for ($xml->childNodes) {
+      if (!defined(my $nodeName = $_->nodeName)) {
+      } elsif ($nodeName eq "AttributesToGet") {
+        my $key = "AttributesToGet";
+            $res->{$key} = "" . ( $_->nodeValue // '' );
+      } elsif ($nodeName eq "ConsistentRead") {
+        my $key = "ConsistentRead";
+            $res->{$key} =
+              do { my $d = $_->nodeValue // ''; $d eq "true" || $d eq "1" };
+      } elsif ($nodeName eq "ExpressionAttributeNames") {
+        my $key = "ExpressionAttributeNames";
+            do {
+              require Paws::DynamoDB::ExpressionAttributeNameMap;
+              Paws::DynamoDB::ExpressionAttributeNameMap->read_xml( $_, $res, $key );
+            };
+      } elsif ($nodeName eq "Key") {
+        my $key = "Key";
+            do {
+              require Paws::DynamoDB::Key;
+              Paws::DynamoDB::Key->read_xml( $_, $res, $key );
+            };
+      } elsif ($nodeName eq "ProjectionExpression") {
+        my $key = "ProjectionExpression";
+            $res->{$key} = "" . ( $_->nodeValue // '' );
+      } elsif ($nodeName eq "ReturnConsumedCapacity") {
+        my $key = "ReturnConsumedCapacity";
+            $res->{$key} = "" . ( $_->nodeValue // '' );
+      } elsif ($nodeName eq "TableName") {
+        my $key = "TableName";
+            $res->{$key} = "" . ( $_->nodeValue // '' );
+
+      } else {
+        # warn "Unrecognized element $nodeName";
+      }
+    }
+
+    return $class->new_with_coercions($res);
+  }
+
+  sub to_hash_data {
+    my ($self) = @_;
+
+    my %res;
+    if (exists $self->{AttributesToGet}) {
+      $res{AttributesToGet} = (map {
+            [ map { defined($_) ? "$_" : undef } @$_ ]
+      } ($self->AttributesToGet))[0];
+    }
+    if (exists $self->{ConsistentRead}) {
+      $res{ConsistentRead} = (map {
+            0 + !!$_
+      } ($self->ConsistentRead))[0];
+    }
+    if (exists $self->{ExpressionAttributeNames}) {
+      $res{ExpressionAttributeNames} = (map {
+            $_->to_hash_data
+      } ($self->ExpressionAttributeNames))[0];
+    }
+    if (exists $self->{Key}) {
+      $res{Key} = (map {
+            $_->to_hash_data
+      } ($self->Key))[0];
+    }
+    if (exists $self->{ProjectionExpression}) {
+      $res{ProjectionExpression} = (map {
+            "$_"
+      } ($self->ProjectionExpression))[0];
+    }
+    if (exists $self->{ReturnConsumedCapacity}) {
+      $res{ReturnConsumedCapacity} = (map {
+            "$_"
+      } ($self->ReturnConsumedCapacity))[0];
+    }
+    if (exists $self->{TableName}) {
+      $res{TableName} = (map {
+            "$_"
+      } ($self->TableName))[0];
+    }
+
+    return \%res;
+  }
+
+  sub to_json_data {
+    my ($self) = @_;
+
+    my %res;
+    if (exists $self->{AttributesToGet}) {
+      $res{AttributesToGet} = (map {
+            [ map { defined($_) ? "$_" : undef } @$_ ]
+      } ($self->AttributesToGet))[0];
+    }
+    if (exists $self->{ConsistentRead}) {
+      $res{ConsistentRead} = (map {
+            $_ ? \1 : \0
+      } ($self->ConsistentRead))[0];
+    }
+    if (exists $self->{ExpressionAttributeNames}) {
+      $res{ExpressionAttributeNames} = (map {
+            $_->to_json_data
+      } ($self->ExpressionAttributeNames))[0];
+    }
+    if (exists $self->{Key}) {
+      $res{Key} = (map {
+            $_->to_json_data
+      } ($self->Key))[0];
+    }
+    if (exists $self->{ProjectionExpression}) {
+      $res{ProjectionExpression} = (map {
+            "$_"
+      } ($self->ProjectionExpression))[0];
+    }
+    if (exists $self->{ReturnConsumedCapacity}) {
+      $res{ReturnConsumedCapacity} = (map {
+            "$_"
+      } ($self->ReturnConsumedCapacity))[0];
+    }
+    if (exists $self->{TableName}) {
+      $res{TableName} = (map {
+            "$_"
+      } ($self->TableName))[0];
+    }
+
+    return \%res;
+  }
+
+  sub to_parameter_data {
+    my ($self, $res, $prefix) = @_;
+    $res //= {};
+    $prefix = defined $prefix ? "$prefix." : "";
+
+
+    if (exists $self->{AttributesToGet}) {
+      my $key = "${prefix}AttributesToGet";
+      do {
+            for my $index ( 0 .. ( @$_ - 1 ) ) {
+              my $orig_key = $key;
+              my $key      = sprintf( '%s.member.%d', $orig_key, $index + 1 );
+              my $val      = $_->[$index];
+              $res->{$key} = defined($val) ? "$val" : undef;
+            }
+      } for $self->AttributesToGet;
+    }
+
+    if (exists $self->{ConsistentRead}) {
+      my $key = "${prefix}ConsistentRead";
+      do {
+            $res->{$key} = $_ ? "true" : "false";
+      } for $self->ConsistentRead;
+    }
+
+    if (exists $self->{ExpressionAttributeNames}) {
+      my $key = "${prefix}ExpressionAttributeNames";
+      do {
+            $_->to_parameter_data( $res, $key );
+      } for $self->ExpressionAttributeNames;
+    }
+
+    if (exists $self->{Key}) {
+      my $key = "${prefix}Key";
+      do {
+            $_->to_parameter_data( $res, $key );
+      } for $self->Key;
+    }
+
+    if (exists $self->{ProjectionExpression}) {
+      my $key = "${prefix}ProjectionExpression";
+      do {
+            $res->{$key} = "$_";
+      } for $self->ProjectionExpression;
+    }
+
+    if (exists $self->{ReturnConsumedCapacity}) {
+      my $key = "${prefix}ReturnConsumedCapacity";
+      do {
+            $res->{$key} = "$_";
+      } for $self->ReturnConsumedCapacity;
+    }
+
+    if (exists $self->{TableName}) {
+      my $key = "${prefix}TableName";
+      do {
+            $res->{$key} = "$_";
+      } for $self->TableName;
+    }
+
+    return $res;
+  }
+
+
+  __PACKAGE__->meta->make_immutable;
 1;
 
 ### main pod documentation begin ###
@@ -60,7 +308,7 @@ For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/dyn
 =head1 ATTRIBUTES
 
 
-=head2 AttributesToGet => ArrayRef[Str|Undef]
+=head2 AttributesToGet => ArrayRef[Maybe[Str]]
 
 This is a legacy parameter. Use C<ProjectionExpression> instead. For
 more information, see AttributesToGet

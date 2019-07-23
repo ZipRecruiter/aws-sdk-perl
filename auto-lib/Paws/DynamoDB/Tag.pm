@@ -1,7 +1,112 @@
 package Paws::DynamoDB::Tag;
   use Moose;
-  has Key => (is => 'ro', isa => 'Str', required => 1);
-  has Value => (is => 'ro', isa => 'Str', required => 1);
+  use Types::Standard -types;
+  use namespace::clean -except => 'meta';
+  with 'Paws::API::Object';
+
+  has Key => (is => 'ro', isa => Str, required => 1);
+  has Value => (is => 'ro', isa => Str, required => 1);
+
+  sub new_with_coercions {
+    my ($class, $args) = @_;
+
+    my %res = %$args;
+    if (exists $args->{Key}) {
+      $res{Key} = (map {
+            "$_"
+      } ($args->{Key}))[0];
+    }
+    if (exists $args->{Value}) {
+      $res{Value} = (map {
+            "$_"
+      } ($args->{Value}))[0];
+    }
+
+    return $class->new(\%res);
+  }
+
+  sub new_from_xml {
+    my ($class, $xml) = @_;
+
+    my $res = {};
+    for ($xml->childNodes) {
+      if (!defined(my $nodeName = $_->nodeName)) {
+      } elsif ($nodeName eq "Key") {
+        my $key = "Key";
+            $res->{$key} = "" . ( $_->nodeValue // '' );
+      } elsif ($nodeName eq "Value") {
+        my $key = "Value";
+            $res->{$key} = "" . ( $_->nodeValue // '' );
+
+      } else {
+        # warn "Unrecognized element $nodeName";
+      }
+    }
+
+    return $class->new_with_coercions($res);
+  }
+
+  sub to_hash_data {
+    my ($self) = @_;
+
+    my %res;
+    if (exists $self->{Key}) {
+      $res{Key} = (map {
+            "$_"
+      } ($self->Key))[0];
+    }
+    if (exists $self->{Value}) {
+      $res{Value} = (map {
+            "$_"
+      } ($self->Value))[0];
+    }
+
+    return \%res;
+  }
+
+  sub to_json_data {
+    my ($self) = @_;
+
+    my %res;
+    if (exists $self->{Key}) {
+      $res{Key} = (map {
+            "$_"
+      } ($self->Key))[0];
+    }
+    if (exists $self->{Value}) {
+      $res{Value} = (map {
+            "$_"
+      } ($self->Value))[0];
+    }
+
+    return \%res;
+  }
+
+  sub to_parameter_data {
+    my ($self, $res, $prefix) = @_;
+    $res //= {};
+    $prefix = defined $prefix ? "$prefix." : "";
+
+
+    if (exists $self->{Key}) {
+      my $key = "${prefix}Key";
+      do {
+            $res->{$key} = "$_";
+      } for $self->Key;
+    }
+
+    if (exists $self->{Value}) {
+      my $key = "${prefix}Value";
+      do {
+            $res->{$key} = "$_";
+      } for $self->Value;
+    }
+
+    return $res;
+  }
+
+
+  __PACKAGE__->meta->make_immutable;
 1;
 
 ### main pod documentation begin ###

@@ -1,10 +1,225 @@
 package Paws::DynamoDB::KeysAndAttributes;
   use Moose;
-  has AttributesToGet => (is => 'ro', isa => 'ArrayRef[Str|Undef]');
-  has ConsistentRead => (is => 'ro', isa => 'Bool');
-  has ExpressionAttributeNames => (is => 'ro', isa => 'Paws::DynamoDB::ExpressionAttributeNameMap');
-  has Keys => (is => 'ro', isa => 'ArrayRef[Paws::DynamoDB::Key]', required => 1);
-  has ProjectionExpression => (is => 'ro', isa => 'Str');
+  use Types::Standard -types;
+  use namespace::clean -except => 'meta';
+  with 'Paws::API::Object';
+
+  has AttributesToGet => (is => 'ro', isa => ArrayRef[Maybe[Str]]);
+  has ConsistentRead => (is => 'ro', isa => Bool);
+  has ExpressionAttributeNames => (is => 'ro', isa => InstanceOf['Paws::DynamoDB::ExpressionAttributeNameMap']);
+  has Keys => (is => 'ro', isa => ArrayRef[InstanceOf['Paws::DynamoDB::Key']], required => 1);
+  has ProjectionExpression => (is => 'ro', isa => Str);
+
+  sub new_with_coercions {
+    my ($class, $args) = @_;
+
+    my %res = %$args;
+    if (exists $args->{AttributesToGet}) {
+      $res{AttributesToGet} = (map {
+            [ map { defined($_) ? "$_" : undef } @$_ ]
+      } ($args->{AttributesToGet}))[0];
+    }
+    if (exists $args->{ConsistentRead}) {
+      $res{ConsistentRead} = (map {
+            0 + !!$_
+      } ($args->{ConsistentRead}))[0];
+    }
+    if (exists $args->{ExpressionAttributeNames}) {
+      $res{ExpressionAttributeNames} = (map {
+            ref($_) eq 'Paws::DynamoDB::ExpressionAttributeNameMap' ? $_ : do {
+              require Paws::DynamoDB::ExpressionAttributeNameMap;
+              Paws::DynamoDB::ExpressionAttributeNameMap->new_with_coercions($_);
+              }
+      } ($args->{ExpressionAttributeNames}))[0];
+    }
+    if (exists $args->{Keys}) {
+      $res{Keys} = (map {
+            [
+              map {
+                ref($_) eq 'Paws::DynamoDB::Key' ? $_ : do {
+                  require Paws::DynamoDB::Key;
+                  Paws::DynamoDB::Key->new_with_coercions($_);
+                }
+              } @$_
+            ]
+      } ($args->{Keys}))[0];
+    }
+    if (exists $args->{ProjectionExpression}) {
+      $res{ProjectionExpression} = (map {
+            "$_"
+      } ($args->{ProjectionExpression}))[0];
+    }
+
+    return $class->new(\%res);
+  }
+
+  sub new_from_xml {
+    my ($class, $xml) = @_;
+
+    my $res = {};
+    for ($xml->childNodes) {
+      if (!defined(my $nodeName = $_->nodeName)) {
+      } elsif ($nodeName eq "AttributesToGet") {
+        my $key = "AttributesToGet";
+            $res->{$key} = "" . ( $_->nodeValue // '' );
+      } elsif ($nodeName eq "ConsistentRead") {
+        my $key = "ConsistentRead";
+            $res->{$key} =
+              do { my $d = $_->nodeValue // ''; $d eq "true" || $d eq "1" };
+      } elsif ($nodeName eq "ExpressionAttributeNames") {
+        my $key = "ExpressionAttributeNames";
+            do {
+              require Paws::DynamoDB::ExpressionAttributeNameMap;
+              Paws::DynamoDB::ExpressionAttributeNameMap->read_xml( $_, $res, $key );
+            };
+      } elsif ($nodeName eq "Keys") {
+        my $key = "Keys";
+            do {
+              my $tmp = $res->{$key} // [];
+              do {
+                require Paws::DynamoDB::Key;
+                Paws::DynamoDB::Key->read_xml( $_, $res, $key );
+              };
+              push @$tmp, $res->{$key};
+              $res->{$key} = $tmp;
+              }
+      } elsif ($nodeName eq "ProjectionExpression") {
+        my $key = "ProjectionExpression";
+            $res->{$key} = "" . ( $_->nodeValue // '' );
+
+      } else {
+        # warn "Unrecognized element $nodeName";
+      }
+    }
+
+    return $class->new_with_coercions($res);
+  }
+
+  sub to_hash_data {
+    my ($self) = @_;
+
+    my %res;
+    if (exists $self->{AttributesToGet}) {
+      $res{AttributesToGet} = (map {
+            [ map { defined($_) ? "$_" : undef } @$_ ]
+      } ($self->AttributesToGet))[0];
+    }
+    if (exists $self->{ConsistentRead}) {
+      $res{ConsistentRead} = (map {
+            0 + !!$_
+      } ($self->ConsistentRead))[0];
+    }
+    if (exists $self->{ExpressionAttributeNames}) {
+      $res{ExpressionAttributeNames} = (map {
+            $_->to_hash_data
+      } ($self->ExpressionAttributeNames))[0];
+    }
+    if (exists $self->{Keys}) {
+      $res{Keys} = (map {
+            [ map { $_->to_hash_data } @$_ ]
+      } ($self->Keys))[0];
+    }
+    if (exists $self->{ProjectionExpression}) {
+      $res{ProjectionExpression} = (map {
+            "$_"
+      } ($self->ProjectionExpression))[0];
+    }
+
+    return \%res;
+  }
+
+  sub to_json_data {
+    my ($self) = @_;
+
+    my %res;
+    if (exists $self->{AttributesToGet}) {
+      $res{AttributesToGet} = (map {
+            [ map { defined($_) ? "$_" : undef } @$_ ]
+      } ($self->AttributesToGet))[0];
+    }
+    if (exists $self->{ConsistentRead}) {
+      $res{ConsistentRead} = (map {
+            $_ ? \1 : \0
+      } ($self->ConsistentRead))[0];
+    }
+    if (exists $self->{ExpressionAttributeNames}) {
+      $res{ExpressionAttributeNames} = (map {
+            $_->to_json_data
+      } ($self->ExpressionAttributeNames))[0];
+    }
+    if (exists $self->{Keys}) {
+      $res{Keys} = (map {
+            [ map { $_->to_json_data } @$_ ]
+      } ($self->Keys))[0];
+    }
+    if (exists $self->{ProjectionExpression}) {
+      $res{ProjectionExpression} = (map {
+            "$_"
+      } ($self->ProjectionExpression))[0];
+    }
+
+    return \%res;
+  }
+
+  sub to_parameter_data {
+    my ($self, $res, $prefix) = @_;
+    $res //= {};
+    $prefix = defined $prefix ? "$prefix." : "";
+
+
+    if (exists $self->{AttributesToGet}) {
+      my $key = "${prefix}AttributesToGet";
+      do {
+            for my $index ( 0 .. ( @$_ - 1 ) ) {
+              my $orig_key = $key;
+              my $key      = sprintf( '%s.member.%d', $orig_key, $index + 1 );
+              my $val      = $_->[$index];
+              $res->{$key} = defined($val) ? "$val" : undef;
+            }
+      } for $self->AttributesToGet;
+    }
+
+    if (exists $self->{ConsistentRead}) {
+      my $key = "${prefix}ConsistentRead";
+      do {
+            $res->{$key} = $_ ? "true" : "false";
+      } for $self->ConsistentRead;
+    }
+
+    if (exists $self->{ExpressionAttributeNames}) {
+      my $key = "${prefix}ExpressionAttributeNames";
+      do {
+            $_->to_parameter_data( $res, $key );
+      } for $self->ExpressionAttributeNames;
+    }
+
+    if (exists $self->{Keys}) {
+      my $key = "${prefix}Keys";
+      do {
+            for my $index ( 0 .. ( @$_ - 1 ) ) {
+              my $orig_key = $key;
+              my $key      = sprintf( '%s.member.%d', $orig_key, $index + 1 );
+              my $val      = $_->[$index];
+              do {
+                $_->to_parameter_data( $res, $key );
+                }
+                for $val;
+            }
+      } for $self->Keys;
+    }
+
+    if (exists $self->{ProjectionExpression}) {
+      my $key = "${prefix}ProjectionExpression";
+      do {
+            $res->{$key} = "$_";
+      } for $self->ProjectionExpression;
+    }
+
+    return $res;
+  }
+
+
+  __PACKAGE__->meta->make_immutable;
 1;
 
 ### main pod documentation begin ###
@@ -46,7 +261,7 @@ the partition key and the sort key.
 =head1 ATTRIBUTES
 
 
-=head2 AttributesToGet => ArrayRef[Str|Undef]
+=head2 AttributesToGet => ArrayRef[Maybe[Str]]
 
   This is a legacy parameter. Use C<ProjectionExpression> instead. For
 more information, see Legacy Conditional Parameters

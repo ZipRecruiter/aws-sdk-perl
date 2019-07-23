@@ -1,6 +1,92 @@
 package Paws::DynamoDB::DeleteRequest;
   use Moose;
-  has Key => (is => 'ro', isa => 'Paws::DynamoDB::Key', required => 1);
+  use Types::Standard -types;
+  use namespace::clean -except => 'meta';
+  with 'Paws::API::Object';
+
+  has Key => (is => 'ro', isa => InstanceOf['Paws::DynamoDB::Key'], required => 1);
+
+  sub new_with_coercions {
+    my ($class, $args) = @_;
+
+    my %res = %$args;
+    if (exists $args->{Key}) {
+      $res{Key} = (map {
+            ref($_) eq 'Paws::DynamoDB::Key' ? $_ : do {
+              require Paws::DynamoDB::Key;
+              Paws::DynamoDB::Key->new_with_coercions($_);
+              }
+      } ($args->{Key}))[0];
+    }
+
+    return $class->new(\%res);
+  }
+
+  sub new_from_xml {
+    my ($class, $xml) = @_;
+
+    my $res = {};
+    for ($xml->childNodes) {
+      if (!defined(my $nodeName = $_->nodeName)) {
+      } elsif ($nodeName eq "Key") {
+        my $key = "Key";
+            do {
+              require Paws::DynamoDB::Key;
+              Paws::DynamoDB::Key->read_xml( $_, $res, $key );
+            };
+
+      } else {
+        # warn "Unrecognized element $nodeName";
+      }
+    }
+
+    return $class->new_with_coercions($res);
+  }
+
+  sub to_hash_data {
+    my ($self) = @_;
+
+    my %res;
+    if (exists $self->{Key}) {
+      $res{Key} = (map {
+            $_->to_hash_data
+      } ($self->Key))[0];
+    }
+
+    return \%res;
+  }
+
+  sub to_json_data {
+    my ($self) = @_;
+
+    my %res;
+    if (exists $self->{Key}) {
+      $res{Key} = (map {
+            $_->to_json_data
+      } ($self->Key))[0];
+    }
+
+    return \%res;
+  }
+
+  sub to_parameter_data {
+    my ($self, $res, $prefix) = @_;
+    $res //= {};
+    $prefix = defined $prefix ? "$prefix." : "";
+
+
+    if (exists $self->{Key}) {
+      my $key = "${prefix}Key";
+      do {
+            $_->to_parameter_data( $res, $key );
+      } for $self->Key;
+    }
+
+    return $res;
+  }
+
+
+  __PACKAGE__->meta->make_immutable;
 1;
 
 ### main pod documentation begin ###

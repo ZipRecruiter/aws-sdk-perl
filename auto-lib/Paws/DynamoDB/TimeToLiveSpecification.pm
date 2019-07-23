@@ -1,7 +1,113 @@
 package Paws::DynamoDB::TimeToLiveSpecification;
   use Moose;
-  has AttributeName => (is => 'ro', isa => 'Str', required => 1);
-  has Enabled => (is => 'ro', isa => 'Bool', required => 1);
+  use Types::Standard -types;
+  use namespace::clean -except => 'meta';
+  with 'Paws::API::Object';
+
+  has AttributeName => (is => 'ro', isa => Str, required => 1);
+  has Enabled => (is => 'ro', isa => Bool, required => 1);
+
+  sub new_with_coercions {
+    my ($class, $args) = @_;
+
+    my %res = %$args;
+    if (exists $args->{AttributeName}) {
+      $res{AttributeName} = (map {
+            "$_"
+      } ($args->{AttributeName}))[0];
+    }
+    if (exists $args->{Enabled}) {
+      $res{Enabled} = (map {
+            0 + !!$_
+      } ($args->{Enabled}))[0];
+    }
+
+    return $class->new(\%res);
+  }
+
+  sub new_from_xml {
+    my ($class, $xml) = @_;
+
+    my $res = {};
+    for ($xml->childNodes) {
+      if (!defined(my $nodeName = $_->nodeName)) {
+      } elsif ($nodeName eq "AttributeName") {
+        my $key = "AttributeName";
+            $res->{$key} = "" . ( $_->nodeValue // '' );
+      } elsif ($nodeName eq "Enabled") {
+        my $key = "Enabled";
+            $res->{$key} =
+              do { my $d = $_->nodeValue // ''; $d eq "true" || $d eq "1" };
+
+      } else {
+        # warn "Unrecognized element $nodeName";
+      }
+    }
+
+    return $class->new_with_coercions($res);
+  }
+
+  sub to_hash_data {
+    my ($self) = @_;
+
+    my %res;
+    if (exists $self->{AttributeName}) {
+      $res{AttributeName} = (map {
+            "$_"
+      } ($self->AttributeName))[0];
+    }
+    if (exists $self->{Enabled}) {
+      $res{Enabled} = (map {
+            0 + !!$_
+      } ($self->Enabled))[0];
+    }
+
+    return \%res;
+  }
+
+  sub to_json_data {
+    my ($self) = @_;
+
+    my %res;
+    if (exists $self->{AttributeName}) {
+      $res{AttributeName} = (map {
+            "$_"
+      } ($self->AttributeName))[0];
+    }
+    if (exists $self->{Enabled}) {
+      $res{Enabled} = (map {
+            $_ ? \1 : \0
+      } ($self->Enabled))[0];
+    }
+
+    return \%res;
+  }
+
+  sub to_parameter_data {
+    my ($self, $res, $prefix) = @_;
+    $res //= {};
+    $prefix = defined $prefix ? "$prefix." : "";
+
+
+    if (exists $self->{AttributeName}) {
+      my $key = "${prefix}AttributeName";
+      do {
+            $res->{$key} = "$_";
+      } for $self->AttributeName;
+    }
+
+    if (exists $self->{Enabled}) {
+      my $key = "${prefix}Enabled";
+      do {
+            $res->{$key} = $_ ? "true" : "false";
+      } for $self->Enabled;
+    }
+
+    return $res;
+  }
+
+
+  __PACKAGE__->meta->make_immutable;
 1;
 
 ### main pod documentation begin ###

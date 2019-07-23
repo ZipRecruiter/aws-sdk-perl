@@ -1,15 +1,51 @@
 [%- -%]
 package [% inner_class %];
   use Moose;
+  use MooseX::ClassAttribute;
+  use Types::Standard -types;
+  use namespace::clean -except => 'meta';
   with 'Paws::API::MapParser';
 
-  use MooseX::ClassAttribute;
   class_has xml_keys =>(is => 'ro', default => '[% iclass.key.locationName || 'key' %]');
   class_has xml_values =>(is => 'ro', default => '[% iclass.value.locationName || 'value' %]');
 
 [% FOREACH param_name=keys_shape.enum.sort -%]
   has [% param_name %] => (is => 'ro', isa => '[% c.get_caller_class_type(iclass.value.shape) %]');
 [% END -%]
+
+[%
+  members = {};
+  FOREACH param_name=keys_shape.enum.sort;
+    members.$param_name = { shape => iclass.value.shape };
+  END;
+  INCLUDE object_raw_constructor.tt members = members, enum = 1;
+%]
+
+  sub new_from_xml {
+    my ($class, $xml) = @_;
+
+    my $res = {};
+    for ($xml->childNodes) {
+      if (my $key = $_->
+      if (!defined(my $nodeName = $_->nodeName)) {
+[% FOREACH param_name IN members.keys.sort -%]
+  [%- member_shape_name = members.$param_name.shape -%]
+  [%- member = c.shape(member_shape_name) -%]
+      } elsif ($nodeName eq "[% member.locationName || param_name %]") {
+        my $key = "[% param_name %]";
+[% FILTER indent('        ') %]
+[%- c.perltidy_source(member.type_information.from_xml) %]
+[%- END %]
+[% END %]
+      } else {
+        # warn "Unrecognized element $nodeName";
+      }
+    }
+
+    return $class->new_with_coercions($res);
+  }
+
+  __PACKAGE__->meta->make_immutable;
 1;
 
 [% INCLUDE 'map_enum_documentation.tt' %]

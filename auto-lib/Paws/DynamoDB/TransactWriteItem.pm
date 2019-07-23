@@ -1,9 +1,186 @@
 package Paws::DynamoDB::TransactWriteItem;
   use Moose;
-  has ConditionCheck => (is => 'ro', isa => 'Paws::DynamoDB::ConditionCheck');
-  has Delete => (is => 'ro', isa => 'Paws::DynamoDB::Delete');
-  has Put => (is => 'ro', isa => 'Paws::DynamoDB::Put');
-  has Update => (is => 'ro', isa => 'Paws::DynamoDB::Update');
+  use Types::Standard -types;
+  use namespace::clean -except => 'meta';
+  with 'Paws::API::Object';
+
+  has ConditionCheck => (is => 'ro', isa => InstanceOf['Paws::DynamoDB::ConditionCheck']);
+  has Delete => (is => 'ro', isa => InstanceOf['Paws::DynamoDB::Delete']);
+  has Put => (is => 'ro', isa => InstanceOf['Paws::DynamoDB::Put']);
+  has Update => (is => 'ro', isa => InstanceOf['Paws::DynamoDB::Update']);
+
+  sub new_with_coercions {
+    my ($class, $args) = @_;
+
+    my %res = %$args;
+    if (exists $args->{ConditionCheck}) {
+      $res{ConditionCheck} = (map {
+            ref($_) eq 'Paws::DynamoDB::ConditionCheck' ? $_ : do {
+              require Paws::DynamoDB::ConditionCheck;
+              Paws::DynamoDB::ConditionCheck->new_with_coercions($_);
+              }
+      } ($args->{ConditionCheck}))[0];
+    }
+    if (exists $args->{Delete}) {
+      $res{Delete} = (map {
+            ref($_) eq 'Paws::DynamoDB::Delete' ? $_ : do {
+              require Paws::DynamoDB::Delete;
+              Paws::DynamoDB::Delete->new_with_coercions($_);
+              }
+      } ($args->{Delete}))[0];
+    }
+    if (exists $args->{Put}) {
+      $res{Put} = (map {
+            ref($_) eq 'Paws::DynamoDB::Put' ? $_ : do {
+              require Paws::DynamoDB::Put;
+              Paws::DynamoDB::Put->new_with_coercions($_);
+              }
+      } ($args->{Put}))[0];
+    }
+    if (exists $args->{Update}) {
+      $res{Update} = (map {
+            ref($_) eq 'Paws::DynamoDB::Update' ? $_ : do {
+              require Paws::DynamoDB::Update;
+              Paws::DynamoDB::Update->new_with_coercions($_);
+              }
+      } ($args->{Update}))[0];
+    }
+
+    return $class->new(\%res);
+  }
+
+  sub new_from_xml {
+    my ($class, $xml) = @_;
+
+    my $res = {};
+    for ($xml->childNodes) {
+      if (!defined(my $nodeName = $_->nodeName)) {
+      } elsif ($nodeName eq "ConditionCheck") {
+        my $key = "ConditionCheck";
+            $res->{$key} = do {
+              require Paws::DynamoDB::ConditionCheck;
+              Paws::DynamoDB::ConditionCheck->new_from_xml($_);
+            };
+      } elsif ($nodeName eq "Delete") {
+        my $key = "Delete";
+            $res->{$key} = do {
+              require Paws::DynamoDB::Delete;
+              Paws::DynamoDB::Delete->new_from_xml($_);
+            };
+      } elsif ($nodeName eq "Put") {
+        my $key = "Put";
+            $res->{$key} =
+              do { require Paws::DynamoDB::Put; Paws::DynamoDB::Put->new_from_xml($_) };
+      } elsif ($nodeName eq "Update") {
+        my $key = "Update";
+            $res->{$key} = do {
+              require Paws::DynamoDB::Update;
+              Paws::DynamoDB::Update->new_from_xml($_);
+            };
+
+      } else {
+        # warn "Unrecognized element $nodeName";
+      }
+    }
+
+    return $class->new_with_coercions($res);
+  }
+
+  sub to_hash_data {
+    my ($self) = @_;
+
+    my %res;
+    if (exists $self->{ConditionCheck}) {
+      $res{ConditionCheck} = (map {
+            $_->to_hash_data
+      } ($self->ConditionCheck))[0];
+    }
+    if (exists $self->{Delete}) {
+      $res{Delete} = (map {
+            $_->to_hash_data
+      } ($self->Delete))[0];
+    }
+    if (exists $self->{Put}) {
+      $res{Put} = (map {
+            $_->to_hash_data
+      } ($self->Put))[0];
+    }
+    if (exists $self->{Update}) {
+      $res{Update} = (map {
+            $_->to_hash_data
+      } ($self->Update))[0];
+    }
+
+    return \%res;
+  }
+
+  sub to_json_data {
+    my ($self) = @_;
+
+    my %res;
+    if (exists $self->{ConditionCheck}) {
+      $res{ConditionCheck} = (map {
+            $_->to_json_data
+      } ($self->ConditionCheck))[0];
+    }
+    if (exists $self->{Delete}) {
+      $res{Delete} = (map {
+            $_->to_json_data
+      } ($self->Delete))[0];
+    }
+    if (exists $self->{Put}) {
+      $res{Put} = (map {
+            $_->to_json_data
+      } ($self->Put))[0];
+    }
+    if (exists $self->{Update}) {
+      $res{Update} = (map {
+            $_->to_json_data
+      } ($self->Update))[0];
+    }
+
+    return \%res;
+  }
+
+  sub to_parameter_data {
+    my ($self, $res, $prefix) = @_;
+    $res //= {};
+    $prefix = defined $prefix ? "$prefix." : "";
+
+
+    if (exists $self->{ConditionCheck}) {
+      my $key = "${prefix}ConditionCheck";
+      do {
+            $_->to_parameter_data( $res, $key );
+      } for $self->ConditionCheck;
+    }
+
+    if (exists $self->{Delete}) {
+      my $key = "${prefix}Delete";
+      do {
+            $_->to_parameter_data( $res, $key );
+      } for $self->Delete;
+    }
+
+    if (exists $self->{Put}) {
+      my $key = "${prefix}Put";
+      do {
+            $_->to_parameter_data( $res, $key );
+      } for $self->Put;
+    }
+
+    if (exists $self->{Update}) {
+      my $key = "${prefix}Update";
+      do {
+            $_->to_parameter_data( $res, $key );
+      } for $self->Update;
+    }
+
+    return $res;
+  }
+
+
+  __PACKAGE__->meta->make_immutable;
 1;
 
 ### main pod documentation begin ###

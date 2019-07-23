@@ -1,11 +1,160 @@
 
 package Paws::DynamoDB::DeleteItemOutput;
   use Moose;
-  has Attributes => (is => 'ro', isa => 'Paws::DynamoDB::AttributeMap');
-  has ConsumedCapacity => (is => 'ro', isa => 'Paws::DynamoDB::ConsumedCapacity');
-  has ItemCollectionMetrics => (is => 'ro', isa => 'Paws::DynamoDB::ItemCollectionMetrics');
+  use Types::Standard -types;
+  use namespace::clean -except => 'meta';
+  with 'Paws::API::CallResult';
+
+  has Attributes => (is => 'ro', isa => InstanceOf['Paws::DynamoDB::AttributeMap']);
+  has ConsumedCapacity => (is => 'ro', isa => InstanceOf['Paws::DynamoDB::ConsumedCapacity']);
+  has ItemCollectionMetrics => (is => 'ro', isa => InstanceOf['Paws::DynamoDB::ItemCollectionMetrics']);
 
   has _request_id => (is => 'ro', isa => 'Str');
+
+  sub new_with_coercions {
+    my ($class, $args) = @_;
+
+    my %res = %$args;
+    if (exists $args->{Attributes}) {
+      $res{Attributes} = (map {
+            ref($_) eq 'Paws::DynamoDB::AttributeMap' ? $_ : do {
+              require Paws::DynamoDB::AttributeMap;
+              Paws::DynamoDB::AttributeMap->new_with_coercions($_);
+              }
+      } ($args->{Attributes}))[0];
+    }
+    if (exists $args->{ConsumedCapacity}) {
+      $res{ConsumedCapacity} = (map {
+            ref($_) eq 'Paws::DynamoDB::ConsumedCapacity' ? $_ : do {
+              require Paws::DynamoDB::ConsumedCapacity;
+              Paws::DynamoDB::ConsumedCapacity->new_with_coercions($_);
+              }
+      } ($args->{ConsumedCapacity}))[0];
+    }
+    if (exists $args->{ItemCollectionMetrics}) {
+      $res{ItemCollectionMetrics} = (map {
+            ref($_) eq 'Paws::DynamoDB::ItemCollectionMetrics' ? $_ : do {
+              require Paws::DynamoDB::ItemCollectionMetrics;
+              Paws::DynamoDB::ItemCollectionMetrics->new_with_coercions($_);
+              }
+      } ($args->{ItemCollectionMetrics}))[0];
+    }
+
+    return $class->new(\%res);
+  }
+
+  sub new_from_xml {
+    my ($class, $xml) = @_;
+
+    my $res = {};
+    for ($xml->childNodes) {
+      if (!defined(my $nodeName = $_->nodeName)) {
+      } elsif ($nodeName eq "Attributes") {
+        my $key = "Attributes";
+            do {
+              require Paws::DynamoDB::AttributeMap;
+              Paws::DynamoDB::AttributeMap->read_xml( $_, $res, $key );
+            };
+      } elsif ($nodeName eq "ConsumedCapacity") {
+        my $key = "ConsumedCapacity";
+            $res->{$key} = do {
+              require Paws::DynamoDB::ConsumedCapacity;
+              Paws::DynamoDB::ConsumedCapacity->new_from_xml($_);
+            };
+      } elsif ($nodeName eq "ItemCollectionMetrics") {
+        my $key = "ItemCollectionMetrics";
+            $res->{$key} = do {
+              require Paws::DynamoDB::ItemCollectionMetrics;
+              Paws::DynamoDB::ItemCollectionMetrics->new_from_xml($_);
+            };
+
+      } else {
+        # warn "Unrecognized element $nodeName";
+      }
+    }
+
+    return $class->new_with_coercions($res);
+  }
+
+  sub to_hash_data {
+    my ($self) = @_;
+
+    my %res;
+    if (exists $self->{Attributes}) {
+      $res{Attributes} = (map {
+            $_->to_hash_data
+      } ($self->Attributes))[0];
+    }
+    if (exists $self->{ConsumedCapacity}) {
+      $res{ConsumedCapacity} = (map {
+            $_->to_hash_data
+      } ($self->ConsumedCapacity))[0];
+    }
+    if (exists $self->{ItemCollectionMetrics}) {
+      $res{ItemCollectionMetrics} = (map {
+            $_->to_hash_data
+      } ($self->ItemCollectionMetrics))[0];
+    }
+
+    return \%res;
+  }
+
+  sub to_json_data {
+    my ($self) = @_;
+
+    my %res;
+    if (exists $self->{Attributes}) {
+      $res{Attributes} = (map {
+            $_->to_json_data
+      } ($self->Attributes))[0];
+    }
+    if (exists $self->{ConsumedCapacity}) {
+      $res{ConsumedCapacity} = (map {
+            $_->to_json_data
+      } ($self->ConsumedCapacity))[0];
+    }
+    if (exists $self->{ItemCollectionMetrics}) {
+      $res{ItemCollectionMetrics} = (map {
+            $_->to_json_data
+      } ($self->ItemCollectionMetrics))[0];
+    }
+
+    return \%res;
+  }
+
+  sub to_parameter_data {
+    my ($self, $res, $prefix) = @_;
+    $res //= {};
+    $prefix = defined $prefix ? "$prefix." : "";
+
+
+    if (exists $self->{Attributes}) {
+      my $key = "${prefix}Attributes";
+      do {
+            $_->to_parameter_data( $res, $key );
+      } for $self->Attributes;
+    }
+
+    if (exists $self->{ConsumedCapacity}) {
+      my $key = "${prefix}ConsumedCapacity";
+      do {
+            $_->to_parameter_data( $res, $key );
+      } for $self->ConsumedCapacity;
+    }
+
+    if (exists $self->{ItemCollectionMetrics}) {
+      my $key = "${prefix}ItemCollectionMetrics";
+      do {
+            $_->to_parameter_data( $res, $key );
+      } for $self->ItemCollectionMetrics;
+    }
+
+    return $res;
+  }
+
+
+  __PACKAGE__->meta->make_immutable;
+1;
 
 ### main pod documentation begin ###
 
@@ -75,4 +224,3 @@ the precision or accuracy of the estimate.
 
 =cut
 
-1;

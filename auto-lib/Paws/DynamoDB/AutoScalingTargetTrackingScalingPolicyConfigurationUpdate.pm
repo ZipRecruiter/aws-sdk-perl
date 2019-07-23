@@ -1,9 +1,165 @@
 package Paws::DynamoDB::AutoScalingTargetTrackingScalingPolicyConfigurationUpdate;
   use Moose;
-  has DisableScaleIn => (is => 'ro', isa => 'Bool');
-  has ScaleInCooldown => (is => 'ro', isa => 'Int');
-  has ScaleOutCooldown => (is => 'ro', isa => 'Int');
-  has TargetValue => (is => 'ro', isa => 'Num', required => 1);
+  use Types::Standard -types;
+  use namespace::clean -except => 'meta';
+  with 'Paws::API::Object';
+
+  has DisableScaleIn => (is => 'ro', isa => Bool);
+  has ScaleInCooldown => (is => 'ro', isa => Int);
+  has ScaleOutCooldown => (is => 'ro', isa => Int);
+  has TargetValue => (is => 'ro', isa => Num, required => 1);
+
+  sub new_with_coercions {
+    my ($class, $args) = @_;
+
+    my %res = %$args;
+    if (exists $args->{DisableScaleIn}) {
+      $res{DisableScaleIn} = (map {
+            0 + !!$_
+      } ($args->{DisableScaleIn}))[0];
+    }
+    if (exists $args->{ScaleInCooldown}) {
+      $res{ScaleInCooldown} = (map {
+            int($_)
+      } ($args->{ScaleInCooldown}))[0];
+    }
+    if (exists $args->{ScaleOutCooldown}) {
+      $res{ScaleOutCooldown} = (map {
+            int($_)
+      } ($args->{ScaleOutCooldown}))[0];
+    }
+    if (exists $args->{TargetValue}) {
+      $res{TargetValue} = (map {
+            0 + $_
+      } ($args->{TargetValue}))[0];
+    }
+
+    return $class->new(\%res);
+  }
+
+  sub new_from_xml {
+    my ($class, $xml) = @_;
+
+    my $res = {};
+    for ($xml->childNodes) {
+      if (!defined(my $nodeName = $_->nodeName)) {
+      } elsif ($nodeName eq "DisableScaleIn") {
+        my $key = "DisableScaleIn";
+            $res->{$key} =
+              do { my $d = $_->nodeValue // ''; $d eq "true" || $d eq "1" };
+      } elsif ($nodeName eq "ScaleInCooldown") {
+        my $key = "ScaleInCooldown";
+            $res->{$key} = int( $_->nodeValue // 0 );
+      } elsif ($nodeName eq "ScaleOutCooldown") {
+        my $key = "ScaleOutCooldown";
+            $res->{$key} = int( $_->nodeValue // 0 );
+      } elsif ($nodeName eq "TargetValue") {
+        my $key = "TargetValue";
+            $res->{$key} = 0 + ( $_->nodeValue // 0 );
+
+      } else {
+        # warn "Unrecognized element $nodeName";
+      }
+    }
+
+    return $class->new_with_coercions($res);
+  }
+
+  sub to_hash_data {
+    my ($self) = @_;
+
+    my %res;
+    if (exists $self->{DisableScaleIn}) {
+      $res{DisableScaleIn} = (map {
+            0 + !!$_
+      } ($self->DisableScaleIn))[0];
+    }
+    if (exists $self->{ScaleInCooldown}) {
+      $res{ScaleInCooldown} = (map {
+            int($_)
+      } ($self->ScaleInCooldown))[0];
+    }
+    if (exists $self->{ScaleOutCooldown}) {
+      $res{ScaleOutCooldown} = (map {
+            int($_)
+      } ($self->ScaleOutCooldown))[0];
+    }
+    if (exists $self->{TargetValue}) {
+      $res{TargetValue} = (map {
+            0 + $_
+      } ($self->TargetValue))[0];
+    }
+
+    return \%res;
+  }
+
+  sub to_json_data {
+    my ($self) = @_;
+
+    my %res;
+    if (exists $self->{DisableScaleIn}) {
+      $res{DisableScaleIn} = (map {
+            $_ ? \1 : \0
+      } ($self->DisableScaleIn))[0];
+    }
+    if (exists $self->{ScaleInCooldown}) {
+      $res{ScaleInCooldown} = (map {
+            int($_)
+      } ($self->ScaleInCooldown))[0];
+    }
+    if (exists $self->{ScaleOutCooldown}) {
+      $res{ScaleOutCooldown} = (map {
+            int($_)
+      } ($self->ScaleOutCooldown))[0];
+    }
+    if (exists $self->{TargetValue}) {
+      $res{TargetValue} = (map {
+            0 + $_
+      } ($self->TargetValue))[0];
+    }
+
+    return \%res;
+  }
+
+  sub to_parameter_data {
+    my ($self, $res, $prefix) = @_;
+    $res //= {};
+    $prefix = defined $prefix ? "$prefix." : "";
+
+
+    if (exists $self->{DisableScaleIn}) {
+      my $key = "${prefix}DisableScaleIn";
+      do {
+            $res->{$key} = $_ ? "true" : "false";
+      } for $self->DisableScaleIn;
+    }
+
+    if (exists $self->{ScaleInCooldown}) {
+      my $key = "${prefix}ScaleInCooldown";
+      do {
+            $res->{$key} = int($_);
+      } for $self->ScaleInCooldown;
+    }
+
+    if (exists $self->{ScaleOutCooldown}) {
+      my $key = "${prefix}ScaleOutCooldown";
+      do {
+            $res->{$key} = int($_);
+      } for $self->ScaleOutCooldown;
+    }
+
+    if (exists $self->{TargetValue}) {
+      my $key = "${prefix}TargetValue";
+      do {
+            $res->{$key} = 0 + $_;
+      } for $self->TargetValue;
+    }
+
+    return $res;
+  }
+
+
+  __PACKAGE__->meta->make_immutable;
 1;
 
 ### main pod documentation begin ###

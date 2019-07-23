@@ -1,18 +1,223 @@
 
 package Paws::DynamoDB::ListBackups;
   use Moose;
-  has BackupType => (is => 'ro', isa => 'Str');
-  has ExclusiveStartBackupArn => (is => 'ro', isa => 'Str');
-  has Limit => (is => 'ro', isa => 'Int');
-  has TableName => (is => 'ro', isa => 'Str');
-  has TimeRangeLowerBound => (is => 'ro', isa => 'Str');
-  has TimeRangeUpperBound => (is => 'ro', isa => 'Str');
-
+  use Types::Standard -types;
   use MooseX::ClassAttribute;
+  use namespace::clean -except => 'meta';
+  with 'Paws::API::CallArgs';
+
+  has BackupType => (is => 'ro', isa => Str);
+  has ExclusiveStartBackupArn => (is => 'ro', isa => Str);
+  has Limit => (is => 'ro', isa => Int);
+  has TableName => (is => 'ro', isa => Str);
+  has TimeRangeLowerBound => (is => 'ro', isa => Str);
+  has TimeRangeUpperBound => (is => 'ro', isa => Str);
+
 
   class_has _api_call => (isa => 'Str', is => 'ro', default => 'ListBackups');
   class_has _returns => (isa => 'Str', is => 'ro', default => 'Paws::DynamoDB::ListBackupsOutput');
   class_has _result_key => (isa => 'Str', is => 'ro');
+
+  sub new_with_coercions {
+    my ($class, $args) = @_;
+
+    my %res = %$args;
+    if (exists $args->{BackupType}) {
+      $res{BackupType} = (map {
+            "$_"
+      } ($args->{BackupType}))[0];
+    }
+    if (exists $args->{ExclusiveStartBackupArn}) {
+      $res{ExclusiveStartBackupArn} = (map {
+            "$_"
+      } ($args->{ExclusiveStartBackupArn}))[0];
+    }
+    if (exists $args->{Limit}) {
+      $res{Limit} = (map {
+            int($_)
+      } ($args->{Limit}))[0];
+    }
+    if (exists $args->{TableName}) {
+      $res{TableName} = (map {
+            "$_"
+      } ($args->{TableName}))[0];
+    }
+    if (exists $args->{TimeRangeLowerBound}) {
+      $res{TimeRangeLowerBound} = (map {
+            "$_"
+      } ($args->{TimeRangeLowerBound}))[0];
+    }
+    if (exists $args->{TimeRangeUpperBound}) {
+      $res{TimeRangeUpperBound} = (map {
+            "$_"
+      } ($args->{TimeRangeUpperBound}))[0];
+    }
+
+    return $class->new(\%res);
+  }
+
+  sub new_from_xml {
+    my ($class, $xml) = @_;
+
+    my $res = {};
+    for ($xml->childNodes) {
+      if (!defined(my $nodeName = $_->nodeName)) {
+      } elsif ($nodeName eq "BackupType") {
+        my $key = "BackupType";
+            $res->{$key} = "" . ( $_->nodeValue // '' );
+      } elsif ($nodeName eq "ExclusiveStartBackupArn") {
+        my $key = "ExclusiveStartBackupArn";
+            $res->{$key} = "" . ( $_->nodeValue // '' );
+      } elsif ($nodeName eq "Limit") {
+        my $key = "Limit";
+            $res->{$key} = int( $_->nodeValue // 0 );
+      } elsif ($nodeName eq "TableName") {
+        my $key = "TableName";
+            $res->{$key} = "" . ( $_->nodeValue // '' );
+      } elsif ($nodeName eq "TimeRangeLowerBound") {
+        my $key = "TimeRangeLowerBound";
+            $res->{$key} = "" . ( $_->nodeValue // '' );
+      } elsif ($nodeName eq "TimeRangeUpperBound") {
+        my $key = "TimeRangeUpperBound";
+            $res->{$key} = "" . ( $_->nodeValue // '' );
+
+      } else {
+        # warn "Unrecognized element $nodeName";
+      }
+    }
+
+    return $class->new_with_coercions($res);
+  }
+
+  sub to_hash_data {
+    my ($self) = @_;
+
+    my %res;
+    if (exists $self->{BackupType}) {
+      $res{BackupType} = (map {
+            "$_"
+      } ($self->BackupType))[0];
+    }
+    if (exists $self->{ExclusiveStartBackupArn}) {
+      $res{ExclusiveStartBackupArn} = (map {
+            "$_"
+      } ($self->ExclusiveStartBackupArn))[0];
+    }
+    if (exists $self->{Limit}) {
+      $res{Limit} = (map {
+            int($_)
+      } ($self->Limit))[0];
+    }
+    if (exists $self->{TableName}) {
+      $res{TableName} = (map {
+            "$_"
+      } ($self->TableName))[0];
+    }
+    if (exists $self->{TimeRangeLowerBound}) {
+      $res{TimeRangeLowerBound} = (map {
+            "$_"
+      } ($self->TimeRangeLowerBound))[0];
+    }
+    if (exists $self->{TimeRangeUpperBound}) {
+      $res{TimeRangeUpperBound} = (map {
+            "$_"
+      } ($self->TimeRangeUpperBound))[0];
+    }
+
+    return \%res;
+  }
+
+  sub to_json_data {
+    my ($self) = @_;
+
+    my %res;
+    if (exists $self->{BackupType}) {
+      $res{BackupType} = (map {
+            "$_"
+      } ($self->BackupType))[0];
+    }
+    if (exists $self->{ExclusiveStartBackupArn}) {
+      $res{ExclusiveStartBackupArn} = (map {
+            "$_"
+      } ($self->ExclusiveStartBackupArn))[0];
+    }
+    if (exists $self->{Limit}) {
+      $res{Limit} = (map {
+            int($_)
+      } ($self->Limit))[0];
+    }
+    if (exists $self->{TableName}) {
+      $res{TableName} = (map {
+            "$_"
+      } ($self->TableName))[0];
+    }
+    if (exists $self->{TimeRangeLowerBound}) {
+      $res{TimeRangeLowerBound} = (map {
+            "$_"
+      } ($self->TimeRangeLowerBound))[0];
+    }
+    if (exists $self->{TimeRangeUpperBound}) {
+      $res{TimeRangeUpperBound} = (map {
+            "$_"
+      } ($self->TimeRangeUpperBound))[0];
+    }
+
+    return \%res;
+  }
+
+  sub to_parameter_data {
+    my ($self, $res, $prefix) = @_;
+    $res //= {};
+    $prefix = defined $prefix ? "$prefix." : "";
+
+
+    if (exists $self->{BackupType}) {
+      my $key = "${prefix}BackupType";
+      do {
+            $res->{$key} = "$_";
+      } for $self->BackupType;
+    }
+
+    if (exists $self->{ExclusiveStartBackupArn}) {
+      my $key = "${prefix}ExclusiveStartBackupArn";
+      do {
+            $res->{$key} = "$_";
+      } for $self->ExclusiveStartBackupArn;
+    }
+
+    if (exists $self->{Limit}) {
+      my $key = "${prefix}Limit";
+      do {
+            $res->{$key} = int($_);
+      } for $self->Limit;
+    }
+
+    if (exists $self->{TableName}) {
+      my $key = "${prefix}TableName";
+      do {
+            $res->{$key} = "$_";
+      } for $self->TableName;
+    }
+
+    if (exists $self->{TimeRangeLowerBound}) {
+      my $key = "${prefix}TimeRangeLowerBound";
+      do {
+            $res->{$key} = "$_";
+      } for $self->TimeRangeLowerBound;
+    }
+
+    if (exists $self->{TimeRangeUpperBound}) {
+      my $key = "${prefix}TimeRangeUpperBound";
+      do {
+            $res->{$key} = "$_";
+      } for $self->TimeRangeUpperBound;
+    }
+
+    return $res;
+  }
+
+
+  __PACKAGE__->meta->make_immutable;
 1;
 
 ### main pod documentation begin ###

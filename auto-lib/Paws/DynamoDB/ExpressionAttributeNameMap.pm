@@ -1,8 +1,67 @@
 package Paws::DynamoDB::ExpressionAttributeNameMap;
   use Moose;
-  with 'Paws::API::StrToNativeMapParser';
+  use Types::Standard -types;
+  use namespace::clean -except => 'meta';
+  with 'Paws::API::MapStr';
 
-  has Map => (is => 'ro', isa => 'HashRef[Maybe[Str]]');
+  has Map => (is => 'ro', isa => HashRef[Str]);
+
+  sub new_with_coercions {
+    my ($class, $args) = @_;
+    return $class->new({
+      Map => {
+        map {
+          ( $_ => (map {
+            "$_"
+          } ($args->{$_}))[0] );
+        } keys %$args,
+      }
+    });
+  }
+
+  sub to_json_data {
+    my ($self) = @_;
+    return {
+      map {
+        ( $_ => (map {
+          "$_"
+        } ($self->Map->{$_}))[0] );
+      } keys %{$self->Map}
+    };
+  }
+
+  sub to_hash_data {
+    my ($self) = @_;
+    return {
+      map {
+        ( $_ => (map {
+          "$_"
+        } ($self->Map->{$_}))[0] );
+      } keys %{$self->Map}
+    };
+  }
+
+  sub to_parameter_data {
+    my ($self, $res, $prefix) = @_;
+    $res //= {};
+    $prefix = defined $prefix ? "$prefix." : "";
+
+    my $map = $self->Map;
+
+    my $i = 1;
+    for my $map_key (keys %$map) {
+      $res->{"${prefix}entry.${i}.key"} = $map_key;
+      my $key = "${prefix}entry.${i}.value";
+      do {
+          $res->{$key} = "$_";
+      } for $map->{$map_key};
+      $i++;
+    }
+
+    return $res;
+  }
+
+  __PACKAGE__->meta->make_immutable;
 1;
 
 ### main pod documentation begin ###

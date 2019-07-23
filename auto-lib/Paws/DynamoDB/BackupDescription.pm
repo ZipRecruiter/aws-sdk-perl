@@ -1,8 +1,156 @@
 package Paws::DynamoDB::BackupDescription;
   use Moose;
-  has BackupDetails => (is => 'ro', isa => 'Paws::DynamoDB::BackupDetails');
-  has SourceTableDetails => (is => 'ro', isa => 'Paws::DynamoDB::SourceTableDetails');
-  has SourceTableFeatureDetails => (is => 'ro', isa => 'Paws::DynamoDB::SourceTableFeatureDetails');
+  use Types::Standard -types;
+  use namespace::clean -except => 'meta';
+  with 'Paws::API::Object';
+
+  has BackupDetails => (is => 'ro', isa => InstanceOf['Paws::DynamoDB::BackupDetails']);
+  has SourceTableDetails => (is => 'ro', isa => InstanceOf['Paws::DynamoDB::SourceTableDetails']);
+  has SourceTableFeatureDetails => (is => 'ro', isa => InstanceOf['Paws::DynamoDB::SourceTableFeatureDetails']);
+
+  sub new_with_coercions {
+    my ($class, $args) = @_;
+
+    my %res = %$args;
+    if (exists $args->{BackupDetails}) {
+      $res{BackupDetails} = (map {
+            ref($_) eq 'Paws::DynamoDB::BackupDetails' ? $_ : do {
+              require Paws::DynamoDB::BackupDetails;
+              Paws::DynamoDB::BackupDetails->new_with_coercions($_);
+              }
+      } ($args->{BackupDetails}))[0];
+    }
+    if (exists $args->{SourceTableDetails}) {
+      $res{SourceTableDetails} = (map {
+            ref($_) eq 'Paws::DynamoDB::SourceTableDetails' ? $_ : do {
+              require Paws::DynamoDB::SourceTableDetails;
+              Paws::DynamoDB::SourceTableDetails->new_with_coercions($_);
+              }
+      } ($args->{SourceTableDetails}))[0];
+    }
+    if (exists $args->{SourceTableFeatureDetails}) {
+      $res{SourceTableFeatureDetails} = (map {
+            ref($_) eq 'Paws::DynamoDB::SourceTableFeatureDetails' ? $_ : do {
+              require Paws::DynamoDB::SourceTableFeatureDetails;
+              Paws::DynamoDB::SourceTableFeatureDetails->new_with_coercions($_);
+              }
+      } ($args->{SourceTableFeatureDetails}))[0];
+    }
+
+    return $class->new(\%res);
+  }
+
+  sub new_from_xml {
+    my ($class, $xml) = @_;
+
+    my $res = {};
+    for ($xml->childNodes) {
+      if (!defined(my $nodeName = $_->nodeName)) {
+      } elsif ($nodeName eq "BackupDetails") {
+        my $key = "BackupDetails";
+            $res->{$key} = do {
+              require Paws::DynamoDB::BackupDetails;
+              Paws::DynamoDB::BackupDetails->new_from_xml($_);
+            };
+      } elsif ($nodeName eq "SourceTableDetails") {
+        my $key = "SourceTableDetails";
+            $res->{$key} = do {
+              require Paws::DynamoDB::SourceTableDetails;
+              Paws::DynamoDB::SourceTableDetails->new_from_xml($_);
+            };
+      } elsif ($nodeName eq "SourceTableFeatureDetails") {
+        my $key = "SourceTableFeatureDetails";
+            $res->{$key} = do {
+              require Paws::DynamoDB::SourceTableFeatureDetails;
+              Paws::DynamoDB::SourceTableFeatureDetails->new_from_xml($_);
+            };
+
+      } else {
+        # warn "Unrecognized element $nodeName";
+      }
+    }
+
+    return $class->new_with_coercions($res);
+  }
+
+  sub to_hash_data {
+    my ($self) = @_;
+
+    my %res;
+    if (exists $self->{BackupDetails}) {
+      $res{BackupDetails} = (map {
+            $_->to_hash_data
+      } ($self->BackupDetails))[0];
+    }
+    if (exists $self->{SourceTableDetails}) {
+      $res{SourceTableDetails} = (map {
+            $_->to_hash_data
+      } ($self->SourceTableDetails))[0];
+    }
+    if (exists $self->{SourceTableFeatureDetails}) {
+      $res{SourceTableFeatureDetails} = (map {
+            $_->to_hash_data
+      } ($self->SourceTableFeatureDetails))[0];
+    }
+
+    return \%res;
+  }
+
+  sub to_json_data {
+    my ($self) = @_;
+
+    my %res;
+    if (exists $self->{BackupDetails}) {
+      $res{BackupDetails} = (map {
+            $_->to_json_data
+      } ($self->BackupDetails))[0];
+    }
+    if (exists $self->{SourceTableDetails}) {
+      $res{SourceTableDetails} = (map {
+            $_->to_json_data
+      } ($self->SourceTableDetails))[0];
+    }
+    if (exists $self->{SourceTableFeatureDetails}) {
+      $res{SourceTableFeatureDetails} = (map {
+            $_->to_json_data
+      } ($self->SourceTableFeatureDetails))[0];
+    }
+
+    return \%res;
+  }
+
+  sub to_parameter_data {
+    my ($self, $res, $prefix) = @_;
+    $res //= {};
+    $prefix = defined $prefix ? "$prefix." : "";
+
+
+    if (exists $self->{BackupDetails}) {
+      my $key = "${prefix}BackupDetails";
+      do {
+            $_->to_parameter_data( $res, $key );
+      } for $self->BackupDetails;
+    }
+
+    if (exists $self->{SourceTableDetails}) {
+      my $key = "${prefix}SourceTableDetails";
+      do {
+            $_->to_parameter_data( $res, $key );
+      } for $self->SourceTableDetails;
+    }
+
+    if (exists $self->{SourceTableFeatureDetails}) {
+      my $key = "${prefix}SourceTableFeatureDetails";
+      do {
+            $_->to_parameter_data( $res, $key );
+      } for $self->SourceTableFeatureDetails;
+    }
+
+    return $res;
+  }
+
+
+  __PACKAGE__->meta->make_immutable;
 1;
 
 ### main pod documentation begin ###

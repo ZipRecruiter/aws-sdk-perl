@@ -1,8 +1,138 @@
 package Paws::DynamoDB::SSEDescription;
   use Moose;
-  has KMSMasterKeyArn => (is => 'ro', isa => 'Str');
-  has SSEType => (is => 'ro', isa => 'Str');
-  has Status => (is => 'ro', isa => 'Str');
+  use Types::Standard -types;
+  use namespace::clean -except => 'meta';
+  with 'Paws::API::Object';
+
+  has KMSMasterKeyArn => (is => 'ro', isa => Str);
+  has SSEType => (is => 'ro', isa => Str);
+  has Status => (is => 'ro', isa => Str);
+
+  sub new_with_coercions {
+    my ($class, $args) = @_;
+
+    my %res = %$args;
+    if (exists $args->{KMSMasterKeyArn}) {
+      $res{KMSMasterKeyArn} = (map {
+            "$_"
+      } ($args->{KMSMasterKeyArn}))[0];
+    }
+    if (exists $args->{SSEType}) {
+      $res{SSEType} = (map {
+            "$_"
+      } ($args->{SSEType}))[0];
+    }
+    if (exists $args->{Status}) {
+      $res{Status} = (map {
+            "$_"
+      } ($args->{Status}))[0];
+    }
+
+    return $class->new(\%res);
+  }
+
+  sub new_from_xml {
+    my ($class, $xml) = @_;
+
+    my $res = {};
+    for ($xml->childNodes) {
+      if (!defined(my $nodeName = $_->nodeName)) {
+      } elsif ($nodeName eq "KMSMasterKeyArn") {
+        my $key = "KMSMasterKeyArn";
+            $res->{$key} = "" . ( $_->nodeValue // '' );
+      } elsif ($nodeName eq "SSEType") {
+        my $key = "SSEType";
+            $res->{$key} = "" . ( $_->nodeValue // '' );
+      } elsif ($nodeName eq "Status") {
+        my $key = "Status";
+            $res->{$key} = "" . ( $_->nodeValue // '' );
+
+      } else {
+        # warn "Unrecognized element $nodeName";
+      }
+    }
+
+    return $class->new_with_coercions($res);
+  }
+
+  sub to_hash_data {
+    my ($self) = @_;
+
+    my %res;
+    if (exists $self->{KMSMasterKeyArn}) {
+      $res{KMSMasterKeyArn} = (map {
+            "$_"
+      } ($self->KMSMasterKeyArn))[0];
+    }
+    if (exists $self->{SSEType}) {
+      $res{SSEType} = (map {
+            "$_"
+      } ($self->SSEType))[0];
+    }
+    if (exists $self->{Status}) {
+      $res{Status} = (map {
+            "$_"
+      } ($self->Status))[0];
+    }
+
+    return \%res;
+  }
+
+  sub to_json_data {
+    my ($self) = @_;
+
+    my %res;
+    if (exists $self->{KMSMasterKeyArn}) {
+      $res{KMSMasterKeyArn} = (map {
+            "$_"
+      } ($self->KMSMasterKeyArn))[0];
+    }
+    if (exists $self->{SSEType}) {
+      $res{SSEType} = (map {
+            "$_"
+      } ($self->SSEType))[0];
+    }
+    if (exists $self->{Status}) {
+      $res{Status} = (map {
+            "$_"
+      } ($self->Status))[0];
+    }
+
+    return \%res;
+  }
+
+  sub to_parameter_data {
+    my ($self, $res, $prefix) = @_;
+    $res //= {};
+    $prefix = defined $prefix ? "$prefix." : "";
+
+
+    if (exists $self->{KMSMasterKeyArn}) {
+      my $key = "${prefix}KMSMasterKeyArn";
+      do {
+            $res->{$key} = "$_";
+      } for $self->KMSMasterKeyArn;
+    }
+
+    if (exists $self->{SSEType}) {
+      my $key = "${prefix}SSEType";
+      do {
+            $res->{$key} = "$_";
+      } for $self->SSEType;
+    }
+
+    if (exists $self->{Status}) {
+      my $key = "${prefix}Status";
+      do {
+            $res->{$key} = "$_";
+      } for $self->Status;
+    }
+
+    return $res;
+  }
+
+
+  __PACKAGE__->meta->make_immutable;
 1;
 
 ### main pod documentation begin ###

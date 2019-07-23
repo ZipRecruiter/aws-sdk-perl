@@ -2,14 +2,18 @@
 [%- iclass = c.input_for_operation(op_name) %]
 package [% c.api %]::[% operation.name %];
   use Moose;
+  use Types::Standard -types;
+  use MooseX::ClassAttribute;
+  use namespace::clean -except => 'meta';
+  with 'Paws::API::CallArgs';
+
 [% FOREACH param_name IN iclass.members.keys.sort -%]
   [%- member = c.shape(iclass.members.$param_name.shape) -%]
-  has [% param_name %] => (is => 'ro', isa => '[% member.perl_type %]'
+  has [% param_name %] => (is => 'ro', isa => [% member.perl_type %]
   [%- IF (iclass.members.${param_name}.locationName && iclass.members.${param_name}.locationName != param_name) %], traits => ['NameInRequest'], request_name => '[% iclass.members.${param_name}.locationName %]' [% END %]
   [%- IF (iclass.members.$param_name.streaming == 1) %], traits => ['ParamInBody'][% END %]
   [%- IF (c.required_in_shape(iclass,param_name)) %], required => 1[% END %]);
 [% END %]
-  use MooseX::ClassAttribute;
 
   class_has _api_call => (isa => 'Str', is => 'ro', default => '[% op_name %]');
   class_has _returns => (isa => 'Str', is => 'ro', default => '
@@ -17,6 +21,10 @@ package [% c.api %]::[% operation.name %];
       [%- c.api %]::[% c.shapename_for_operation_output(op_name) -%]
     [%- ELSE -%]Paws::API::Response[% END -%]');
   class_has _result_key => (isa => 'Str', is => 'ro');
+
+[% INCLUDE object_raw_constructor.tt members = iclass.members %]
+
+  __PACKAGE__->meta->make_immutable;
 1;
 
 [% INCLUDE 'callclass_documentation.tt' %]

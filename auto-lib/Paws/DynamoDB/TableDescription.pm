@@ -1,23 +1,651 @@
 package Paws::DynamoDB::TableDescription;
   use Moose;
-  has AttributeDefinitions => (is => 'ro', isa => 'ArrayRef[Paws::DynamoDB::AttributeDefinition]');
-  has BillingModeSummary => (is => 'ro', isa => 'Paws::DynamoDB::BillingModeSummary');
-  has CreationDateTime => (is => 'ro', isa => 'Str');
-  has GlobalSecondaryIndexes => (is => 'ro', isa => 'ArrayRef[Paws::DynamoDB::GlobalSecondaryIndexDescription]');
-  has ItemCount => (is => 'ro', isa => 'Int');
-  has KeySchema => (is => 'ro', isa => 'ArrayRef[Paws::DynamoDB::KeySchemaElement]');
-  has LatestStreamArn => (is => 'ro', isa => 'Str');
-  has LatestStreamLabel => (is => 'ro', isa => 'Str');
-  has LocalSecondaryIndexes => (is => 'ro', isa => 'ArrayRef[Paws::DynamoDB::LocalSecondaryIndexDescription]');
-  has ProvisionedThroughput => (is => 'ro', isa => 'Paws::DynamoDB::ProvisionedThroughputDescription');
-  has RestoreSummary => (is => 'ro', isa => 'Paws::DynamoDB::RestoreSummary');
-  has SSEDescription => (is => 'ro', isa => 'Paws::DynamoDB::SSEDescription');
-  has StreamSpecification => (is => 'ro', isa => 'Paws::DynamoDB::StreamSpecification');
-  has TableArn => (is => 'ro', isa => 'Str');
-  has TableId => (is => 'ro', isa => 'Str');
-  has TableName => (is => 'ro', isa => 'Str');
-  has TableSizeBytes => (is => 'ro', isa => 'Int');
-  has TableStatus => (is => 'ro', isa => 'Str');
+  use Types::Standard -types;
+  use namespace::clean -except => 'meta';
+  with 'Paws::API::Object';
+
+  has AttributeDefinitions => (is => 'ro', isa => ArrayRef[InstanceOf['Paws::DynamoDB::AttributeDefinition']]);
+  has BillingModeSummary => (is => 'ro', isa => InstanceOf['Paws::DynamoDB::BillingModeSummary']);
+  has CreationDateTime => (is => 'ro', isa => Str);
+  has GlobalSecondaryIndexes => (is => 'ro', isa => ArrayRef[InstanceOf['Paws::DynamoDB::GlobalSecondaryIndexDescription']]);
+  has ItemCount => (is => 'ro', isa => Int);
+  has KeySchema => (is => 'ro', isa => ArrayRef[InstanceOf['Paws::DynamoDB::KeySchemaElement']]);
+  has LatestStreamArn => (is => 'ro', isa => Str);
+  has LatestStreamLabel => (is => 'ro', isa => Str);
+  has LocalSecondaryIndexes => (is => 'ro', isa => ArrayRef[InstanceOf['Paws::DynamoDB::LocalSecondaryIndexDescription']]);
+  has ProvisionedThroughput => (is => 'ro', isa => InstanceOf['Paws::DynamoDB::ProvisionedThroughputDescription']);
+  has RestoreSummary => (is => 'ro', isa => InstanceOf['Paws::DynamoDB::RestoreSummary']);
+  has SSEDescription => (is => 'ro', isa => InstanceOf['Paws::DynamoDB::SSEDescription']);
+  has StreamSpecification => (is => 'ro', isa => InstanceOf['Paws::DynamoDB::StreamSpecification']);
+  has TableArn => (is => 'ro', isa => Str);
+  has TableId => (is => 'ro', isa => Str);
+  has TableName => (is => 'ro', isa => Str);
+  has TableSizeBytes => (is => 'ro', isa => Int);
+  has TableStatus => (is => 'ro', isa => Str);
+
+  sub new_with_coercions {
+    my ($class, $args) = @_;
+
+    my %res = %$args;
+    if (exists $args->{AttributeDefinitions}) {
+      $res{AttributeDefinitions} = (map {
+            [
+              map {
+                ref($_) eq 'Paws::DynamoDB::AttributeDefinition' ? $_ : do {
+                  require Paws::DynamoDB::AttributeDefinition;
+                  Paws::DynamoDB::AttributeDefinition->new_with_coercions($_);
+                }
+              } @$_
+            ]
+      } ($args->{AttributeDefinitions}))[0];
+    }
+    if (exists $args->{BillingModeSummary}) {
+      $res{BillingModeSummary} = (map {
+            ref($_) eq 'Paws::DynamoDB::BillingModeSummary' ? $_ : do {
+              require Paws::DynamoDB::BillingModeSummary;
+              Paws::DynamoDB::BillingModeSummary->new_with_coercions($_);
+              }
+      } ($args->{BillingModeSummary}))[0];
+    }
+    if (exists $args->{CreationDateTime}) {
+      $res{CreationDateTime} = (map {
+            "$_"
+      } ($args->{CreationDateTime}))[0];
+    }
+    if (exists $args->{GlobalSecondaryIndexes}) {
+      $res{GlobalSecondaryIndexes} = (map {
+            [
+              map {
+                ref($_) eq 'Paws::DynamoDB::GlobalSecondaryIndexDescription' ? $_ : do {
+                  require Paws::DynamoDB::GlobalSecondaryIndexDescription;
+                  Paws::DynamoDB::GlobalSecondaryIndexDescription->new_with_coercions(
+                    $_);
+                }
+              } @$_
+            ]
+      } ($args->{GlobalSecondaryIndexes}))[0];
+    }
+    if (exists $args->{ItemCount}) {
+      $res{ItemCount} = (map {
+            int($_)
+      } ($args->{ItemCount}))[0];
+    }
+    if (exists $args->{KeySchema}) {
+      $res{KeySchema} = (map {
+            [
+              map {
+                ref($_) eq 'Paws::DynamoDB::KeySchemaElement' ? $_ : do {
+                  require Paws::DynamoDB::KeySchemaElement;
+                  Paws::DynamoDB::KeySchemaElement->new_with_coercions($_);
+                }
+              } @$_
+            ]
+      } ($args->{KeySchema}))[0];
+    }
+    if (exists $args->{LatestStreamArn}) {
+      $res{LatestStreamArn} = (map {
+            "$_"
+      } ($args->{LatestStreamArn}))[0];
+    }
+    if (exists $args->{LatestStreamLabel}) {
+      $res{LatestStreamLabel} = (map {
+            "$_"
+      } ($args->{LatestStreamLabel}))[0];
+    }
+    if (exists $args->{LocalSecondaryIndexes}) {
+      $res{LocalSecondaryIndexes} = (map {
+            [
+              map {
+                ref($_) eq 'Paws::DynamoDB::LocalSecondaryIndexDescription' ? $_ : do {
+                  require Paws::DynamoDB::LocalSecondaryIndexDescription;
+                  Paws::DynamoDB::LocalSecondaryIndexDescription->new_with_coercions($_);
+                }
+              } @$_
+            ]
+      } ($args->{LocalSecondaryIndexes}))[0];
+    }
+    if (exists $args->{ProvisionedThroughput}) {
+      $res{ProvisionedThroughput} = (map {
+            ref($_) eq 'Paws::DynamoDB::ProvisionedThroughputDescription' ? $_ : do {
+              require Paws::DynamoDB::ProvisionedThroughputDescription;
+              Paws::DynamoDB::ProvisionedThroughputDescription->new_with_coercions($_);
+              }
+      } ($args->{ProvisionedThroughput}))[0];
+    }
+    if (exists $args->{RestoreSummary}) {
+      $res{RestoreSummary} = (map {
+            ref($_) eq 'Paws::DynamoDB::RestoreSummary' ? $_ : do {
+              require Paws::DynamoDB::RestoreSummary;
+              Paws::DynamoDB::RestoreSummary->new_with_coercions($_);
+              }
+      } ($args->{RestoreSummary}))[0];
+    }
+    if (exists $args->{SSEDescription}) {
+      $res{SSEDescription} = (map {
+            ref($_) eq 'Paws::DynamoDB::SSEDescription' ? $_ : do {
+              require Paws::DynamoDB::SSEDescription;
+              Paws::DynamoDB::SSEDescription->new_with_coercions($_);
+              }
+      } ($args->{SSEDescription}))[0];
+    }
+    if (exists $args->{StreamSpecification}) {
+      $res{StreamSpecification} = (map {
+            ref($_) eq 'Paws::DynamoDB::StreamSpecification' ? $_ : do {
+              require Paws::DynamoDB::StreamSpecification;
+              Paws::DynamoDB::StreamSpecification->new_with_coercions($_);
+              }
+      } ($args->{StreamSpecification}))[0];
+    }
+    if (exists $args->{TableArn}) {
+      $res{TableArn} = (map {
+            "$_"
+      } ($args->{TableArn}))[0];
+    }
+    if (exists $args->{TableId}) {
+      $res{TableId} = (map {
+            "$_"
+      } ($args->{TableId}))[0];
+    }
+    if (exists $args->{TableName}) {
+      $res{TableName} = (map {
+            "$_"
+      } ($args->{TableName}))[0];
+    }
+    if (exists $args->{TableSizeBytes}) {
+      $res{TableSizeBytes} = (map {
+            int($_)
+      } ($args->{TableSizeBytes}))[0];
+    }
+    if (exists $args->{TableStatus}) {
+      $res{TableStatus} = (map {
+            "$_"
+      } ($args->{TableStatus}))[0];
+    }
+
+    return $class->new(\%res);
+  }
+
+  sub new_from_xml {
+    my ($class, $xml) = @_;
+
+    my $res = {};
+    for ($xml->childNodes) {
+      if (!defined(my $nodeName = $_->nodeName)) {
+      } elsif ($nodeName eq "AttributeDefinitions") {
+        my $key = "AttributeDefinitions";
+            do {
+              my $tmp = $res->{$key} // [];
+              $res->{$key} = do {
+                require Paws::DynamoDB::AttributeDefinition;
+                Paws::DynamoDB::AttributeDefinition->new_from_xml($_);
+              };
+              push @$tmp, $res->{$key};
+              $res->{$key} = $tmp;
+              }
+      } elsif ($nodeName eq "BillingModeSummary") {
+        my $key = "BillingModeSummary";
+            $res->{$key} = do {
+              require Paws::DynamoDB::BillingModeSummary;
+              Paws::DynamoDB::BillingModeSummary->new_from_xml($_);
+            };
+      } elsif ($nodeName eq "CreationDateTime") {
+        my $key = "CreationDateTime";
+            $res->{$key} = "" . ( $_->nodeValue // '' );
+      } elsif ($nodeName eq "GlobalSecondaryIndexes") {
+        my $key = "GlobalSecondaryIndexes";
+            do {
+              my $tmp = $res->{$key} // [];
+              $res->{$key} = do {
+                require Paws::DynamoDB::GlobalSecondaryIndexDescription;
+                Paws::DynamoDB::GlobalSecondaryIndexDescription->new_from_xml($_);
+              };
+              push @$tmp, $res->{$key};
+              $res->{$key} = $tmp;
+              }
+      } elsif ($nodeName eq "ItemCount") {
+        my $key = "ItemCount";
+            $res->{$key} = int( $_->nodeValue // 0 );
+      } elsif ($nodeName eq "KeySchema") {
+        my $key = "KeySchema";
+            do {
+              my $tmp = $res->{$key} // [];
+              $res->{$key} = do {
+                require Paws::DynamoDB::KeySchemaElement;
+                Paws::DynamoDB::KeySchemaElement->new_from_xml($_);
+              };
+              push @$tmp, $res->{$key};
+              $res->{$key} = $tmp;
+              }
+      } elsif ($nodeName eq "LatestStreamArn") {
+        my $key = "LatestStreamArn";
+            $res->{$key} = "" . ( $_->nodeValue // '' );
+      } elsif ($nodeName eq "LatestStreamLabel") {
+        my $key = "LatestStreamLabel";
+            $res->{$key} = "" . ( $_->nodeValue // '' );
+      } elsif ($nodeName eq "LocalSecondaryIndexes") {
+        my $key = "LocalSecondaryIndexes";
+            do {
+              my $tmp = $res->{$key} // [];
+              $res->{$key} = do {
+                require Paws::DynamoDB::LocalSecondaryIndexDescription;
+                Paws::DynamoDB::LocalSecondaryIndexDescription->new_from_xml($_);
+              };
+              push @$tmp, $res->{$key};
+              $res->{$key} = $tmp;
+              }
+      } elsif ($nodeName eq "ProvisionedThroughput") {
+        my $key = "ProvisionedThroughput";
+            $res->{$key} = do {
+              require Paws::DynamoDB::ProvisionedThroughputDescription;
+              Paws::DynamoDB::ProvisionedThroughputDescription->new_from_xml($_);
+            };
+      } elsif ($nodeName eq "RestoreSummary") {
+        my $key = "RestoreSummary";
+            $res->{$key} = do {
+              require Paws::DynamoDB::RestoreSummary;
+              Paws::DynamoDB::RestoreSummary->new_from_xml($_);
+            };
+      } elsif ($nodeName eq "SSEDescription") {
+        my $key = "SSEDescription";
+            $res->{$key} = do {
+              require Paws::DynamoDB::SSEDescription;
+              Paws::DynamoDB::SSEDescription->new_from_xml($_);
+            };
+      } elsif ($nodeName eq "StreamSpecification") {
+        my $key = "StreamSpecification";
+            $res->{$key} = do {
+              require Paws::DynamoDB::StreamSpecification;
+              Paws::DynamoDB::StreamSpecification->new_from_xml($_);
+            };
+      } elsif ($nodeName eq "TableArn") {
+        my $key = "TableArn";
+            $res->{$key} = "" . ( $_->nodeValue // '' );
+      } elsif ($nodeName eq "TableId") {
+        my $key = "TableId";
+            $res->{$key} = "" . ( $_->nodeValue // '' );
+      } elsif ($nodeName eq "TableName") {
+        my $key = "TableName";
+            $res->{$key} = "" . ( $_->nodeValue // '' );
+      } elsif ($nodeName eq "TableSizeBytes") {
+        my $key = "TableSizeBytes";
+            $res->{$key} = int( $_->nodeValue // 0 );
+      } elsif ($nodeName eq "TableStatus") {
+        my $key = "TableStatus";
+            $res->{$key} = "" . ( $_->nodeValue // '' );
+
+      } else {
+        # warn "Unrecognized element $nodeName";
+      }
+    }
+
+    return $class->new_with_coercions($res);
+  }
+
+  sub to_hash_data {
+    my ($self) = @_;
+
+    my %res;
+    if (exists $self->{AttributeDefinitions}) {
+      $res{AttributeDefinitions} = (map {
+            [ map { $_->to_hash_data } @$_ ]
+      } ($self->AttributeDefinitions))[0];
+    }
+    if (exists $self->{BillingModeSummary}) {
+      $res{BillingModeSummary} = (map {
+            $_->to_hash_data
+      } ($self->BillingModeSummary))[0];
+    }
+    if (exists $self->{CreationDateTime}) {
+      $res{CreationDateTime} = (map {
+            "$_"
+      } ($self->CreationDateTime))[0];
+    }
+    if (exists $self->{GlobalSecondaryIndexes}) {
+      $res{GlobalSecondaryIndexes} = (map {
+            [ map { $_->to_hash_data } @$_ ]
+      } ($self->GlobalSecondaryIndexes))[0];
+    }
+    if (exists $self->{ItemCount}) {
+      $res{ItemCount} = (map {
+            int($_)
+      } ($self->ItemCount))[0];
+    }
+    if (exists $self->{KeySchema}) {
+      $res{KeySchema} = (map {
+            [ map { $_->to_hash_data } @$_ ]
+      } ($self->KeySchema))[0];
+    }
+    if (exists $self->{LatestStreamArn}) {
+      $res{LatestStreamArn} = (map {
+            "$_"
+      } ($self->LatestStreamArn))[0];
+    }
+    if (exists $self->{LatestStreamLabel}) {
+      $res{LatestStreamLabel} = (map {
+            "$_"
+      } ($self->LatestStreamLabel))[0];
+    }
+    if (exists $self->{LocalSecondaryIndexes}) {
+      $res{LocalSecondaryIndexes} = (map {
+            [ map { $_->to_hash_data } @$_ ]
+      } ($self->LocalSecondaryIndexes))[0];
+    }
+    if (exists $self->{ProvisionedThroughput}) {
+      $res{ProvisionedThroughput} = (map {
+            $_->to_hash_data
+      } ($self->ProvisionedThroughput))[0];
+    }
+    if (exists $self->{RestoreSummary}) {
+      $res{RestoreSummary} = (map {
+            $_->to_hash_data
+      } ($self->RestoreSummary))[0];
+    }
+    if (exists $self->{SSEDescription}) {
+      $res{SSEDescription} = (map {
+            $_->to_hash_data
+      } ($self->SSEDescription))[0];
+    }
+    if (exists $self->{StreamSpecification}) {
+      $res{StreamSpecification} = (map {
+            $_->to_hash_data
+      } ($self->StreamSpecification))[0];
+    }
+    if (exists $self->{TableArn}) {
+      $res{TableArn} = (map {
+            "$_"
+      } ($self->TableArn))[0];
+    }
+    if (exists $self->{TableId}) {
+      $res{TableId} = (map {
+            "$_"
+      } ($self->TableId))[0];
+    }
+    if (exists $self->{TableName}) {
+      $res{TableName} = (map {
+            "$_"
+      } ($self->TableName))[0];
+    }
+    if (exists $self->{TableSizeBytes}) {
+      $res{TableSizeBytes} = (map {
+            int($_)
+      } ($self->TableSizeBytes))[0];
+    }
+    if (exists $self->{TableStatus}) {
+      $res{TableStatus} = (map {
+            "$_"
+      } ($self->TableStatus))[0];
+    }
+
+    return \%res;
+  }
+
+  sub to_json_data {
+    my ($self) = @_;
+
+    my %res;
+    if (exists $self->{AttributeDefinitions}) {
+      $res{AttributeDefinitions} = (map {
+            [ map { $_->to_json_data } @$_ ]
+      } ($self->AttributeDefinitions))[0];
+    }
+    if (exists $self->{BillingModeSummary}) {
+      $res{BillingModeSummary} = (map {
+            $_->to_json_data
+      } ($self->BillingModeSummary))[0];
+    }
+    if (exists $self->{CreationDateTime}) {
+      $res{CreationDateTime} = (map {
+            "$_"
+      } ($self->CreationDateTime))[0];
+    }
+    if (exists $self->{GlobalSecondaryIndexes}) {
+      $res{GlobalSecondaryIndexes} = (map {
+            [ map { $_->to_json_data } @$_ ]
+      } ($self->GlobalSecondaryIndexes))[0];
+    }
+    if (exists $self->{ItemCount}) {
+      $res{ItemCount} = (map {
+            int($_)
+      } ($self->ItemCount))[0];
+    }
+    if (exists $self->{KeySchema}) {
+      $res{KeySchema} = (map {
+            [ map { $_->to_json_data } @$_ ]
+      } ($self->KeySchema))[0];
+    }
+    if (exists $self->{LatestStreamArn}) {
+      $res{LatestStreamArn} = (map {
+            "$_"
+      } ($self->LatestStreamArn))[0];
+    }
+    if (exists $self->{LatestStreamLabel}) {
+      $res{LatestStreamLabel} = (map {
+            "$_"
+      } ($self->LatestStreamLabel))[0];
+    }
+    if (exists $self->{LocalSecondaryIndexes}) {
+      $res{LocalSecondaryIndexes} = (map {
+            [ map { $_->to_json_data } @$_ ]
+      } ($self->LocalSecondaryIndexes))[0];
+    }
+    if (exists $self->{ProvisionedThroughput}) {
+      $res{ProvisionedThroughput} = (map {
+            $_->to_json_data
+      } ($self->ProvisionedThroughput))[0];
+    }
+    if (exists $self->{RestoreSummary}) {
+      $res{RestoreSummary} = (map {
+            $_->to_json_data
+      } ($self->RestoreSummary))[0];
+    }
+    if (exists $self->{SSEDescription}) {
+      $res{SSEDescription} = (map {
+            $_->to_json_data
+      } ($self->SSEDescription))[0];
+    }
+    if (exists $self->{StreamSpecification}) {
+      $res{StreamSpecification} = (map {
+            $_->to_json_data
+      } ($self->StreamSpecification))[0];
+    }
+    if (exists $self->{TableArn}) {
+      $res{TableArn} = (map {
+            "$_"
+      } ($self->TableArn))[0];
+    }
+    if (exists $self->{TableId}) {
+      $res{TableId} = (map {
+            "$_"
+      } ($self->TableId))[0];
+    }
+    if (exists $self->{TableName}) {
+      $res{TableName} = (map {
+            "$_"
+      } ($self->TableName))[0];
+    }
+    if (exists $self->{TableSizeBytes}) {
+      $res{TableSizeBytes} = (map {
+            int($_)
+      } ($self->TableSizeBytes))[0];
+    }
+    if (exists $self->{TableStatus}) {
+      $res{TableStatus} = (map {
+            "$_"
+      } ($self->TableStatus))[0];
+    }
+
+    return \%res;
+  }
+
+  sub to_parameter_data {
+    my ($self, $res, $prefix) = @_;
+    $res //= {};
+    $prefix = defined $prefix ? "$prefix." : "";
+
+
+    if (exists $self->{AttributeDefinitions}) {
+      my $key = "${prefix}AttributeDefinitions";
+      do {
+            for my $index ( 0 .. ( @$_ - 1 ) ) {
+              my $orig_key = $key;
+              my $key      = sprintf( '%s.member.%d', $orig_key, $index + 1 );
+              my $val      = $_->[$index];
+              do {
+                $_->to_parameter_data( $res, $key );
+                }
+                for $val;
+            }
+      } for $self->AttributeDefinitions;
+    }
+
+    if (exists $self->{BillingModeSummary}) {
+      my $key = "${prefix}BillingModeSummary";
+      do {
+            $_->to_parameter_data( $res, $key );
+      } for $self->BillingModeSummary;
+    }
+
+    if (exists $self->{CreationDateTime}) {
+      my $key = "${prefix}CreationDateTime";
+      do {
+            $res->{$key} = "$_";
+      } for $self->CreationDateTime;
+    }
+
+    if (exists $self->{GlobalSecondaryIndexes}) {
+      my $key = "${prefix}GlobalSecondaryIndexes";
+      do {
+            for my $index ( 0 .. ( @$_ - 1 ) ) {
+              my $orig_key = $key;
+              my $key      = sprintf( '%s.member.%d', $orig_key, $index + 1 );
+              my $val      = $_->[$index];
+              do {
+                $_->to_parameter_data( $res, $key );
+                }
+                for $val;
+            }
+      } for $self->GlobalSecondaryIndexes;
+    }
+
+    if (exists $self->{ItemCount}) {
+      my $key = "${prefix}ItemCount";
+      do {
+            $res->{$key} = int($_);
+      } for $self->ItemCount;
+    }
+
+    if (exists $self->{KeySchema}) {
+      my $key = "${prefix}KeySchema";
+      do {
+            for my $index ( 0 .. ( @$_ - 1 ) ) {
+              my $orig_key = $key;
+              my $key      = sprintf( '%s.member.%d', $orig_key, $index + 1 );
+              my $val      = $_->[$index];
+              do {
+                $_->to_parameter_data( $res, $key );
+                }
+                for $val;
+            }
+      } for $self->KeySchema;
+    }
+
+    if (exists $self->{LatestStreamArn}) {
+      my $key = "${prefix}LatestStreamArn";
+      do {
+            $res->{$key} = "$_";
+      } for $self->LatestStreamArn;
+    }
+
+    if (exists $self->{LatestStreamLabel}) {
+      my $key = "${prefix}LatestStreamLabel";
+      do {
+            $res->{$key} = "$_";
+      } for $self->LatestStreamLabel;
+    }
+
+    if (exists $self->{LocalSecondaryIndexes}) {
+      my $key = "${prefix}LocalSecondaryIndexes";
+      do {
+            for my $index ( 0 .. ( @$_ - 1 ) ) {
+              my $orig_key = $key;
+              my $key      = sprintf( '%s.member.%d', $orig_key, $index + 1 );
+              my $val      = $_->[$index];
+              do {
+                $_->to_parameter_data( $res, $key );
+                }
+                for $val;
+            }
+      } for $self->LocalSecondaryIndexes;
+    }
+
+    if (exists $self->{ProvisionedThroughput}) {
+      my $key = "${prefix}ProvisionedThroughput";
+      do {
+            $_->to_parameter_data( $res, $key );
+      } for $self->ProvisionedThroughput;
+    }
+
+    if (exists $self->{RestoreSummary}) {
+      my $key = "${prefix}RestoreSummary";
+      do {
+            $_->to_parameter_data( $res, $key );
+      } for $self->RestoreSummary;
+    }
+
+    if (exists $self->{SSEDescription}) {
+      my $key = "${prefix}SSEDescription";
+      do {
+            $_->to_parameter_data( $res, $key );
+      } for $self->SSEDescription;
+    }
+
+    if (exists $self->{StreamSpecification}) {
+      my $key = "${prefix}StreamSpecification";
+      do {
+            $_->to_parameter_data( $res, $key );
+      } for $self->StreamSpecification;
+    }
+
+    if (exists $self->{TableArn}) {
+      my $key = "${prefix}TableArn";
+      do {
+            $res->{$key} = "$_";
+      } for $self->TableArn;
+    }
+
+    if (exists $self->{TableId}) {
+      my $key = "${prefix}TableId";
+      do {
+            $res->{$key} = "$_";
+      } for $self->TableId;
+    }
+
+    if (exists $self->{TableName}) {
+      my $key = "${prefix}TableName";
+      do {
+            $res->{$key} = "$_";
+      } for $self->TableName;
+    }
+
+    if (exists $self->{TableSizeBytes}) {
+      my $key = "${prefix}TableSizeBytes";
+      do {
+            $res->{$key} = int($_);
+      } for $self->TableSizeBytes;
+    }
+
+    if (exists $self->{TableStatus}) {
+      my $key = "${prefix}TableStatus";
+      do {
+            $res->{$key} = "$_";
+      } for $self->TableStatus;
+    }
+
+    return $res;
+  }
+
+
+  __PACKAGE__->meta->make_immutable;
 1;
 
 ### main pod documentation begin ###
